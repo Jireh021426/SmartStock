@@ -12,6 +12,7 @@ import com.smartstock.repository.StockLocationRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 @Component
+@ConditionalOnProperty(name = "smartstock.migration.enabled", havingValue = "true", matchIfMissing = true)
 public class LegacyInventoryMigration
         implements ApplicationRunner {
 
