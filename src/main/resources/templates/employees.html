@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Employees</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main>
+
+    <div class="heading">
+        <div>
+            <h2>Employee Management</h2>
+            <p>
+                Create staff accounts, assign locations,
+                and manage employee access.
+            </p>
+        </div>
+    </div>
+
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}">
+    </p>
+
+    <p th:if="${notice}"
+       th:text="${notice}">
+    </p>
+
+    <div class="panel">
+
+        <h3>Create Employee Account</h3>
+
+        <form th:action="@{/employees/create}"
+              method="post">
+
+            <label>
+                Full Name
+                <input type="text"
+                       name="fullName"
+                       maxlength="100"
+                       required>
+            </label>
+
+            <label>
+                Username
+                <input type="text"
+                       name="username"
+                       minlength="3"
+                       maxlength="50"
+                       pattern="[A-Za-z0-9._-]+"
+                       autocomplete="off"
+                       required>
+            </label>
+
+            <label>
+                Password
+                <input type="password"
+                       name="password"
+                       minlength="12"
+                       maxlength="72"
+                       autocomplete="new-password"
+                       required>
+            </label>
+
+            <label>
+                Employee Role
+
+                <select name="role" required>
+                    <option value="">Select Role</option>
+
+                    <option th:each="role : ${roles}"
+                            th:value="${role}"
+                            th:text="${role}">
+                    </option>
+                </select>
+            </label>
+
+            <label>
+                Assigned Stall / Storage
+
+                <select name="locationId">
+                    <option value="">
+                        No Assigned Location
+                    </option>
+
+                    <option th:each="location : ${locations}"
+                            th:value="${location.id}"
+                            th:text="${location.name + ' (' + location.code + ')'}">
+                    </option>
+                </select>
+            </label>
+
+            <p>
+                <small>
+                    Sender and Receiver accounts require
+                    an assigned location.
+                </small>
+            </p>
+
+            <button class="button" type="submit">
+                Create Employee
+            </button>
+
+        </form>
+    </div>
+
+    <div class="panel">
+
+        <h3>Registered Employees</h3>
+
+        <div style="overflow-x:auto">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Assigned Location</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="employee : ${employees}">
+
+                    <td th:text="${employee.id}"></td>
+
+                    <td th:text="${employee.fullName}"></td>
+
+                    <td th:text="${employee.username}"></td>
+
+                    <td th:text="${employee.role}"></td>
+
+                    <td th:text="${employee.assignedLocation != null ? employee.assignedLocation.name : 'Not Assigned'}">
+                    </td>
+
+                    <td th:text="${employee.active ? 'ACTIVE' : 'INACTIVE'}">
+                    </td>
+
+                    <td>
+
+                        <form th:if="${employee.active}"
+                              th:action="@{/employees/deactivate}"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="employeeId"
+                                   th:value="${employee.id}">
+
+                            <button type="submit">
+                                Deactivate
+                            </button>
+                        </form>
+
+                        <form th:unless="${employee.active}"
+                              th:action="@{/employees/activate}"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="employeeId"
+                                   th:value="${employee.id}">
+
+                            <button type="submit">
+                                Activate
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(employees)}">
+                    <td colspan="7">
+                        No employee accounts found.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

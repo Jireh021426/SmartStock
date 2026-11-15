@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Inventory History</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <style>
+        .inventory-summary {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit, minmax(180px, 1fr)
+            );
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .summary-box {
+            padding: 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .summary-box h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .summary-box strong {
+            font-size: 23px;
+            color: #111827;
+        }
+
+        .inventory-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .inventory-table-wrapper table {
+            width: 100%;
+            min-width: 750px;
+        }
+
+        .inventory-table-wrapper th,
+        .inventory-table-wrapper td {
+            padding: 12px;
+            text-align: left;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .inventory-table-wrapper td:last-child {
+            white-space: normal;
+            min-width: 180px;
+        }
+
+        .movement-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .movement-in {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .movement-out {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .movement-sale {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .money {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .loss-value {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+
+        .inventory-note {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+            padding: 24px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}">
+</header>
+
+<main>
+
+    <!-- PAGE HEADING -->
+    <div class="heading">
+
+        <div>
+            <h2>Stock Movement History</h2>
+
+            <p>
+                Track supplier deliveries, sales deductions,
+                spoilage, and inventory adjustments.
+            </p>
+        </div>
+
+        <!-- ADMIN ONLY -->
+        <a class="button"
+           th:if="${canRecordMovement}"
+           th:href="@{/inventory/new}">
+            + Record Movement
+        </a>
+
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="inventory-summary">
+
+        <div class="summary-box">
+            <h3>Total Movements</h3>
+
+            <strong th:text="${#lists.size(movements)}">
+                0
+            </strong>
+        </div>
+
+        <div class="summary-box">
+            <h3>Stock-In Records</h3>
+
+            <strong
+                th:text="${#aggregates.sum(movements.![type == T(com.smartstock.model.MovementType).STOCK_IN ? 1 : 0]) ?: 0}">
+                0
+            </strong>
+        </div>
+
+        <div class="summary-box">
+            <h3>Stock-Out Records</h3>
+
+            <strong
+                th:text="${#aggregates.sum(movements.![type == T(com.smartstock.model.MovementType).STOCK_OUT ? 1 : 0]) ?: 0}">
+                0
+            </strong>
+        </div>
+
+    </div>
+
+    <!-- MOVEMENT HISTORY -->
+    <div class="panel">
+
+        <div class="inventory-table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Date / Time</th>
+                        <th>Product</th>
+                        <th>Movement</th>
+                        <th>Weight (kg)</th>
+
+                        <!-- FINANCIAL COLUMNS -->
+                        <th th:if="${canSeeInventoryFinancials}">
+                            Purchase Cost / kg
+                        </th>
+
+                        <th th:if="${canSeeInventoryFinancials}">
+                            Total Purchase Cost
+                        </th>
+
+                        <th th:if="${canSeeInventoryFinancials}">
+                            Average Cost After
+                        </th>
+
+                        <th th:if="${canSeeInventoryFinancials}">
+                            Inventory Loss
+                        </th>
+
+                        <th>Reason / Reference</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="m : ${movements}">
+
+                        <!-- DATE -->
+                        <td
+                            th:text="${#temporals.format(m.recordedAt, 'yyyy-MM-dd HH:mm:ss')}">
+                        </td>
+
+                        <!-- PRODUCT -->
+                        <td th:text="${m.productName}">
+                        </td>
+
+                        <!-- MOVEMENT TYPE -->
+                        <td>
+                            <span
+                                class="movement-badge"
+                                th:classappend="${m.type == T(com.smartstock.model.MovementType).STOCK_IN ? 'movement-in' : (m.reason != null and #strings.startsWith(m.reason, 'SALE #') ? 'movement-sale' : 'movement-out')}"
+                                th:text="${m.type == T(com.smartstock.model.MovementType).STOCK_IN ? 'STOCK IN' : (m.reason != null and #strings.startsWith(m.reason, 'SALE #') ? 'SALE' : 'STOCK OUT')}">
+                            </span>
+                        </td>
+
+                        <!-- WEIGHT -->
+                        <td
+                            th:text="${#numbers.formatDecimal(m.weightKg, 1, 3)}">
+                        </td>
+
+                        <!-- PURCHASE COST PER KG -->
+                        <td class="money"
+                            th:if="${canSeeInventoryFinancials}">
+
+                            <span
+                                th:if="${m.purchaseCostPerKg != null}"
+                                th:text="${'₱' + #numbers.formatDecimal(m.purchaseCostPerKg, 1, 2)}">
+                            </span>
+
+                            <span
+                                th:unless="${m.purchaseCostPerKg != null}">
+                                —
+                            </span>
+                        </td>
+
+                        <!-- TOTAL PURCHASE COST -->
+                        <td class="money"
+                            th:if="${canSeeInventoryFinancials}">
+
+                            <span
+                                th:if="${m.totalPurchaseCost != null}"
+                                th:text="${'₱' + #numbers.formatDecimal(m.totalPurchaseCost, 1, 2)}">
+                            </span>
+
+                            <span
+                                th:unless="${m.totalPurchaseCost != null}">
+                                —
+                            </span>
+                        </td>
+
+                        <!-- AVERAGE COST AFTER -->
+                        <td class="money"
+                            th:if="${canSeeInventoryFinancials}">
+
+                            <span
+                                th:if="${m.averageCostAfter != null}"
+                                th:text="${'₱' + #numbers.formatDecimal(m.averageCostAfter, 1, 2)}">
+                            </span>
+
+                            <span
+                                th:unless="${m.averageCostAfter != null}">
+                                —
+                            </span>
+                        </td>
+
+                        <!-- INVENTORY LOSS VALUE -->
+                        <td class="money"
+                            th:if="${canSeeInventoryFinancials}">
+
+                            <span
+                                class="loss-value"
+                                th:if="${m.inventoryLossValue != null}"
+                                th:text="${'₱' + #numbers.formatDecimal(m.inventoryLossValue, 1, 2)}">
+                            </span>
+
+                            <span
+                                th:unless="${m.inventoryLossValue != null}">
+                                —
+                            </span>
+                        </td>
+
+                        <!-- REASON -->
+                        <td th:text="${m.reason}">
+                        </td>
+
+                    </tr>
+
+                    <!-- EMPTY HISTORY -->
+                    <tr th:if="${#lists.isEmpty(movements)}">
+
+                        <td
+                            th:colspan="${canSeeInventoryFinancials ? 9 : 5}"
+                            class="empty">
+
+                            No stock movements recorded yet.
+
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- ACCOUNTING INFORMATION -->
+        <div class="inventory-note"
+             th:if="${canSeeInventoryFinancials}">
+
+            <strong>Inventory Accounting</strong>
+
+            <p>
+                <strong>Stock In:</strong>
+                Supplier deliveries increase inventory.
+                SmartStock records the purchase price,
+                total purchase value, and updated
+                weighted-average cost.
+            </p>
+
+            <p>
+                <strong>Sales:</strong>
+                Customer sales reduce inventory.
+                Their purchase costs and gross profits
+                are recorded separately in the Sales module.
+            </p>
+
+            <p>
+                <strong>Stock Out:</strong>
+                Manual stock deductions record the
+                inventory cost of the removed items.
+                These should be classified separately
+                if they represent transfers or corrections
+                rather than actual losses.
+            </p>
+
+            <p>
+                <strong>Historical Records:</strong>
+                Older movements without financial
+                information remain unchanged.
+                Missing values are displayed as a dash.
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

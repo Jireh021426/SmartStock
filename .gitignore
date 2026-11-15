@@ -1,0 +1,54 @@
+# Production and local databases
+data/
+*.mv.db
+*.trace.db
+*.h2.db
+*.db
+*.db-shm
+*.db-wal
+
+# Maven build output
+target/
+build/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.bak
+*.swp
+*~
+
+# IDE and operating system files
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+.DS_Store
+Thumbs.db
+
+# Java compiled files
+*.class
+
+# Source archives and generated backups
+*.zip
+src/main/resources/templates-backup-before-navigation/
+
+# Disabled legacy administrator bootstrap
+src/main/java/com/smartstock/config/AdminBootstrap.java.disabled

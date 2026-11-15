@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Dashboard</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main>
+
+    <div class="heading">
+        <div>
+            <h2>Business Dashboard</h2>
+
+            <p>
+                Daily sales, collections, gross profit,
+                costs and estimated losses.
+            </p>
+        </div>
+
+        <form th:action="@{/dashboard}" method="get">
+
+            <label>
+                Report date
+
+                <input type="date"
+                       name="date"
+                       th:value="${date}">
+            </label>
+
+            <button class="button" type="submit">
+                View
+            </button>
+
+        </form>
+    </div>
+
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}">
+    </p>
+
+    <p th:if="${notice}"
+       th:text="${notice}">
+    </p>
+
+    <!-- Sales, collections and gross profit -->
+
+    <div class="stats triple">
+
+        <div class="panel">
+            <small>Total sales (including utang)</small>
+            <h2 th:text="'₱' + ${revenue}"></h2>
+        </div>
+
+        <div class="panel">
+            <small>Money collected (Cash + GCash)</small>
+            <h2 th:text="'₱' + ${collected}"></h2>
+        </div>
+
+        <div class="panel">
+            <small>Gross profit on sales</small>
+            <h2 th:text="'₱' + ${gross}"></h2>
+        </div>
+
+    </div>
+
+    <!-- Costs and estimated result -->
+
+    <div class="stats triple">
+
+        <div class="panel">
+            <small>Cost of goods sold</small>
+            <h2 th:text="'₱' + ${cost}"></h2>
+        </div>
+
+        <div class="panel">
+            <small>Operating expenses</small>
+            <h2 th:text="'₱' + ${expenses}"></h2>
+        </div>
+
+        <div class="panel">
+            <small>
+                Estimated result after expenses and losses
+            </small>
+            <h2 th:text="'₱' + ${estimatedResult}"></h2>
+        </div>
+
+    </div>
+
+    <!-- Detailed breakdown -->
+
+    <div class="stats triple">
+
+        <div class="panel">
+
+            <h3>Sales breakdown</h3>
+
+            <p>
+                Cash sales:
+                <strong th:text="'₱' + ${cashSales}"></strong>
+            </p>
+
+            <p>
+                GCash sales:
+                <strong th:text="'₱' + ${gcashSales}"></strong>
+            </p>
+
+            <p>
+                Utang sales:
+                <strong th:text="'₱' + ${creditSales}"></strong>
+            </p>
+
+        </div>
+
+        <div class="panel">
+
+            <h3>Collections breakdown</h3>
+
+            <p>
+                Cash collected:
+                <strong th:text="'₱' + ${cashCollected}"></strong>
+            </p>
+
+            <p>
+                GCash collected:
+                <strong th:text="'₱' + ${gcashCollected}"></strong>
+            </p>
+
+            <p>
+                Includes repayments received on this date.
+            </p>
+
+        </div>
+
+        <div class="panel">
+
+            <h3>Inventory indicators</h3>
+
+            <p>
+                Current stock at purchase cost:
+                <strong th:text="'₱' + ${stockCostValue}"></strong>
+            </p>
+
+            <p>
+                Non-sale stock out:
+                <strong th:text="${lossKg} + ' kg'"></strong>
+            </p>
+
+            <p>
+                Estimated non-sale stock cost:
+                <strong th:text="'₱' + ${estimatedLossCost}"></strong>
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Only ADMIN and MANAGER may record expenses -->
+
+    <div class="panel" th:if="${canRecordExpense}">
+
+        <h3>Record operating expense</h3>
+
+        <form th:action="@{/expenses}" method="post">
+
+            <label>
+                Category
+
+                <select name="category">
+                    <option>Transport</option>
+                    <option>Labor</option>
+                    <option>Market Fees</option>
+                    <option>Utilities</option>
+                    <option>Other</option>
+                </select>
+            </label>
+
+            <label>
+                Amount (₱)
+
+                <input name="amount"
+                       type="number"
+                       step="0.01"
+                       min="0.01"
+                       required>
+            </label>
+
+            <label>
+                Description
+
+                <input name="description"
+                       maxlength="255"
+                       required>
+            </label>
+
+            <button class="button" type="submit">
+                Record Expense
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Expense history -->
+
+    <div class="panel">
+
+        <h3>Expenses for selected date</h3>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr th:each="e : ${dayExpenses}">
+
+                    <td th:text="${#temporals.format(e.incurredAt, 'HH:mm')}">
+                    </td>
+
+                    <td th:text="${e.category}"></td>
+
+                    <td th:text="${e.description}"></td>
+
+                    <td th:text="'₱' + ${e.amount}"></td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(dayExpenses)}">
+                    <td colspan="4">
+                        No expenses recorded for this date.
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Accounting disclaimer -->
+
+    <p>
+        <small>
+            Important: Cost is the current product cost/kg
+            captured at the moment of each sale.
+
+            Non-sale stock-out loss is estimated using today's
+            product cost, not historical batch cost.
+
+            This is an educational estimate, not an audited
+            profit or cash reconciliation.
+
+            Entering a cost of ₱0 produces misleading profit.
+        </small>
+    </p>
+
+</main>
+
+</body>
+</html>

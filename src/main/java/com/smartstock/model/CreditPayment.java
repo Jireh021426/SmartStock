@@ -1,0 +1,18 @@
+package com.smartstock.model;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+@Entity
+public class CreditPayment {
+ @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id;
+ @ManyToOne(optional=false,fetch=FetchType.EAGER) private Customer customer;
+ @Column(nullable=false,precision=14,scale=2) private BigDecimal amount;
+ @Enumerated(EnumType.STRING) @Column(nullable=false) private PaymentMethod method;
+ @Column(nullable=false) private LocalDateTime paidAt;
+ @ManyToOne(fetch=FetchType.EAGER) @JoinColumn(name="cashier_id") private Employee cashier;
+ public Employee getCashier(){return cashier;}
+ public void assignCashier(Employee employee){if(employee==null || employee.getRole()!=EmployeeRole.CASHIER) throw new IllegalArgumentException("Cashier required");cashier=employee;}
+ protected CreditPayment(){}
+ public CreditPayment(Customer customer,BigDecimal amount,PaymentMethod method){this.customer=customer;this.amount=amount;this.method=method;this.paidAt=LocalDateTime.now();}
+ public Long getId(){return id;}public Customer getCustomer(){return customer;}public BigDecimal getAmount(){return amount;}public PaymentMethod getMethod(){return method;}public LocalDateTime getPaidAt(){return paidAt;}
+}

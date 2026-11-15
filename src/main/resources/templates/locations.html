@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Stock Locations</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main>
+
+    <div class="heading">
+        <div>
+            <h2>Stock Locations</h2>
+
+            <p th:if="${isAdmin}">
+                Manage chicken stalls and storage locations.
+                Monitor stock balances and reconciliation.
+            </p>
+
+            <p th:unless="${isAdmin}">
+                View registered locations, stock balances,
+                and company inventory reconciliation.
+            </p>
+        </div>
+    </div>
+
+    <p th:if="${isAdmin}">
+        <a class="button" th:href="@{/locations/new}">
+            Add New Location
+        </a>
+    </p>
+
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}">
+    </p>
+
+    <p th:if="${success}"
+       th:text="${success}">
+    </p>
+
+    <div class="panel">
+
+        <h3>Registered Locations</h3>
+
+        <div style="overflow-x:auto">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th th:if="${isAdmin}">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="loc : ${locations}">
+
+                    <td th:text="${loc.code}"></td>
+
+                    <td th:text="${loc.name}"></td>
+
+                    <td th:text="${loc.locationType}"></td>
+
+                    <td th:text="${loc.active ? 'Active' : 'Inactive'}">
+                    </td>
+
+                    <td th:if="${isAdmin}">
+
+                        <a th:if="${loc.code != 'LEGACY'}"
+                           th:href="@{/locations/{id}/edit(id=${loc.id})}">
+                            Edit
+                        </a>
+
+                        <form th:if="${loc.active and loc.code != 'LEGACY'}"
+                              th:action="@{/locations/{id}/deactivate(id=${loc.id})}"
+                              method="post"
+                              style="display:inline">
+
+                            <button type="submit">
+                                Deactivate
+                            </button>
+
+                        </form>
+
+                        <form th:if="${not loc.active and loc.code != 'LEGACY'}"
+                              th:action="@{/locations/{id}/activate(id=${loc.id})}"
+                              method="post"
+                              style="display:inline">
+
+                            <button type="submit">
+                                Activate
+                            </button>
+
+                        </form>
+
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(locations)}">
+                    <td th:attr="colspan=${isAdmin ? 5 : 4}">
+                        No stock locations found.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="panel">
+
+        <h3>Location Inventory Balances</h3>
+
+        <p>
+            Current recorded stock for each product
+            at every registered location.
+        </p>
+
+        <div style="overflow-x:auto">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Location Code</th>
+                    <th>Location</th>
+                    <th>Product</th>
+                    <th>Stock (kg)</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="balance : ${reconciliation.balances}">
+
+                    <td th:text="${balance.locationCode}">
+                    </td>
+
+                    <td th:text="${balance.locationName}">
+                    </td>
+
+                    <td th:text="${balance.productName}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(balance.stockKg, 1, 3)} + ' kg'">
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(reconciliation.balances)}">
+                    <td colspan="4">
+                        No inventory balances available.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="panel">
+
+        <h3>Company Inventory Reconciliation</h3>
+
+        <p>
+            Compare company-wide inventory against
+            location balances, stock in transit,
+            and unresolved transfer discrepancies.
+        </p>
+
+        <p th:if="${reconciliation.allBalanced}"
+           style="color:green;font-weight:bold">
+            BALANCED - All product quantities reconcile.
+        </p>
+
+        <p th:unless="${reconciliation.allBalanced}"
+           class="error">
+            MISMATCH - One or more product quantities
+            require investigation.
+        </p>
+
+        <div style="overflow-x:auto">
+
+            <table>
+
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Company Stock</th>
+                    <th>At Locations</th>
+                    <th>In Transit</th>
+                    <th>Unresolved</th>
+                    <th>Accounted Total</th>
+                    <th>Difference</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="item : ${reconciliation.products}">
+
+                    <td th:text="${item.productName}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(item.companyStockKg, 1, 3)}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(item.locationStockKg, 1, 3)}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(item.inTransitKg, 1, 3)}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(item.unresolvedKg, 1, 3)}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(item.accountedKg, 1, 3)}">
+                    </td>
+
+                    <td th:text="${#numbers.formatDecimal(item.differenceKg, 1, 3)}">
+                    </td>
+
+                    <td>
+                        <strong th:if="${item.balanced}"
+                                style="color:green">
+                            BALANCED
+                        </strong>
+
+                        <strong th:unless="${item.balanced}"
+                                style="color:#c62828">
+                            MISMATCH
+                        </strong>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(reconciliation.products)}">
+                    <td colspan="8">
+                        No products available for reconciliation.
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <p>
+            <small>
+                Accounted Total =
+                Location Stock + In Transit + Unresolved.
+            </small>
+        </p>
+
+        <p>
+            <small>
+                Difference =
+                Company Stock - Accounted Total.
+            </small>
+        </p>
+
+        <p>
+            <small>
+                A balanced result means recorded quantities
+                agree mathematically. It does not prove
+                that physical stock has been counted.
+            </small>
+        </p>
+
+    </div>
+
+    <p>
+        <strong>Important:</strong>
+        LEGACY contains historical test inventory.
+        Do not treat it as verified physical stock.
+        Locations holding stock cannot be deactivated.
+    </p>
+
+</main>
+
+</body>
+</html>

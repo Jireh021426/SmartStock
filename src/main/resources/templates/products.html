@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Chicken Products</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main>
+
+    <div class="heading">
+        <div>
+            <h2>Chicken Products</h2>
+            <p>Stock is measured exclusively in kilograms.</p>
+        </div>
+
+        <a class="button"
+           th:if="${isAdmin}"
+           th:href="@{/products/new}">
+            + Add Chicken Product
+        </a>
+    </div>
+
+    <div class="stats">
+
+        <div class="panel">
+            <small>Available weight</small>
+            <h2 th:text="${totalKg} + ' kg'"></h2>
+        </div>
+
+        <div class="panel"
+             th:if="${isAdmin or isManager or nav.auditor}">
+            <small>Estimated stock value (selling price)</small>
+            <h2 th:text="'₱' + ${totalValue}"></h2>
+        </div>
+
+    </div>
+
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}">
+    </p>
+
+    <div class="panel">
+        <div style="overflow-x:auto">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product</th>
+                        <th>Type</th>
+
+                        <th th:if="${isAdmin or isManager or isCashier or nav.auditor}">
+                            Price / kg
+                        </th>
+
+                        <th th:if="${isAdmin or isManager or nav.auditor}">
+                            Cost / kg
+                        </th>
+
+                        <th>Stock (kg)</th>
+                        <th>Low threshold</th>
+                        <th>Status</th>
+
+                        <th th:if="${isAdmin}">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="p : ${products}">
+
+                        <td th:text="${p.sku}"></td>
+                        <td th:text="${p.name}"></td>
+                        <td th:text="${p.category}"></td>
+
+                        <td th:if="${isAdmin or isManager or isCashier or nav.auditor}"
+                            th:text="'₱' + ${p.price}">
+                        </td>
+
+                        <td th:if="${isAdmin or isManager or nav.auditor}"
+                            th:text="'₱' + ${p.costPerKg}">
+                        </td>
+
+                        <td th:text="${p.stockKg}"></td>
+
+                        <td th:text="${p.lowStockKg} + ' kg'"></td>
+
+                        <td>
+                            <span
+                                th:class="${p.lowStock} ? 'tag warn' : 'tag'"
+                                th:text="${p.stockKg.signum() == 0} ? 'Out of stock' : (${p.lowStock} ? 'Low stock' : 'In stock')">
+                            </span>
+                        </td>
+
+                        <td class="actions" th:if="${isAdmin}">
+
+                            <a th:href="@{/inventory/new(productId=${p.id})}">
+                                Move stock
+                            </a>
+
+                            <a th:href="@{/products/{id}/edit(id=${p.id})}">
+                                Edit
+                            </a>
+
+                            <form
+                                th:action="@{/products/{id}/delete(id=${p.id})}"
+                                method="post"
+                                onsubmit="return confirm('Delete product? Products with history cannot be deleted.')">
+
+                                <button class="link danger" type="submit">
+                                    Delete
+                                </button>
+
+                            </form>
+                        </td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(products)}">
+
+                        <td th:colspan="${isAdmin ? 9 : (isManager or nav.auditor ? 8 : (isCashier ? 7 : 6))}"
+                            class="empty">
+                            No chicken products yet.
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

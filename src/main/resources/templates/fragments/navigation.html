@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<header th:fragment="siteHeader">
+
+    <h1>SmartStock</h1>
+
+    <span>Chicken Stall &amp; Storage Management</span>
+
+    <nav>
+
+        <a th:if="${nav.admin or nav.manager}"
+           th:href="@{/dashboard}">
+            Dashboard
+        </a>
+
+        <a th:href="@{/products}">
+            Products
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.auditor or nav.sender or nav.receiver}"
+           th:href="@{/inventory}">
+            Stock History
+        </a>
+
+        <a th:if="${nav.admin}"
+           th:href="@{/inventory/new}">
+            Stock In/Out
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
+           th:href="@{/sales}">
+            Sales
+        </a>
+
+        <a th:if="${nav.cashier}"
+           th:href="@{/sales/new}">
+            New Sale
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
+           th:href="@{/customers}">
+            Customers / Utang
+        </a>
+
+        <a th:if="${nav.canViewLocations}"
+           th:href="@{/locations}">
+            Locations
+        </a>
+
+        <a th:if="${nav.canViewTransfers}"
+           th:href="@{/transfers}">
+            Transfers
+        </a>
+
+        <a th:if="${nav.canViewAudits}"
+           th:href="@{/audits}">
+            Audits
+        </a>
+
+        <a th:if="${nav.canViewRemittances}"
+           th:href="@{/remittances}">
+            Remittances
+        </a>
+
+        <a th:if="${nav.admin}"
+           th:href="@{/employees}">
+            Employees
+        </a>
+
+    </nav>
+
+</header>
+
+</body>
+</html>

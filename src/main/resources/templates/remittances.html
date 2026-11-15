@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartStock | Remittances</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<main style="max-width:1400px;margin:35px auto;padding:20px">
+
+    <h1>Cashier Remittance Reconciliation</h1>
+
+    <p>
+        <a href="/dashboard">Dashboard</a> |
+        <a href="/sales">Sales</a>
+    </p>
+
+    <p style="color:green"
+       th:if="${message}"
+       th:text="${message}"></p>
+
+    <p style="color:red"
+       th:if="${error}"
+       th:text="${error}"></p>
+
+    <section th:if="${cashier}">
+        <h2>Submit today's remittance</h2>
+
+        <p>
+            Expected physical cash:
+            <strong th:text="${expected.cash}"></strong>
+
+            | Expected GCash receipts:
+            <strong th:text="${expected.gcash}"></strong>
+        </p>
+
+        <p>
+            Cash and GCash are reconciled separately.
+            These expected amounts include transactions
+            attributed to your cashier account.
+        </p>
+
+        <p th:if="${alreadySubmitted}">
+            Today's remittance has already been submitted.
+        </p>
+
+        <form th:unless="${alreadySubmitted}"
+              th:action="@{/remittances/submit}"
+              method="post">
+
+            <label>
+                Actual cash handed over
+                <input type="number"
+                       name="declaredCash"
+                       min="0"
+                       step="0.01"
+                       required>
+            </label>
+
+            <label>
+                Actual GCash confirmed
+                <input type="number"
+                       name="declaredGcash"
+                       min="0"
+                       step="0.01"
+                       required>
+            </label>
+
+            <button type="submit">
+                Submit for verification
+            </button>
+        </form>
+    </section>
+
+    <h2>Remittance history</h2>
+
+    <div style="overflow-x:auto">
+        <table border="1"
+               cellpadding="8"
+               style="border-collapse:collapse;width:100%">
+
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Cashier</th>
+                <th>Location</th>
+                <th>Expected cash</th>
+                <th>Declared cash</th>
+                <th>Cashier cash difference</th>
+                <th>Manager-counted cash</th>
+                <th>Actual cash difference</th>
+                <th>Count vs declaration</th>
+                <th>Expected GCash</th>
+                <th>Declared GCash</th>
+                <th>Manager-confirmed GCash</th>
+                <th>Actual GCash difference</th>
+                <th>Status</th>
+                <th>Review</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="r : ${remittances}">
+
+                <td th:text="${r.businessDate}"></td>
+                <td th:text="${r.cashier.fullName}"></td>
+                <td th:text="${r.location.name}"></td>
+
+                <td th:text="${r.expectedCash}"></td>
+                <td th:text="${r.declaredCash}"></td>
+                <td th:text="${r.cashVariance}"></td>
+
+                <td th:text="${r.confirmedCash != null ? r.confirmedCash : 'Not recorded'}"></td>
+
+                <td th:text="${r.confirmedCashVariance != null ? r.confirmedCashVariance : '—'}"></td>
+
+                <td th:text="${r.cashDeclarationDifference != null ? r.cashDeclarationDifference : '—'}"></td>
+
+                <td th:text="${r.expectedGcash}"></td>
+                <td th:text="${r.declaredGcash}"></td>
+
+                <td th:text="${r.confirmedGcash != null ? r.confirmedGcash : 'Not recorded'}"></td>
+
+                <td th:text="${r.confirmedGcashVariance != null ? r.confirmedGcashVariance : '—'}"></td>
+
+                <td th:text="${r.status}"></td>
+
+                <td>
+                    <div th:if="${r.verifiedBy != null}">
+                        <strong th:text="${r.verifiedBy.fullName}"></strong>
+
+                        <div th:text="${r.verifiedAt}"></div>
+
+                        <div th:text="${r.reviewNote}"></div>
+
+                        <small th:if="${r.confirmedCash == null}">
+                            Historical review — independent count
+                            was not recorded.
+                        </small>
+                    </div>
+
+                    <form th:if="${reviewer and r.status.name() == 'SUBMITTED'}"
+                          th:action="@{/remittances/verify}"
+                          method="post">
+
+                        <input type="hidden"
+                               name="id"
+                               th:value="${r.id}">
+
+                        <div>
+                            <label>
+                                Manager physically counted cash
+                                <input type="number"
+                                       name="countedCash"
+                                       min="0"
+                                       step="0.01"
+                                       required>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label>
+                                Independently confirmed GCash
+                                <input type="number"
+                                       name="confirmedGcash"
+                                       min="0"
+                                       step="0.01"
+                                       required>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label>
+                                Review note
+                                <input type="text"
+                                       name="note"
+                                       maxlength="1000"
+                                       placeholder="Count method or discrepancy explanation">
+                            </label>
+                        </div>
+
+                        <button type="submit">
+                            Verify / Flag
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p>
+        Positive difference = overage.
+        Negative difference = shortage.
+    </p>
+
+    <p>
+        Manager-counted cash must be independently counted.
+        GCash must be independently confirmed from a trusted
+        payment record, not merely copied from the cashier declaration.
+    </p>
+
+    <p>
+        Historical transactions without cashier attribution
+        are excluded from employee remittance totals.
+    </p>
+
+</main>
+</body>
+</html>

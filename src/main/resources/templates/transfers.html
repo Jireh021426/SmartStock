@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Stock Transfers</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main>
+
+    <div class="heading">
+        <div>
+            <h2>Stock Transfers</h2>
+            <p>
+                Dispatch stock, confirm receipts, and investigate
+                discrepancies with a permanent audit trail.
+            </p>
+        </div>
+    </div>
+
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}"></p>
+
+    <p th:if="${notice}"
+       th:text="${notice}"></p>
+
+    <!-- SENDER -->
+
+    <div class="panel" th:if="${isSender}">
+
+        <h3>Dispatch Stock</h3>
+
+        <p>
+            Source location:
+            <strong th:text="${assignedLocationName}"></strong>
+        </p>
+
+        <form th:action="@{/transfers/dispatch}"
+              method="post">
+
+            <label>
+                Product
+                <select name="productId" required>
+                    <option value="">Select product</option>
+
+                    <option th:each="p : ${products}"
+                            th:value="${p.id}"
+                            th:text="${p.name}">
+                    </option>
+                </select>
+            </label>
+
+            <label>
+                Destination
+                <select name="destinationId" required>
+                    <option value="">Select destination</option>
+
+                    <option th:each="loc : ${locations}"
+                            th:value="${loc.id}"
+                            th:text="${loc.name + ' (' + loc.code + ')'}">
+                    </option>
+                </select>
+            </label>
+
+            <label>
+                Weight to dispatch (kg)
+                <input type="number"
+                       name="weightKg"
+                       step="0.001"
+                       min="0.001"
+                       required>
+            </label>
+
+            <label>
+                Dispatch note
+                <input type="text"
+                       name="note"
+                       maxlength="255">
+            </label>
+
+            <button class="button" type="submit">
+                Dispatch Stock
+            </button>
+
+        </form>
+    </div>
+
+    <!-- RECEIVER -->
+
+    <div class="panel" th:if="${isReceiver}">
+
+        <h3>Confirm Received Stock</h3>
+
+        <p>
+            Assigned location:
+            <strong th:text="${assignedLocationName}"></strong>
+        </p>
+
+        <p>
+            Enter the actual measured weight.
+            Any shortage requires a separate investigation.
+        </p>
+
+        <div th:each="t : ${transfers}"
+             th:if="${t.status == dispatchedStatus
+                     and assignedLocationId != null
+                     and t.destinationLocationId == assignedLocationId}">
+
+            <hr>
+
+            <h4 th:text="'Transfer #' + ${t.id}"></h4>
+
+            <p>
+                Product:
+                <strong th:text="${t.productName}"></strong>
+            </p>
+
+            <p>
+                Source:
+                <strong th:text="${t.sourceLocationName}"></strong>
+            </p>
+
+            <p>
+                Dispatched:
+                <strong th:text="${t.dispatchedKg} + ' kg'"></strong>
+            </p>
+
+            <p>
+                Sender:
+                <strong th:text="${t.senderName}"></strong>
+            </p>
+
+            <form th:action="@{/transfers/receive}"
+                  method="post">
+
+                <input type="hidden"
+                       name="transferId"
+                       th:value="${t.id}">
+
+                <label>
+                    Actual received weight (kg)
+                    <input type="number"
+                           name="actualKg"
+                           step="0.001"
+                           min="0"
+                           th:max="${t.dispatchedKg}"
+                           required>
+                </label>
+
+                <label>
+                    Receiving note
+                    <input type="text"
+                           name="note"
+                           maxlength="255">
+                </label>
+
+                <button class="button" type="submit">
+                    Confirm Receipt
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- MANAGEMENT INVESTIGATION -->
+
+    <div class="panel" th:if="${isManager}">
+
+        <h3>Discrepancy Investigation</h3>
+
+        <p>
+            Review shortages before closing an investigation.
+            The original dispatch and receipt remain unchanged.
+        </p>
+
+        <div th:each="t : ${transfers}"
+             th:if="${t.status == discrepancyStatus and !t.resolved}">
+
+            <hr>
+
+            <h4 th:text="'Investigate Transfer #' + ${t.id}"></h4>
+
+            <p>
+                Product:
+                <strong th:text="${t.productName}"></strong>
+            </p>
+
+            <p>
+                Source:
+                <strong th:text="${t.sourceLocationName}"></strong>
+            </p>
+
+            <p>
+                Destination:
+                <strong th:text="${t.destinationLocationName}"></strong>
+            </p>
+
+            <p>
+                Dispatched:
+                <strong th:text="${t.dispatchedKg} + ' kg'"></strong>
+            </p>
+
+            <p>
+                Received:
+                <strong th:text="${t.receivedKg} + ' kg'"></strong>
+            </p>
+
+            <p>
+                Discrepancy:
+                <strong th:text="${t.discrepancyKg} + ' kg'"></strong>
+            </p>
+
+            <p>
+                Sender:
+                <strong th:text="${t.senderName}"></strong>
+            </p>
+
+            <p>
+                Receiver:
+                <strong th:text="${t.receiverName}"></strong>
+            </p>
+
+            <form th:action="@{/transfers/resolve}"
+                  method="post">
+
+                <input type="hidden"
+                       name="transferId"
+                       th:value="${t.id}">
+
+                <label>
+                    Recovered stock (kg)
+                    <input type="number"
+                           name="recoveredKg"
+                           min="0"
+                           step="0.001"
+                           value="0"
+                           th:max="${t.discrepancyKg}"
+                           required>
+                </label>
+
+                <label>
+                    Confirmed missing stock (kg)
+                    <input type="number"
+                           name="confirmedLossKg"
+                           min="0"
+                           step="0.001"
+                           th:max="${t.discrepancyKg}"
+                           required>
+                </label>
+
+                <p>
+                    <small>
+                        Recovered + confirmed missing stock
+                        must equal the original discrepancy.
+                    </small>
+                </p>
+
+                <label>
+                    Investigation explanation
+                    <textarea name="explanation"
+                              rows="4"
+                              maxlength="1000"
+                              required></textarea>
+                </label>
+
+                <button class="button" type="submit">
+                    Close Investigation
+                </button>
+
+            </form>
+        </div>
+
+        <p>
+            <small>
+                If there are no unresolved discrepancies,
+                no investigation forms will appear.
+            </small>
+        </p>
+    </div>
+
+    <!-- TRANSFER HISTORY -->
+
+    <div class="panel">
+
+        <h3>Transfer History</h3>
+
+        <div style="overflow-x:auto">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Dispatched</th>
+                    <th>Received</th>
+                    <th>Discrepancy</th>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Transfer Status</th>
+                    <th>Investigation</th>
+                    <th>Dispatch Time</th>
+                    <th>Receipt Time</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="t : ${transfers}">
+
+                    <td th:text="${t.id}"></td>
+
+                    <td th:text="${t.productName}"></td>
+
+                    <td th:text="${t.sourceLocationName}"></td>
+
+                    <td th:text="${t.destinationLocationName}"></td>
+
+                    <td th:text="${t.dispatchedKg} + ' kg'"></td>
+
+                    <td th:text="${t.receivedKg != null
+                            ? t.receivedKg + ' kg' : '-'}"></td>
+
+                    <td th:text="${t.discrepancyKg != null
+                            ? t.discrepancyKg + ' kg' : '-'}"></td>
+
+                    <td th:text="${t.senderName}"></td>
+
+                    <td th:text="${t.receiverName != null
+                            ? t.receiverName : '-'}"></td>
+
+                    <td th:text="${t.status}"></td>
+
+                    <td th:text="${t.resolved
+                            ? 'RESOLVED'
+                            : (t.status == discrepancyStatus
+                                ? 'OPEN' : '-')}"></td>
+
+                    <td th:text="${#temporals.format(
+                            t.dispatchedAt,
+                            'yyyy-MM-dd HH:mm')}"></td>
+
+                    <td th:text="${t.receivedAt != null
+                            ? #temporals.format(
+                                t.receivedAt,
+                                'yyyy-MM-dd HH:mm')
+                            : '-'}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(transfers)}">
+                    <td colspan="13">
+                        No stock transfers recorded.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- INVESTIGATION AUDIT HISTORY -->
+
+    <div class="panel">
+
+        <h3>Investigation Audit History</h3>
+
+        <div style="overflow-x:auto">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Resolution ID</th>
+                    <th>Transfer</th>
+                    <th>Recovered</th>
+                    <th>Confirmed Loss</th>
+
+                    <th th:if="${canSeeTransferFinancials}">
+                        Loss Value
+                    </th>
+
+                    <th>Resolved By</th>
+                    <th>Resolution Time</th>
+                    <th>Explanation</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="r : ${resolutionHistory}">
+
+                    <td th:text="${r.id}"></td>
+
+                    <td th:text="${r.transferId}"></td>
+
+                    <td th:text="${r.recoveredKg} + ' kg'"></td>
+
+                    <td th:text="${r.confirmedLossKg} + ' kg'"></td>
+
+                    <td th:if="${canSeeTransferFinancials}"
+                        th:text="'₱' + ${r.lossValue}"></td>
+
+                    <td th:text="${r.resolvedByName}"></td>
+
+                    <td th:text="${#temporals.format(
+                            r.resolvedAt,
+                            'yyyy-MM-dd HH:mm')}"></td>
+
+                    <td th:text="${r.explanation}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(resolutionHistory)}">
+
+                    <td th:colspan="${canSeeTransferFinancials ? 8 : 7}">
+                        No investigations have been closed.
+                    </td>
+
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <p>
+        <small>
+            Internal transfers do not change company-wide stock.
+            Recovered stock is added to its destination location.
+            Confirmed missing stock is written off only after
+            an authorized investigation. A resolved discrepancy
+            remains visible in the original transfer history.
+        </small>
+    </p>
+
+</main>
+
+</body>
+</html>
