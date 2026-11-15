@@ -328,9 +328,9 @@ public class SalesService {
     public void recordPayment(String username, PaymentForm form) {
 
         Employee cashier = requireCashier(username);
-        requireOpenRemittanceDay(cashier);
-
         if (form == null ||
+                form.getRequestId() == null ||
+                form.getRequestId().isBlank() ||
                 form.getCustomerId() == null ||
                 form.getAmount() == null ||
                 form.getAmount().signum() <= 0 ||
@@ -342,6 +342,31 @@ public class SalesService {
                     "Select a customer, positive payment " +
                     "and Cash or GCash");
         }
+
+        // The cashier row is locked by requireCashier(), serializing
+        // retries from the same cashier with remittance submission.
+        // Check the key BEFORE the remittance-day check: a retry after
+        // a successful payment must not be interpreted as a new payment.
+        String requestId;
+        try {
+            requestId = java.util.UUID.fromString(form.getRequestId()).toString();
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid payment request ID");
+        }
+        var previous = payments.findByRequestId(requestId);
+        if (previous.isPresent()) {
+            CreditPayment existing = previous.get();
+            if (existing.getCashier() == null ||
+                    !existing.getCashier().getId().equals(cashier.getId()) ||
+                    !existing.getCustomer().getId().equals(form.getCustomerId()) ||
+                    existing.getAmount().compareTo(form.getAmount()) != 0 ||
+                    existing.getMethod() != form.getMethod()) {
+                throw new IllegalArgumentException("Payment request ID already used for different payment details");
+            }
+            return;
+        }
+
+        requireOpenRemittanceDay(cashier);
 
         Customer customer = customers
                 .findLockedById(form.getCustomerId())
@@ -358,6 +383,7 @@ public class SalesService {
         );
 
         payment.assignCashier(cashier);
+        payment.assignRequestId(requestId);
 
         payments.save(payment);
     }

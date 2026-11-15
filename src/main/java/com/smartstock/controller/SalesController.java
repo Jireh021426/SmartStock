@@ -149,7 +149,9 @@ public class SalesController {
     @GetMapping("/payments/new")
     public String paymentForm(Model model) {
 
-        model.addAttribute("paymentForm", new PaymentForm());
+        PaymentForm form = new PaymentForm();
+        form.setRequestId(java.util.UUID.randomUUID().toString());
+        model.addAttribute("paymentForm", form);
         fillPaymentOptions(model);
 
         return "payment-form";

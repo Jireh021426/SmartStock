@@ -118,6 +118,7 @@ public class PaymentRemittanceConcurrencyTest {
 
         PaymentForm form = new PaymentForm();
 
+        form.setRequestId(java.util.UUID.randomUUID().toString());
         form.setCustomerId(customerId);
         form.setAmount(PAYMENT);
         form.setMethod(PaymentMethod.CASH);
