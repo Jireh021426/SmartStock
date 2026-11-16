@@ -1,4 +1,3 @@
-
 package com.smartstock.service;
 
 import com.smartstock.model.*;
@@ -11,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class RemittanceService {
@@ -159,6 +159,28 @@ public class RemittanceService {
     @Transactional(readOnly = true)
     public Employee current(String username) {
         return employee(username);
+    }
+
+    // Like current(), but returns empty instead of throwing.
+    // Used for the built-in in-memory "admin" login, which has
+    // no row in the employees table.
+    @Transactional(readOnly = true)
+    public Optional<Employee> findActive(String username) {
+
+        if (username == null || username.isBlank()) {
+            return Optional.empty();
+        }
+
+        return employees
+                .findByUsername(username.toLowerCase(Locale.ROOT))
+                .filter(Employee::isActive);
+    }
+
+    // Every remittance, newest first (read-only view for the
+    // built-in admin).
+    @Transactional(readOnly = true)
+    public List<Remittance> all() {
+        return remittances.findAllByOrderBySubmittedAtDesc();
     }
 
     // ========================================

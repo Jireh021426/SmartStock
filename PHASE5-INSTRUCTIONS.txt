@@ -1,0 +1,13 @@
+SmartStock Phase 5 remittance patch - source only.
+
+1. Stop the app (Ctrl+C).
+2. Make a consistent backup of data/smartstock-chicken-phase3.mv.db while stopped.
+3. Extract this ZIP into the SmartStock project root and REPLACE matching source files.
+4. Run mvn clean compile. If it fails, do not start the app; share the error.
+5. Start with mvn spring-boot:run.
+6. Log in as cashier001 and open http://localhost:8080/remittances
+7. Record small test sales/repayments BEFORE submitting remittance.
+8. Submit declared cash and GCash amounts. This closes that cashier's transactions for today.
+9. Log in as a database ADMIN or MANAGER and review at /remittances.
+
+IMPORTANT LIMITATIONS: This is a source-level implementation not compiled in the assistant environment. Test on a copy before real use. Historical transactions lack cashier attribution and are excluded from individual expected remittances. A remittance is one per cashier per calendar day. After submission, further sales and credit collections by that cashier are blocked for that day. Submitted remittances cannot be reopened or amended; a future adjustment workflow is required. GCash amounts are declared, not validated against payment-provider records. Physical cash verification is still a human action. No change to the H2 file is included; Hibernate ddl-auto=update adds nullable attribution columns and a new remittance table. Do not use this patch as production-ready accounting software.

@@ -1,4 +1,3 @@
-
 package com.smartstock.controller;
 
 import com.smartstock.model.EmployeeRole;
@@ -22,8 +21,30 @@ public class RemittanceController {
         this.service = service;
     }
 
+    // The built-in in-memory "admin" login (see SecurityConfig)
+    // has ROLE_ADMIN but no employee record.
+    private static boolean hasAdminRole(Authentication auth) {
+        return auth.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
     @GetMapping("/remittances")
     public String index(Authentication auth, Model model) {
+
+        // Built-in admin: no employee row, so show all
+        // remittances read-only. Verifying a remittance records
+        // the reviewing employee, so that needs a manager account.
+        if (service.findActive(auth.getName()).isEmpty()
+                && hasAdminRole(auth)) {
+
+            model.addAttribute("cashier", false);
+            model.addAttribute("reviewer", false);
+            model.addAttribute("builtInAdmin", true);
+            model.addAttribute("remittances", service.all());
+
+            return "remittances";
+        }
 
         var employee = service.current(auth.getName());
 

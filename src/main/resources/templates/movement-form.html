@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -146,6 +145,11 @@
 
             </div>
 
+            <!-- WEIGHT + PURCHASE COST side by side -->
+            <div class="field-row">
+
+            <div>
+
             <!-- WEIGHT -->
             <label for="weightKg">
                 Weight (kg)
@@ -163,6 +167,8 @@
                    th:if="${#fields.hasErrors('weightKg')}"
                    th:errors="*{weightKg}">
             </small>
+
+            </div>
 
             <!-- PURCHASE COST -->
             <div id="purchaseCostSection">
@@ -190,6 +196,8 @@
                 </p>
             </div>
 
+            </div>
+
             <!-- REASON -->
             <label for="reason">
                 Reason / Reference
@@ -207,30 +215,34 @@
             </small>
 
             <!-- GUIDANCE -->
-            <p>
-                <strong>Stock In:</strong>
-                Adds purchased inventory directly to the
-                selected location and updates the company total.
-            </p>
+            <div class="form-note">
 
-            <p>
-                <strong>Stock Out:</strong>
-                Records spoilage, damage or missing stock
-                against the selected location.
-            </p>
+                <p>
+                    <strong>Stock In:</strong>
+                    Adds purchased inventory directly to the
+                    selected location and updates the company total.
+                </p>
 
-            <p>
-                <strong>Transfers:</strong>
-                Do not use this form to move inventory
-                between stalls. A separate transfer
-                workflow will handle that.
-            </p>
+                <p>
+                    <strong>Stock Out:</strong>
+                    Records spoilage, damage or missing stock
+                    against the selected location.
+                </p>
 
-            <p>
-                <strong>Sales:</strong>
-                Customer sales are recorded separately
-                through the Sales module.
-            </p>
+                <p>
+                    <strong>Transfers:</strong>
+                    Do not use this form to move inventory
+                    between stalls. A separate transfer
+                    workflow will handle that.
+                </p>
+
+                <p>
+                    <strong>Sales:</strong>
+                    Customer sales are recorded separately
+                    through the Sales module.
+                </p>
+
+            </div>
 
             <button class="button"
                     type="submit">

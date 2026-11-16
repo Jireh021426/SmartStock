@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org">
@@ -7,73 +6,132 @@
 
 <header th:fragment="siteHeader">
 
-    <h1>SmartStock</h1>
+    <!-- Icon sprite: every page that includes this header can reuse these -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
+        <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+        <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4v14M3 14l4 4 4-4M17 20V6M13 10l4-4 4 4"/></symbol>
+        <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"/><path d="M9 7h6M9 11h6"/></symbol>
+        <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M1 2h4l2.7 13.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L22 7H6"/></symbol>
+        <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+        <symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+        <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></symbol>
+        <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h16v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7"/><path d="M16 14h2"/></symbol>
+        <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+        <symbol id="i-peso" viewBox="0 0 24 24"><path d="M7 4v16M7 4h5a4 4 0 0 1 0 8H7M4 8h12M4 11h12"/></symbol>
+        <symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+        <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1"/></symbol>
+        <symbol id="i-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></symbol>
+        <symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+        <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    </svg>
 
-    <span>Chicken Stall &amp; Storage Management</span>
+    <div class="brand">
+        <span class="brand-mark">
+            <svg class="ico"><use href="#i-box"/></svg>
+        </span>
+        <div class="brand-text">
+            <h1>SmartStock</h1>
+            <span>Chicken Stall &amp; Storage Management</span>
+        </div>
+    </div>
 
     <nav>
 
         <a th:if="${nav.admin or nav.manager}"
-           th:href="@{/dashboard}"
->
-            Dashboard
+           th:href="@{/dashboard}">
+            <svg class="ico"><use href="#i-grid"/></svg>
+            <span>Dashboard</span>
         </a>
 
+        <div class="nav-label">Inventory</div>
+
         <a th:href="@{/products}">
-            Products
+            <svg class="ico"><use href="#i-box"/></svg>
+            <span>Products</span>
         </a>
 
         <a th:if="${nav.admin or nav.manager or nav.auditor or nav.sender or nav.receiver}"
            th:href="@{/inventory}">
-            Stock History
+            <svg class="ico"><use href="#i-clock"/></svg>
+            <span>Stock History</span>
         </a>
 
         <a th:if="${nav.admin}"
            th:href="@{/inventory/new}">
-            Stock In/Out
-        </a>
-
-        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
-           th:href="@{/sales}">
-            Sales
-        </a>
-
-        <a th:if="${nav.cashier}"
-           th:href="@{/sales/new}">
-            New Sale
-        </a>
-
-        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
-           th:href="@{/customers}">
-            Customers / Utang
+            <svg class="ico"><use href="#i-swap"/></svg>
+            <span>Stock In/Out</span>
         </a>
 
         <a th:if="${nav.canViewLocations}"
            th:href="@{/locations}">
-            Locations
+            <svg class="ico"><use href="#i-pin"/></svg>
+            <span>Locations</span>
         </a>
 
         <a th:if="${nav.canViewTransfers}"
            th:href="@{/transfers}">
-            Transfers
+            <svg class="ico"><use href="#i-truck"/></svg>
+            <span>Transfers</span>
         </a>
 
         <a th:if="${nav.canViewAudits}"
            th:href="@{/audits}">
-            Audits
+            <svg class="ico"><use href="#i-clipboard"/></svg>
+            <span>Audits</span>
+        </a>
+
+        <div class="nav-label"
+             th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor or nav.canViewRemittances}">
+            Sales
+        </div>
+
+        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
+           th:href="@{/sales}">
+            <svg class="ico"><use href="#i-receipt"/></svg>
+            <span>Sales</span>
+        </a>
+
+        <a th:if="${nav.cashier}"
+           th:href="@{/sales/new}">
+            <svg class="ico"><use href="#i-cart"/></svg>
+            <span>New Sale</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
+           th:href="@{/customers}">
+            <svg class="ico"><use href="#i-users"/></svg>
+            <span>Customers / Utang</span>
         </a>
 
         <a th:if="${nav.canViewRemittances}"
            th:href="@{/remittances}">
-            Remittances
+            <svg class="ico"><use href="#i-wallet"/></svg>
+            <span>Remittances</span>
         </a>
+
+        <div class="nav-label" th:if="${nav.admin}">Admin</div>
 
         <a th:if="${nav.admin}"
            th:href="@{/employees}">
-            Employees
+            <svg class="ico"><use href="#i-briefcase"/></svg>
+            <span>Employees</span>
         </a>
 
     </nav>
+
+    <!-- Spring Security logout: POST /logout (th:action adds the CSRF token) -->
+    <form class="logout-form no-print"
+          th:action="@{/logout}"
+          method="post">
+        <button type="submit" class="logout-btn">
+            <svg class="ico"><use href="#i-logout"/></svg>
+            <span>Log out</span>
+        </button>
+    </form>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

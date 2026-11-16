@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Sign in</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <style>
+        body.login-body {
+            padding-left: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            width: min(100%, 400px);
+            padding: 32px;
+        }
+
+        .login-card .brand {
+            margin-bottom: 24px;
+        }
+
+        .login-card h2 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .login-card .button {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 20px;
+        }
+
+        .login-note {
+            margin: 16px 0 0;
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--teal-soft, #e6f6f2);
+            color: var(--teal-dark, #14917a);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body class="login-body">
+
+<div class="panel login-card">
+
+    <div class="brand">
+        <span class="brand-mark">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg>
+        </span>
+        <div class="brand-text">
+            <h1 style="margin:0;font-size:20px;color:var(--ink)">SmartStock</h1>
+            <span style="display:block;color:var(--muted);font-size:11px">Chicken Stall &amp; Storage Management</span>
+        </div>
+    </div>
+
+    <h2>Sign in</h2>
+    <p>Enter your username and password.</p>
+
+    <p class="error" th:if="${param.error}">
+        Invalid username or password.
+    </p>
+
+    <p class="login-note" th:if="${param.logout}">
+        You have been logged out.
+    </p>
+
+    <!-- Any /login?session... redirect from the session filter -->
+    <p class="login-note"
+       th:each="k : ${param.keySet()}"
+       th:if="${#strings.startsWith(k, 'session')}">
+        Your session has ended. Please sign in again.
+    </p>
+
+    <form th:action="@{/login}" method="post">
+
+        <label>
+            Username
+            <input name="username"
+                   type="text"
+                   autocomplete="username"
+                   autofocus
+                   required>
+        </label>
+
+        <label>
+            Password
+            <input name="password"
+                   type="password"
+                   autocomplete="current-password"
+                   required>
+        </label>
+
+        <button class="button" type="submit">
+            Sign in
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

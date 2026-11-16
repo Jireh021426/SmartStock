@@ -1,4 +1,3 @@
-
 package com.smartstock.service;
 
 import com.smartstock.model.*;
@@ -10,8 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
@@ -214,6 +218,93 @@ public class ReportService {
                         .map(Product::getStockCostValue)
                         .toList());
 
+        // ========================================
+        // CHART 1: REVENUE TREND
+        // Last 6 calendar months, ending with the
+        // month of the selected report date.
+        // ========================================
+
+        YearMonth lastMonth = YearMonth.from(date);
+        YearMonth firstMonth = lastMonth.minusMonths(5);
+
+        var trendSales =
+                sales.findBySoldAtGreaterThanEqualAndSoldAtLessThan(
+                        firstMonth.atDay(1).atStartOfDay(),
+                        lastMonth.plusMonths(1).atDay(1).atStartOfDay());
+
+        Map<YearMonth, BigDecimal> monthly = new LinkedHashMap<>();
+
+        for (int i = 0; i < 6; i++) {
+            monthly.put(firstMonth.plusMonths(i), BigDecimal.ZERO);
+        }
+
+        for (Sale s : trendSales) {
+            monthly.merge(
+                    YearMonth.from(s.getSoldAt()),
+                    s.getTotal(),
+                    BigDecimal::add);
+        }
+
+        List<String> trendLabels = new ArrayList<>();
+        List<BigDecimal> trendValues = new ArrayList<>();
+
+        monthly.forEach((month, total) -> {
+            trendLabels.add(
+                    month.getMonth().getDisplayName(
+                            TextStyle.SHORT, Locale.ENGLISH));
+            trendValues.add(total);
+        });
+
+        // ========================================
+        // CHART 2: SALES BY CATEGORY
+        // Last 7 days, ending on the selected date.
+        // ========================================
+
+        var weekSales =
+                sales.findBySoldAtGreaterThanEqualAndSoldAtLessThan(
+                        date.minusDays(6).atStartOfDay(), end);
+
+        Map<String, BigDecimal> byCategory = new LinkedHashMap<>();
+
+        for (Sale s : weekSales) {
+
+            String category = s.getProduct().getCategory();
+
+            if (category == null || category.isBlank()) {
+                category = "Other";
+            }
+
+            byCategory.merge(category, s.getTotal(), BigDecimal::add);
+        }
+
+        BigDecimal categoryTotal = sum(byCategory.values());
+
+        List<Map<String, Object>> categorySales =
+                byCategory.entrySet()
+                        .stream()
+                        .sorted(Map.Entry
+                                .<String, BigDecimal>comparingByValue()
+                                .reversed())
+                        .map(entry -> {
+
+                            Map<String, Object> row =
+                                    new LinkedHashMap<>();
+
+                            row.put("name", entry.getKey());
+                            row.put("total", entry.getValue());
+                            row.put("percent",
+                                    categoryTotal.signum() == 0
+                                            ? BigDecimal.ZERO
+                                            : entry.getValue()
+                                                    .multiply(BigDecimal.valueOf(100))
+                                                    .divide(categoryTotal,
+                                                            1,
+                                                            RoundingMode.HALF_UP));
+
+                            return row;
+                        })
+                        .toList();
+
         Map<String, Object> m = new LinkedHashMap<>();
 
         m.put("date", date);
@@ -240,6 +331,12 @@ public class ReportService {
 
         m.put("daySales", daySales);
         m.put("dayExpenses", dayExpenses);
+
+        // Chart data
+        m.put("trendLabels", trendLabels);
+        m.put("trendValues", trendValues);
+        m.put("categorySales", categorySales);
+        m.put("categoryTotal", categoryTotal);
 
         return m;
     }

@@ -1,4 +1,3 @@
-
 package com.smartstock.config;
 
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
@@ -101,12 +100,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // Public static resources
-                .requestMatchers(
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/favicon.ico"
-                ).permitAll()
+                // Public static resources and error handling
+.requestMatchers(
+        "/css/**",
+        "/js/**",
+        "/images/**",
+        "/favicon.ico",
+        "/error"
+).permitAll()
 
                 // Financial dashboard
                 .requestMatchers(
@@ -342,10 +343,28 @@ public class SecurityConfig {
                 .anyRequest().denyAll()
             )
 
-            .formLogin(form -> form
-                    .defaultSuccessUrl("/products", false)
-                    .permitAll()
-            )
+           .formLogin(form -> form
+        .loginPage("/login")
+        .successHandler((request, response, authentication) -> {
+
+            boolean isAdminOrManager =
+                    authentication.getAuthorities()
+                            .stream()
+                            .anyMatch(authority ->
+                                    authority.getAuthority().equals("ROLE_ADMIN")
+                                    || authority.getAuthority().equals("ROLE_MANAGER")
+                            );
+
+            String destination = isAdminOrManager
+                    ? "/dashboard"
+                    : "/products";
+
+            response.sendRedirect(
+                    request.getContextPath() + destination
+            );
+        })
+        .permitAll()
+)
 
             .logout(logout -> logout
                     .logoutSuccessUrl("/login?logout")

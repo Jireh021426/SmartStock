@@ -99,7 +99,7 @@
 
                         <td>
                             <span
-                                th:class="${p.lowStock} ? 'tag warn' : 'tag'"
+                                th:class="${p.stockKg.signum() == 0} ? 'tag out-of-stock' : (${p.lowStock} ? 'tag warn' : 'tag')"
                                 th:text="${p.stockKg.signum() == 0} ? 'Out of stock' : (${p.lowStock} ? 'Low stock' : 'In stock')">
                             </span>
                         </td>

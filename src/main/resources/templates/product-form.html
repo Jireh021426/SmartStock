@@ -1,10 +1,93 @@
-<!DOCTYPE html><html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SmartStock | Product</title><link rel="stylesheet" th:href="@{/css/style.css}"></head><body>
-<header th:replace="~{fragments/navigation :: siteHeader}"></header><main class="narrow"><a href="/products">← Products</a><h2 th:text="${editing} ? 'Edit Chicken Product' : 'Add Chicken Product'"></h2><div class="panel"><p class="error" th:if="${error}" th:text="${error}"></p>
-<form th:object="${productForm}" th:action="${editing} ? @{/products/{id}/save(id=${productId})} : @{/products/save}" method="post">
-<label>SKU<input th:field="*{sku}" required></label><small th:errors="*{sku}"></small>
-<label>Product name<input th:field="*{name}" required placeholder="e.g. Chicken Breast"></label><small th:errors="*{name}"></small>
-<label>Selling price per kg (₱)<input th:field="*{price}" type="number" min="0" step="0.01" required></label><small th:errors="*{price}"></small>
-<label>Purchase cost per kg (₱)<input th:field="*{costPerKg}" type="number" min="0" step="0.01" required></label><small th:errors="*{costPerKg}"></small>
-<label>Low-stock threshold (kg)<input th:field="*{lowStockKg}" type="number" min="0" step="0.001" required></label><small th:errors="*{lowStockKg}"></small>
-<label>Chicken product type<select th:field="*{type}" th:disabled="${editing}"><option value="WHOLE">Whole Chicken</option><option value="PART">Chicken Part</option></select></label><input th:if="${editing}" type="hidden" name="type" th:value="*{type}">
-<p>Stock weight is changed only through recorded stock movements.</p><button class="button" type="submit">Save Product</button></form></div></main></body></html>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SmartStock | Product</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="narrow product-form-page">
+
+    <a class="product-back-link" th:href="@{/products}">
+        ← Back to Products
+    </a>
+
+    <h2 th:text="${editing} ? 'Edit Chicken Product' : 'Add Chicken Product'">
+        Chicken Product
+    </h2>
+
+    <p>Manage product information, pricing, and stock thresholds.</p>
+
+    <div class="panel">
+
+        <p class="error" th:if="${error}" th:text="${error}"></p>
+
+        <form class="product-entry-form"
+              th:object="${productForm}"
+              th:action="${editing} ? @{/products/{id}/save(id=${productId})} : @{/products/save}"
+              method="post">
+
+            <div class="product-form-grid">
+
+                <div class="product-field">
+                    <label for="sku">SKU</label>
+                    <input id="sku" th:field="*{sku}" required>
+                    <small th:errors="*{sku}"></small>
+                </div>
+
+                <div class="product-field">
+                    <label for="name">Product name</label>
+                    <input id="name" th:field="*{name}"
+                           required placeholder="e.g. Chicken Breast">
+                    <small th:errors="*{name}"></small>
+                </div>
+
+                <div class="product-field">
+                    <label for="price">Selling price per kg (₱)</label>
+                    <input id="price" th:field="*{price}"
+                           type="number" min="0" step="0.01" required>
+                    <small th:errors="*{price}"></small>
+                </div>
+
+                <div class="product-field">
+                    <label for="costPerKg">Purchase cost per kg (₱)</label>
+                    <input id="costPerKg" th:field="*{costPerKg}"
+                           type="number" min="0" step="0.01" required>
+                    <small th:errors="*{costPerKg}"></small>
+                </div>
+
+                <div class="product-field">
+                    <label for="lowStockKg">Low-stock threshold (kg)</label>
+                    <input id="lowStockKg" th:field="*{lowStockKg}"
+                           type="number" min="0" step="0.001" required>
+                    <small th:errors="*{lowStockKg}"></small>
+                </div>
+
+                <div class="product-field">
+                    <label for="type">Chicken product type</label>
+                    <select id="type" th:field="*{type}"
+                            th:disabled="${editing}">
+                        <option value="WHOLE">Whole Chicken</option>
+                        <option value="PART">Chicken Part</option>
+                    </select>
+                    <input th:if="${editing}" type="hidden"
+                           name="type" th:value="*{type}">
+                </div>
+
+            </div>
+
+            <p class="product-stock-note">
+                Stock weight is changed only through recorded stock movements.
+            </p>
+
+            <button class="button" type="submit">Save Product</button>
+
+        </form>
+    </div>
+</main>
+</body>
+</html>
