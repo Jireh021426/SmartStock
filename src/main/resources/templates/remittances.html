@@ -7,14 +7,10 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navigation :: siteHeader}"></div>
 <main style="max-width:1400px;margin:35px auto;padding:20px">
 
     <h1>Cashier Remittance Reconciliation</h1>
-
-    <p>
-        <a href="/dashboard">Dashboard</a> |
-        <a href="/sales">Sales</a>
-    </p>
 
     <p style="color:green"
        th:if="${message}"
@@ -75,10 +71,8 @@
 
     <h2>Remittance history</h2>
 
-    <div style="overflow-x:auto">
-        <table border="1"
-               cellpadding="8"
-               style="border-collapse:collapse;width:100%">
+    <div class="remittance-table-scroll">
+        <table class="remittance-table">
 
             <thead>
             <tr>
@@ -101,6 +95,12 @@
             </thead>
 
             <tbody>
+            <tr th:if="${#lists.isEmpty(remittances)}">
+                <td colspan="15"
+                    style="text-align:center;padding:32px;color:#64748b">
+                    No remittance records yet.
+                </td>
+            </tr>
             <tr th:each="r : ${remittances}">
 
                 <td th:text="${r.businessDate}"></td>

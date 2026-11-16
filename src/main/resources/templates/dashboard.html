@@ -173,7 +173,8 @@
 
         <h3>Record operating expense</h3>
 
-        <form th:action="@{/expenses}" method="post">
+        <form class="expense-form"
+              th:action="@{/expenses}" method="post">
 
             <label>
                 Category
@@ -259,7 +260,7 @@
 
     <!-- Accounting disclaimer -->
 
-    <p>
+    <p class="accounting-disclaimer">
         <small>
             Important: Cost is the current product cost/kg
             captured at the moment of each sale.

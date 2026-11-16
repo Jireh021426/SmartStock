@@ -14,7 +14,8 @@
     <nav>
 
         <a th:if="${nav.admin or nav.manager}"
-           th:href="@{/dashboard}">
+           th:href="@{/dashboard}"
+>
             Dashboard
         </a>
 
@@ -73,6 +74,33 @@
         </a>
 
     </nav>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll("header nav a");
+
+            let activeLink = null;
+
+            links.forEach(function (link) {
+                const linkPath = new URL(link.href).pathname;
+
+                if (currentPath === linkPath) {
+                    activeLink = link;
+                } else if (
+                    currentPath.startsWith(linkPath + "/") &&
+                    (!activeLink || linkPath.length > new URL(activeLink.href).pathname.length)
+                ) {
+                    activeLink = link;
+                }
+            });
+
+            if (activeLink) {
+                activeLink.classList.add("active");
+                activeLink.setAttribute("aria-current", "page");
+            }
+        });
+    </script>
 
 </header>
 
