@@ -94,7 +94,11 @@ class EmployeeSessionSecurityTest {
                         .password(PASSWORD)
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/products"))
+        .andExpect(redirectedUrl(
+                employee.getRole() == EmployeeRole.ADMIN
+                        || employee.getRole() == EmployeeRole.MANAGER
+                        ? "/dashboard"
+                        : "/products"))
         .andReturn();
 
         MockHttpSession session =
@@ -125,7 +129,7 @@ class EmployeeSessionSecurityTest {
                         .password(PASSWORD)
         )
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/products"))
+        .andExpect(redirectedUrl("/dashboard"))
         .andReturn();
 
         MockHttpSession session =
