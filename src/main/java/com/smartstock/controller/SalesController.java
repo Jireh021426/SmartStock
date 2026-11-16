@@ -23,16 +23,19 @@ public class SalesController {
 
     private final EmployeeRepository employees;
     private final SalesService sales;
+    private final PaymentRecoveryService paymentRecovery;
     private final ProductService products;
     private final StockLocationRepository locations;
 
     public SalesController(
             SalesService sales,
+            PaymentRecoveryService paymentRecovery,
             EmployeeRepository employees,
             ProductService products,
             StockLocationRepository locations) {
 
         this.sales = sales;
+        this.paymentRecovery = paymentRecovery;
         this.employees = employees;
         this.products = products;
         this.locations = locations;
@@ -170,10 +173,22 @@ public class SalesController {
         }
 
         try {
-            sales.recordPayment(
+            paymentRecovery.recordPayment(
                     authentication.getName(), form);
 
             return "redirect:/customers";
+
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+
+            model.addAttribute(
+                    "error",
+                    "The payment could not be completed because of a database conflict. " +
+                    "Check the customer's payment history and contact an administrator " +
+                    "before attempting another payment."
+            );
+
+            fillPaymentOptions(model);
+            return "payment-form";
 
         } catch (IllegalArgumentException |
                  IllegalStateException ex) {

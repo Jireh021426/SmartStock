@@ -4,11 +4,16 @@ import com.smartstock.model.*;
 import com.smartstock.repository.*;
 import com.smartstock.service.LegacyInventoryMigration;
 import com.smartstock.service.SalesService;
+import com.smartstock.service.PaymentRecoveryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.dao.DataIntegrityViolationException;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -29,6 +34,8 @@ class PaymentIdempotencyTest {
  @Autowired CustomerRepository customers;
  @Autowired CreditPaymentRepository payments;
  @Autowired SalesService sales;
+ @Autowired PaymentRecoveryService paymentRecovery;
+ @SpyBean SalesService salesSpy;
  @MockBean LegacyInventoryMigration legacyInventoryMigration;
  @MockBean(name="temporaryAdminService") UserDetailsService temporaryAdminService;
  String username;
@@ -81,4 +88,171 @@ class PaymentIdempotencyTest {
   assertBalance("1500.00");
   assertEquals(1,payments.findAll().stream().filter(p->key.equals(p.getRequestId())).count());
  }
+
+  @Test
+  void differentCashiersSameRequestId() throws Exception {
+    String suffix = UUID.randomUUID().toString().replace("-", "");
+
+    StockLocation secondStall = locations.save(
+        new StockLocation(
+            "D" + suffix.substring(0, 15),
+            "Second Cashier Stall",
+            "STALL"
+        )
+    );
+
+    Employee secondCashier = employees.save(
+        new Employee(
+            "Second Cashier",
+            "idem_second_" + suffix,
+            "test-hash",
+            EmployeeRole.CASHIER,
+            secondStall
+        )
+    );
+
+    String secondUsername = secondCashier.getUsername();
+    String key = UUID.randomUUID().toString();
+
+    ExecutorService pool = Executors.newFixedThreadPool(2);
+    CountDownLatch ready = new CountDownLatch(2);
+    CountDownLatch start = new CountDownLatch(1);
+
+    try {
+      Callable<Throwable> first = () -> {
+        ready.countDown();
+        if (!start.await(10, TimeUnit.SECONDS)) {
+          throw new IllegalStateException("Start timeout");
+        }
+
+        try {
+          paymentRecovery.recordPayment(username, form(key, "500.00"));
+          return null;
+        } catch (Exception ex) {
+          return ex;
+        }
+      };
+
+      Callable<Throwable> second = () -> {
+        ready.countDown();
+        if (!start.await(10, TimeUnit.SECONDS)) {
+          throw new IllegalStateException("Start timeout");
+        }
+
+        try {
+          paymentRecovery.recordPayment(secondUsername, form(key, "500.00"));
+          return null;
+        } catch (Exception ex) {
+          return ex;
+        }
+      };
+
+      Future<Throwable> a = pool.submit(first);
+      Future<Throwable> b = pool.submit(second);
+
+      assertTrue(ready.await(10, TimeUnit.SECONDS));
+      start.countDown();
+
+      Throwable errorA = a.get(20, TimeUnit.SECONDS);
+      Throwable errorB = b.get(20, TimeUnit.SECONDS);
+
+      System.out.println("Cashier A result: " + errorA);
+      System.out.println("Cashier B result: " + errorB);
+
+      assertTrue(
+          errorA == null || errorA instanceof IllegalArgumentException,
+          "Cashier A received an unexpected exception: " + errorA
+      );
+
+      assertTrue(
+          errorB == null || errorB instanceof IllegalArgumentException,
+          "Cashier B received an unexpected exception: " + errorB
+      );
+
+      assertTrue(
+          (errorA == null) != (errorB == null),
+          "Exactly one cashier must succeed"
+      );
+
+      Throwable rejected = errorA != null ? errorA : errorB;
+
+      assertInstanceOf(IllegalArgumentException.class, rejected);
+
+      assertEquals(
+          "Payment request ID already used for different payment details",
+          rejected.getMessage()
+      );
+
+    } finally {
+      start.countDown();
+      pool.shutdownNow();
+    }
+
+    assertBalance("1500.00");
+
+    assertEquals(
+        1,
+        payments.findAll().stream()
+            .filter(p -> key.equals(p.getRequestId()))
+            .count()
+    );
+  }
+
+
+ @Test
+ void matchingPaymentAfterDatabaseConflictShowsDuplicateWarning() {
+  String key = UUID.randomUUID().toString();
+  PaymentForm original = form(key, "500.00");
+
+  sales.recordPayment(username, original);
+
+  doThrow(new DataIntegrityViolationException("Simulated conflict"))
+      .when(salesSpy)
+      .recordPayment(eq(username), any(PaymentForm.class));
+
+  IllegalArgumentException error = assertThrows(
+      IllegalArgumentException.class,
+      () -> paymentRecovery.recordPayment(
+          username, form(key, "500.00"))
+  );
+
+  assertEquals(
+      "Payment request ID already used. Check payment history before trying again.",
+      error.getMessage()
+  );
+
+  assertBalance("1500.00");
+
+  assertEquals(
+      1,
+      payments.findAll().stream()
+          .filter(p -> key.equals(p.getRequestId()))
+          .count()
+  );
+ }
+
+
+ @Test
+ void unrelatedDatabaseConflictPreservesOriginalException() {
+  String key = UUID.randomUUID().toString();
+
+  DataIntegrityViolationException original =
+      new DataIntegrityViolationException("Simulated unrelated database error");
+
+  doThrow(original)
+      .when(salesSpy)
+      .recordPayment(eq(username), any(PaymentForm.class));
+
+  DataIntegrityViolationException actual = assertThrows(
+      DataIntegrityViolationException.class,
+      () -> paymentRecovery.recordPayment(
+          username, form(key, "500.00"))
+  );
+
+  assertSame(original, actual);
+  assertBalance("2000.00");
+
+  assertTrue(payments.findByRequestId(key).isEmpty());
+ }
+
 }
