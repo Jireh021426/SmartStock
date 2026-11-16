@@ -110,6 +110,78 @@
             color: #64748b;
             padding: 24px;
         }
+
+        /* Stock history pagination */
+        .inventory-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .pagination-info strong {
+            color: #1e293b;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .page-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 36px;
+            min-height: 36px;
+            padding: 8px 12px;
+            border: 1px solid #dbe3ee;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #334155;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .page-button:hover:not(.disabled) {
+            background: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        .page-button.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .page-button.disabled {
+            color: #a1a1aa;
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 650px) {
+            .inventory-pagination {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .pagination-controls {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -147,7 +219,7 @@
         <div class="summary-box">
             <h3>Total Movements</h3>
 
-            <strong th:text="${#lists.size(movements)}">
+            <strong th:text="${totalMovements}">
                 0
             </strong>
         </div>
@@ -156,7 +228,7 @@
             <h3>Stock-In Records</h3>
 
             <strong
-                th:text="${#aggregates.sum(movements.![type == T(com.smartstock.model.MovementType).STOCK_IN ? 1 : 0]) ?: 0}">
+                th:text="${stockInRecords}">
                 0
             </strong>
         </div>
@@ -165,7 +237,7 @@
             <h3>Stock-Out Records</h3>
 
             <strong
-                th:text="${#aggregates.sum(movements.![type == T(com.smartstock.model.MovementType).STOCK_OUT ? 1 : 0]) ?: 0}">
+                th:text="${stockOutRecords}">
                 0
             </strong>
         </div>
@@ -317,6 +389,54 @@
 
             </table>
 
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="inventory-pagination"
+             th:if="${totalPages > 0}">
+
+            <div class="pagination-info">
+                Showing
+                <strong th:text="${showingStart}"></strong>
+                to
+                <strong th:text="${showingEnd}"></strong>
+                of
+                <strong th:text="${totalMovements}"></strong>
+                movements
+            </div>
+
+            <div class="pagination-controls">
+
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/inventory(page=${currentPage - 1})}"
+                   class="page-button">
+                    Previous
+                </a>
+
+                <span th:unless="${currentPage > 0}"
+                      class="page-button disabled">
+                    Previous
+                </span>
+
+                <a th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
+                   th:href="@{/inventory(page=${pageNumber})}"
+                   th:text="${pageNumber + 1}"
+                   th:classappend="${pageNumber == currentPage} ? ' active' : ''"
+                   class="page-button">
+                </a>
+
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/inventory(page=${currentPage + 1})}"
+                   class="page-button">
+                    Next
+                </a>
+
+                <span th:unless="${currentPage < totalPages - 1}"
+                      class="page-button disabled">
+                    Next
+                </span>
+
+            </div>
         </div>
 
         <!-- ACCOUNTING INFORMATION -->

@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class InventoryService {
@@ -34,6 +36,21 @@ public class InventoryService {
     @Transactional(readOnly = true)
     public List<StockMovement> history() {
         return movements.findAllByOrderByRecordedAtDescIdDesc();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<StockMovement> history(Pageable pageable) {
+        return movements.findAllByOrderByRecordedAtDescIdDesc(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public long totalMovements() {
+        return movements.count();
+    }
+
+    @Transactional(readOnly = true)
+    public long countByType(MovementType type) {
+        return movements.countByType(type);
     }
 
     @Transactional

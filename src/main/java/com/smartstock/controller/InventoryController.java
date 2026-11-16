@@ -21,6 +21,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Controller
 @RequestMapping("/inventory")
@@ -42,6 +45,7 @@ public class InventoryController {
 
     @GetMapping
     public String history(
+            @RequestParam(defaultValue = "0") int page,
             Model model,
             Authentication authentication) {
 
@@ -52,18 +56,59 @@ public class InventoryController {
         boolean canSeeFinancials =
                 admin || manager || auditor;
 
+        final int pageSize = 10;
+        int safePage = Math.max(0, page);
+
+        Pageable pageable = PageRequest.of(safePage, pageSize);
+
+        Page<StockMovement> movementPage =
+                inventory.history(pageable);
+
+        // Handle a page number beyond the last available page.
+        if (movementPage.getTotalPages() > 0
+                && safePage >= movementPage.getTotalPages()) {
+
+            safePage = movementPage.getTotalPages() - 1;
+            pageable = PageRequest.of(safePage, pageSize);
+            movementPage = inventory.history(pageable);
+        }
+
         List<InventoryMovementView> movements =
-                inventory.history()
+                movementPage.getContent()
                         .stream()
                         .map(movement -> toView(
                                 movement,
                                 canSeeFinancials))
                         .toList();
 
+        long totalRecords = movementPage.getTotalElements();
+
         model.addAttribute("movements", movements);
+        model.addAttribute("currentPage", safePage);
+        model.addAttribute("totalPages", movementPage.getTotalPages());
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalMovements", totalRecords);
+
+        model.addAttribute(
+                "showingStart",
+                totalRecords == 0 ? 0 : safePage * pageSize + 1);
+
+        model.addAttribute(
+                "showingEnd",
+                Math.min((safePage + 1L) * pageSize, totalRecords));
+
+        model.addAttribute(
+                "stockInRecords",
+                inventory.countByType(MovementType.STOCK_IN));
+
+        model.addAttribute(
+                "stockOutRecords",
+                inventory.countByType(MovementType.STOCK_OUT));
+
         model.addAttribute(
                 "canSeeInventoryFinancials",
                 canSeeFinancials);
+
         model.addAttribute(
                 "canRecordMovement",
                 admin);
