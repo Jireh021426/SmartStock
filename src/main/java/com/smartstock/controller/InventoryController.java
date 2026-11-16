@@ -46,6 +46,7 @@ public class InventoryController {
     @GetMapping
     public String history(
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             Model model,
             Authentication authentication) {
 
@@ -56,7 +57,10 @@ public class InventoryController {
         boolean canSeeFinancials =
                 admin || manager || auditor;
 
-        final int pageSize = 10;
+        // Only allow supported page sizes.
+        int pageSize = List.of(10, 25, 50).contains(size)
+                ? size : 10;
+
         int safePage = Math.max(0, page);
 
         Pageable pageable = PageRequest.of(safePage, pageSize);
@@ -87,7 +91,26 @@ public class InventoryController {
         model.addAttribute("currentPage", safePage);
         model.addAttribute("totalPages", movementPage.getTotalPages());
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("pageSizes", List.of(10, 25, 50));
         model.addAttribute("totalMovements", totalRecords);
+
+        // Show a maximum of seven numbered pages.
+        int totalPages = movementPage.getTotalPages();
+
+        int windowStart = Math.max(
+                0,
+                Math.min(safePage - 3, totalPages - 7)
+        );
+
+        int windowEnd = Math.min(totalPages, windowStart + 7);
+
+        model.addAttribute(
+                "pageNumbers",
+                java.util.stream.IntStream
+                        .range(windowStart, windowEnd)
+                        .boxed()
+                        .toList()
+        );
 
         model.addAttribute(
                 "showingStart",

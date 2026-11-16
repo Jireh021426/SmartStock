@@ -182,6 +182,49 @@
                 width: 100%;
             }
         }
+
+        /* Pagination size selector */
+        .pagination-size-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 12px;
+        }
+
+        .pagination-size-form label {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .pagination-size-form select {
+            width: auto;
+            min-width: 70px;
+            margin: 0;
+            padding: 8px 10px;
+            border: 1px solid #dbe3ee;
+            border-radius: 7px;
+            background: #ffffff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .pagination-size-form select:focus-visible,
+        .page-button:focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 650px) {
+            .pagination-size-form {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+        }
+
     </style>
 </head>
 
@@ -407,8 +450,29 @@
 
             <div class="pagination-controls">
 
+                <form method="get"
+                      th:action="@{/inventory}"
+                      class="pagination-size-form">
+                    <label for="page-size">Rows per page</label>
+                    <select id="page-size"
+                            name="size"
+                            onchange="this.form.submit()">
+                        <option th:each="option : ${pageSizes}"
+                                th:value="${option}"
+                                th:text="${option}"
+                                th:selected="${option == pageSize}">
+                        </option>
+                    </select>
+                </form>
+
                 <a th:if="${currentPage > 0}"
-                   th:href="@{/inventory(page=${currentPage - 1})}"
+                   th:href="@{/inventory(page=0,size=${pageSize})}"
+                   class="page-button">
+                    First
+                </a>
+
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/inventory(page=${currentPage - 1},size=${pageSize})}"
                    class="page-button">
                     Previous
                 </a>
@@ -418,17 +482,23 @@
                     Previous
                 </span>
 
-                <a th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
-                   th:href="@{/inventory(page=${pageNumber})}"
+                <a th:each="pageNumber : ${pageNumbers}"
+                   th:href="@{/inventory(page=${pageNumber},size=${pageSize})}"
                    th:text="${pageNumber + 1}"
                    th:classappend="${pageNumber == currentPage} ? ' active' : ''"
                    class="page-button">
                 </a>
 
                 <a th:if="${currentPage < totalPages - 1}"
-                   th:href="@{/inventory(page=${currentPage + 1})}"
+                   th:href="@{/inventory(page=${currentPage + 1},size=${pageSize})}"
                    class="page-button">
                     Next
+                </a>
+
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/inventory(page=${totalPages - 1},size=${pageSize})}"
+                   class="page-button">
+                    Last
                 </a>
 
                 <span th:unless="${currentPage < totalPages - 1}"
