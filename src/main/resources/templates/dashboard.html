@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>SmartStock | Dashboard</title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
@@ -21,34 +20,21 @@
     <div class="heading">
         <div>
             <h2>Business Dashboard</h2>
-
-            <p>
-                Daily sales, collections, gross profit,
-                costs and estimated losses.
-            </p>
+            <p>Daily sales, collections, gross profit, costs and estimated losses.</p>
         </div>
 
         <div class="heading-actions no-print">
 
             <form th:action="@{/dashboard}" method="get">
-
                 <label>
                     Report date
-
-                    <input type="date"
-                           name="date"
-                           th:value="${date}">
+                    <input type="date" name="date" th:value="${date}">
                 </label>
 
-                <button class="button" type="submit">
-                    View
-                </button>
-
+                <button class="button" type="submit">View</button>
             </form>
 
-            <button class="button ghost"
-                    type="button"
-                    onclick="window.print()">
+            <button class="button ghost" type="button" onclick="window.print()">
                 <svg class="ico"><use href="#i-download"/></svg>
                 Export
             </button>
@@ -56,64 +42,76 @@
         </div>
     </div>
 
-    <p class="error"
-       th:if="${error}"
-       th:text="${error}">
-    </p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
 
-    <p th:if="${notice}"
-       th:text="${notice}">
-    </p>
+    <p class="notice" th:if="${notice}" th:text="${notice}" role="status"></p>
 
-    <!-- Sales, collections and gross profit -->
+    <!-- Overview band: money in (left) and costs / result (right) -->
 
-    <div class="stats triple">
+    <section class="overview">
 
-        <div class="panel kpi">
-            <span class="kpi-icon"><svg class="ico"><use href="#i-peso"/></svg></span>
-            <small>Total sales (including utang)</small>
-            <h2 th:text="'₱' + ${revenue}"></h2>
+        <div class="overview-main">
+
+            <h3 class="overview-title">Sales activity</h3>
+
+            <div class="tiles">
+
+                <div class="tile">
+                    <p class="tile-value" th:text="'₱' + ${revenue}">₱0</p>
+                    <p class="tile-label">
+                        <svg class="ico"><use href="#i-peso"/></svg>
+                        Total sales (including utang)
+                    </p>
+                </div>
+
+                <div class="tile">
+                    <p class="tile-value" th:text="'₱' + ${collected}">₱0</p>
+                    <p class="tile-label">
+                        <svg class="ico"><use href="#i-wallet"/></svg>
+                        Money collected (Cash + GCash)
+                    </p>
+                </div>
+
+                <div class="tile">
+                    <p class="tile-value" th:text="'₱' + ${gross}">₱0</p>
+                    <p class="tile-label">
+                        <svg class="ico"><use href="#i-trend"/></svg>
+                        Gross profit on sales
+                    </p>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="panel kpi">
-            <span class="kpi-icon"><svg class="ico"><use href="#i-wallet"/></svg></span>
-            <small>Money collected (Cash + GCash)</small>
-            <h2 th:text="'₱' + ${collected}"></h2>
+        <div class="overview-side">
+
+            <h3 class="overview-title">Costs and result</h3>
+
+            <div class="sumrows">
+
+                <div class="sumrow">
+                    <span class="sumrow-label">Cost of goods sold</span>
+                    <span class="sumrow-value" th:text="'₱' + ${cost}">₱0</span>
+                </div>
+
+                <div class="sumrow">
+                    <span class="sumrow-label">Operating expenses</span>
+                    <span class="sumrow-value" th:text="'₱' + ${expenses}">₱0</span>
+                </div>
+
+                <!-- Turns red automatically when the result is negative -->
+                <div class="sumrow sumrow--result"
+                     th:classappend="${estimatedResult != null and estimatedResult.toString().startsWith('-')} ? 'sumrow--negative'">
+                    <span class="sumrow-label">Estimated result after expenses and losses</span>
+                    <span class="sumrow-value" th:text="'₱' + ${estimatedResult}">₱0</span>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="panel kpi">
-            <span class="kpi-icon"><svg class="ico"><use href="#i-trend"/></svg></span>
-            <small>Gross profit on sales</small>
-            <h2 th:text="'₱' + ${gross}"></h2>
-        </div>
-
-    </div>
-
-    <!-- Costs and estimated result -->
-
-    <div class="stats triple">
-
-        <div class="panel kpi">
-            <span class="kpi-icon warn"><svg class="ico"><use href="#i-tag"/></svg></span>
-            <small>Cost of goods sold</small>
-            <h2 th:text="'₱' + ${cost}"></h2>
-        </div>
-
-        <div class="panel kpi">
-            <span class="kpi-icon warn"><svg class="ico"><use href="#i-card"/></svg></span>
-            <small>Operating expenses</small>
-            <h2 th:text="'₱' + ${expenses}"></h2>
-        </div>
-
-        <div class="panel kpi">
-            <span class="kpi-icon"><svg class="ico"><use href="#i-percent"/></svg></span>
-            <small>
-                Estimated result after expenses and losses
-            </small>
-            <h2 th:text="'₱' + ${estimatedResult}"></h2>
-        </div>
-
-    </div>
+    </section>
 
     <!-- Charts -->
 
@@ -122,7 +120,7 @@
         <div class="panel chart-panel">
 
             <div class="chart-head">
-                <h3>Revenue Trend</h3>
+                <h3>Revenue trend</h3>
                 <span class="chip">Last 6 months</span>
             </div>
 
@@ -133,12 +131,11 @@
         <div class="panel chart-panel">
 
             <div class="chart-head">
-                <h3>Sales by Category</h3>
+                <h3>Sales by category</h3>
                 <span class="chip">Last 7 days</span>
             </div>
 
-            <div class="cat-list"
-                 th:if="${!#lists.isEmpty(categorySales)}">
+            <div class="cat-list" th:if="${!#lists.isEmpty(categorySales)}">
 
                 <div class="cat-row" th:each="c : ${categorySales}">
 
@@ -152,18 +149,17 @@
                     </div>
 
                     <div class="cat-track">
-                        <div class="cat-bar"
-                             th:style="'width:' + ${c.percent} + '%'"></div>
+                        <div class="cat-bar" th:style="'width:' + ${c.percent} + '%'"></div>
                     </div>
 
                 </div>
 
             </div>
 
-            <p class="chart-empty"
-               th:if="${#lists.isEmpty(categorySales)}">
-                No sales recorded in this period.
-            </p>
+            <div class="empty-state" th:if="${#lists.isEmpty(categorySales)}">
+                <p>No sales in the last 7 days. Sales you record will show up here by category.</p>
+                <a class="button ghost no-print" th:href="@{/sales}">Go to sales</a>
+            </div>
 
         </div>
 
@@ -171,84 +167,88 @@
 
     <!-- Detailed breakdown -->
 
-    <div class="stats triple">
+    <section class="stats triple" aria-label="Breakdowns">
 
         <div class="panel">
 
-            <h3>Sales breakdown</h3>
+            <div class="panel-head"><h3>Sales breakdown</h3></div>
 
-            <p>
-                Cash sales:
-                <strong th:text="'₱' + ${cashSales}"></strong>
-            </p>
+            <div class="mix">
 
-            <p>
-                GCash sales:
-                <strong th:text="'₱' + ${gcashSales}"></strong>
-            </p>
+                <div class="donut" id="salesMix"
+                     th:attr="data-cash=${cashSales},data-gcash=${gcashSales},data-credit=${creditSales}"></div>
 
-            <p>
-                Utang sales:
-                <strong th:text="'₱' + ${creditSales}"></strong>
-            </p>
+                <dl class="figures">
+                    <div>
+                        <dt><span class="swatch swatch--cash"></span>Cash sales</dt>
+                        <dd th:text="'₱' + ${cashSales}">₱0</dd>
+                    </div>
+                    <div>
+                        <dt><span class="swatch swatch--gcash"></span>GCash sales</dt>
+                        <dd th:text="'₱' + ${gcashSales}">₱0</dd>
+                    </div>
+                    <div>
+                        <dt><span class="swatch swatch--credit"></span>Utang sales</dt>
+                        <dd th:text="'₱' + ${creditSales}">₱0</dd>
+                    </div>
+                </dl>
+
+            </div>
 
         </div>
 
         <div class="panel">
 
-            <h3>Collections breakdown</h3>
+            <div class="panel-head"><h3>Collections breakdown</h3></div>
 
-            <p>
-                Cash collected:
-                <strong th:text="'₱' + ${cashCollected}"></strong>
-            </p>
+            <dl class="figures">
+                <div>
+                    <dt>Cash collected</dt>
+                    <dd th:text="'₱' + ${cashCollected}">₱0</dd>
+                </div>
+                <div>
+                    <dt>GCash collected</dt>
+                    <dd th:text="'₱' + ${gcashCollected}">₱0</dd>
+                </div>
+            </dl>
 
-            <p>
-                GCash collected:
-                <strong th:text="'₱' + ${gcashCollected}"></strong>
-            </p>
-
-            <p>
-                Includes repayments received on this date.
-            </p>
+            <p class="panel-note">Includes repayments received on this date.</p>
 
         </div>
 
         <div class="panel">
 
-            <h3>Inventory indicators</h3>
+            <div class="panel-head"><h3>Inventory indicators</h3></div>
 
-            <p>
-                Current stock at purchase cost:
-                <strong th:text="'₱' + ${stockCostValue}"></strong>
-            </p>
-
-            <p>
-                Non-sale stock out:
-                <strong th:text="${lossKg} + ' kg'"></strong>
-            </p>
-
-            <p>
-                Estimated non-sale stock cost:
-                <strong th:text="'₱' + ${estimatedLossCost}"></strong>
-            </p>
+            <dl class="figures">
+                <div>
+                    <dt>Current stock at purchase cost</dt>
+                    <dd th:text="'₱' + ${stockCostValue}">₱0</dd>
+                </div>
+                <div>
+                    <dt>Non-sale stock out</dt>
+                    <dd th:text="${lossKg} + ' kg'">0 kg</dd>
+                </div>
+                <div>
+                    <dt>Estimated non-sale stock cost</dt>
+                    <dd th:text="'₱' + ${estimatedLossCost}">₱0</dd>
+                </div>
+            </dl>
 
         </div>
 
-    </div>
+    </section>
 
     <!-- Only ADMIN and MANAGER may record expenses -->
 
-    <div class="panel" th:if="${canRecordExpense}">
+    <div class="panel no-print" th:if="${canRecordExpense}">
 
-        <h3>Record operating expense</h3>
+        <div class="panel-head"><h3>Record operating expense</h3></div>
 
-        <form class="expense-form"
-              th:action="@{/expenses}" method="post">
+        <form class="expense-form" th:action="@{/expenses}" method="post">
 
             <label>
                 Category
-
                 <select name="category">
                     <option>Transport</option>
                     <option>Labor</option>
@@ -260,25 +260,15 @@
 
             <label>
                 Amount (₱)
-
-                <input name="amount"
-                       type="number"
-                       step="0.01"
-                       min="0.01"
-                       required>
+                <input name="amount" type="number" step="0.01" min="0.01" required>
             </label>
 
             <label>
                 Description
-
-                <input name="description"
-                       maxlength="255"
-                       required>
+                <input name="description" maxlength="255" required>
             </label>
 
-            <button class="button" type="submit">
-                Record Expense
-            </button>
+            <button class="button" type="submit">Record expense</button>
 
         </form>
 
@@ -286,66 +276,93 @@
 
     <!-- Expense history -->
 
-    <div class="panel spaced">
+    <div class="panel">
 
-        <h3>Expenses for selected date</h3>
+        <div class="panel-head"><h3>Expenses for selected date</h3></div>
 
-        <table>
+        <div class="table-wrap">
+            <table>
 
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th class="num">Amount</th>
+                    </tr>
+                </thead>
 
-            <tbody>
+                <tbody>
 
-                <tr th:each="e : ${dayExpenses}">
+                    <tr th:each="e : ${dayExpenses}">
+                        <td th:text="${#temporals.format(e.incurredAt, 'HH:mm')}"></td>
+                        <td th:text="${e.category}"></td>
+                        <td th:text="${e.description}"></td>
+                        <td class="num" th:text="'₱' + ${e.amount}"></td>
+                    </tr>
 
-                    <td th:text="${#temporals.format(e.incurredAt, 'HH:mm')}">
-                    </td>
+                    <tr th:if="${#lists.isEmpty(dayExpenses)}">
+                        <td class="empty-row" colspan="4">No expenses recorded for this date.</td>
+                    </tr>
 
-                    <td th:text="${e.category}"></td>
+                </tbody>
 
-                    <td th:text="${e.description}"></td>
-
-                    <td th:text="'₱' + ${e.amount}"></td>
-
-                </tr>
-
-                <tr th:if="${#lists.isEmpty(dayExpenses)}">
-                    <td colspan="4">
-                        No expenses recorded for this date.
-                    </td>
-                </tr>
-
-            </tbody>
-
-        </table>
+            </table>
+        </div>
 
     </div>
 
-    <!-- Accounting disclaimer -->
+    <!-- Accounting disclaimer (collapsed so it doesn't dominate the page) -->
 
-    <p class="accounting-disclaimer">
-        <small>
-            Important: Cost is the current product cost/kg
-            captured at the moment of each sale.
-
-            Non-sale stock-out loss is estimated using today's
-            product cost, not historical batch cost.
-
-            This is an educational estimate, not an audited
-            profit or cash reconciliation.
-
-            Entering a cost of ₱0 produces misleading profit.
-        </small>
-    </p>
+    <details class="accounting-note">
+        <summary>How these figures are calculated</summary>
+        <ul>
+            <li>Cost is the product's cost per kg at the moment of each sale.</li>
+            <li>Non-sale stock-out loss uses today's product cost, not the historical batch cost.</li>
+            <li>This is an educational estimate, not an audited profit or cash reconciliation.</li>
+            <li>A product cost of ₱0 produces misleading profit, so always enter a cost.</li>
+        </ul>
+    </details>
 
 </main>
+
+<!-- Sales mix donut (plain SVG, no external library) -->
+<script>
+    (function () {
+        var el = document.getElementById('salesMix');
+        if (!el) return;
+
+        var cash = parseFloat(el.dataset.cash) || 0;
+        var gcash = parseFloat(el.dataset.gcash) || 0;
+        var credit = parseFloat(el.dataset.credit) || 0;
+        var total = cash + gcash + credit;
+        var parts = Array.of([cash, 'cash'], [gcash, 'gcash'], [credit, 'credit']);
+
+        var svg = '<svg viewBox="0 0 42 42" role="img" aria-label="Share of sales by payment type">'
+            + '<circle class="donut-ring" cx="21" cy="21" r="15.915"/>';
+
+        var offset = 25;   // start the first segment at 12 o'clock
+        var paid = 0;
+
+        if (total > 0) {
+            parts.forEach(function (p) {
+                var pct = p[0] / total * 100;
+                if (pct <= 0) return;
+                svg += '<circle class="donut-seg donut-seg--' + p[1] + '" cx="21" cy="21" r="15.915"'
+                    + ' stroke-dasharray="' + pct + ' ' + (100 - pct) + '"'
+                    + ' stroke-dashoffset="' + offset + '"/>';
+                offset -= pct;
+            });
+            paid = Math.round((cash + gcash) / total * 100);
+        }
+
+        svg += '</svg>'
+            + '<div class="donut-center"><strong>' + (total > 0 ? paid + '%' : '–') + '</strong>'
+            + '<span>paid at sale</span></div>';
+
+        el.innerHTML = svg;
+    })();
+</script>
 
 <!-- Revenue trend line chart (plain SVG, no external library) -->
 <script th:inline="javascript">
@@ -356,7 +373,19 @@
 
         var labels = /*[[${trendLabels}]]*/ ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
         var values = /*[[${trendValues}]]*/ [0, 0, 0, 0, 0, 0];
+        var salesUrl = /*[[@{/sales}]]*/ '/sales';
         values = values.map(Number);
+
+        // Show an empty state instead of drawing a zero-revenue chart.
+        if (values.length === 0 || values.every(function (value) {
+            return value === 0;
+        })) {
+            el.innerHTML = '<div class="empty-state" role="status">'
+                + '<p>No revenue in the last 6 months. Your trend will appear after your first sale.</p>'
+                + '<a class="button ghost no-print" href="' + salesUrl + '">Go to sales</a>'
+                + '</div>';
+            return;
+        }
 
         var W = 640, H = 280, L = 54, R = 16, T = 14, B = 34;
         var pw = W - L - R, ph = H - T - B;
@@ -387,8 +416,8 @@
 
         var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Revenue trend, last 6 months">';
         svg += '<defs><linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">'
-            + '<stop offset="0%" style="stop-color:var(--orange);stop-opacity:.28"/>'
-            + '<stop offset="100%" style="stop-color:var(--orange);stop-opacity:0"/>'
+            + '<stop offset="0%" style="stop-color:var(--d-teal);stop-opacity:.22"/>'
+            + '<stop offset="100%" style="stop-color:var(--d-teal);stop-opacity:0"/>'
             + '</linearGradient></defs>';
 
         // Horizontal grid lines and y labels
