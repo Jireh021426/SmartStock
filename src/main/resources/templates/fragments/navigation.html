@@ -26,8 +26,107 @@
         <symbol id="i-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></symbol>
         <symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
         <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+        <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
         <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
     </svg>
+
+    <!-- SmartStock top navigation -->
+    <div class="smart-topbar no-print">
+        <div class="topbar-left">
+            <details class="topbar-quick-add">
+                <summary aria-label="Quick add" title="Quick add">
+                    <span aria-hidden="true">+</span>
+                </summary>
+                <div class="topbar-dropdown">
+                    <strong>Quick Add</strong>
+                    <a th:if="${nav.admin}" th:href="@{/products/new}">
+                        New Product
+                    </a>
+                    <a th:if="${nav.admin}" th:href="@{/inventory/new}">
+                        Stock In / Out
+                    </a>
+                    <a th:if="${nav.cashier}" th:href="@{/sales/new}">
+                        New Sale
+                    </a>
+                </div>
+            </details>
+
+            <a class="topbar-icon-link"
+               th:if="${nav.admin or nav.manager or nav.auditor or nav.sender or nav.receiver}"
+               th:href="@{/inventory}"
+               title="Stock activity"
+               aria-label="Stock activity">
+                <svg class="ico"><use href="#i-clock"/></svg>
+            </a>
+        </div>
+
+        <div class="topbar-search">
+            <svg class="ico" aria-hidden="true">
+                <use href="#i-search"/>
+            </svg>
+            <input id="smartstock-nav-search"
+                   type="search"
+                   placeholder="Search pages..."
+                   aria-label="Search SmartStock pages"
+                   autocomplete="off"/>
+            <div id="smartstock-search-results"
+                 class="topbar-search-results"
+                 hidden></div>
+        </div>
+
+        <div class="topbar-right">
+            <details class="topbar-notifications"
+                     th:if="${nav.admin or nav.manager}">
+                <summary aria-label="Notifications"
+                         title="Notifications">
+                    <svg class="ico" aria-hidden="true">
+                        <use href="#i-bell"/>
+                    </svg>
+                    <span class="topbar-notification-count"
+                          th:if="${pendingAuditCount > 0}"
+                          th:text="${pendingAuditCount}">0</span>
+                </summary>
+                <div class="topbar-notification-menu">
+                    <strong>Notifications</strong>
+                    <a th:if="${pendingAuditCount > 0}"
+                       th:href="@{/audits}">
+                        <span>Pending stock audits</span>
+                        <b th:text="${pendingAuditCount}">0</b>
+                    </a>
+                    <p th:if="${pendingAuditCount == 0}">
+                        No pending stock audits.
+                    </p>
+                </div>
+            </details>
+            <details class="topbar-profile">
+                <summary aria-label="Account menu">
+                    <span class="topbar-avatar" aria-hidden="true">
+                        <svg class="ico"><use href="#i-users"/></svg>
+                    </span>
+                    <span class="topbar-profile-label"
+                          th:text="${currentUsername}">Account</span>
+                    <span aria-hidden="true">⌄</span>
+                </summary>
+
+                <div class="topbar-profile-menu">
+                    <strong th:text="${currentUsername}">Account</strong>
+                    <span class="topbar-profile-role"
+                          th:text="${nav.admin ? 'Administrator' :
+                                   nav.manager ? 'Manager' :
+                                   nav.cashier ? 'Cashier' :
+                                   nav.sender ? 'Sender' :
+                                   nav.receiver ? 'Receiver' :
+                                   nav.auditor ? 'Auditor' : 'User'}">
+                        User
+                    </span>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Log out</button>
+                    </form>
+                </div>
+            </details>
+        </div>
+    </div>
 
     <div class="brand">
         <span class="brand-mark">
@@ -123,16 +222,9 @@
 
     </nav>
 
-    <!-- Spring Security logout: POST /logout (th:action adds the CSRF token) -->
-    <form class="logout-form no-print"
-          th:action="@{/logout}"
-          method="post">
-        <button type="submit" class="logout-btn">
-            <svg class="ico"><use href="#i-logout"/></svg>
-            <span>Log out</span>
-        </button>
-    </form>
 
+
+    <script th:src="@{/js/navigation-search.js}" defer></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const currentPath = window.location.pathname;

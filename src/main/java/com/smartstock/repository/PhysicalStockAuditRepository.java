@@ -16,6 +16,10 @@ public interface PhysicalStockAuditRepository
 
     List<PhysicalStockAudit> findAllByOrderByCountedAtDescIdDesc();
 
+    long countByStatus(PhysicalStockAudit.Status status);
+
+
+
     boolean existsByLocationIdAndProductIdAndStatus(
             Long locationId,
             Long productId,

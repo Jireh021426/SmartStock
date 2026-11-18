@@ -1,211 +1,362 @@
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmartStock | Remittances</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <div th:replace="~{fragments/navigation :: siteHeader}"></div>
-<main style="max-width:1400px;margin:35px auto;padding:20px">
 
-    <h1>Cashier Remittance Reconciliation</h1>
+<main class="remittances-page">
 
-    <p style="color:green"
+    <div class="heading">
+        <div>
+            <h1>Cashier Remittance Reconciliation</h1>
+            <p>
+                Compare what each cashier should hand over with what was
+                declared and independently counted.
+            </p>
+        </div>
+    </div>
+
+    <p class="notice"
        th:if="${message}"
        th:text="${message}"></p>
 
-    <p style="color:red"
+    <p class="error"
        th:if="${error}"
        th:text="${error}"></p>
 
+    <p class="notice info"
+       th:if="${builtInAdmin}">
+        You are signed in with the built-in admin account, so this page is
+        read-only. Verifying a remittance records the reviewing employee,
+        so please use a manager account for that.
+    </p>
+
+    <!-- ========================================
+         CASHIER: expected amounts + submit form
+         ======================================== -->
     <section th:if="${cashier}">
-        <h2>Submit today's remittance</h2>
 
-        <p>
-            Expected physical cash:
-            <strong th:text="${expected.cash}"></strong>
+        <div class="stats">
 
-            | Expected GCash receipts:
-            <strong th:text="${expected.gcash}"></strong>
-        </p>
+            <div class="panel rem-kpi">
+                <span class="kpi-icon"><svg class="ico"><use href="#i-wallet"/></svg></span>
+                <small>Expected physical cash</small>
+                <h2 class="money" th:text="${expected.cash}"></h2>
+            </div>
 
-        <p>
-            Cash and GCash are reconciled separately.
-            These expected amounts include transactions
-            attributed to your cashier account.
-        </p>
+            <div class="panel rem-kpi">
+                <span class="kpi-icon"><svg class="ico"><use href="#i-card"/></svg></span>
+                <small>Expected GCash receipts</small>
+                <h2 class="money" th:text="${expected.gcash}"></h2>
+            </div>
 
-        <p th:if="${alreadySubmitted}">
-            Today's remittance has already been submitted.
-        </p>
+        </div>
 
-        <form th:unless="${alreadySubmitted}"
-              th:action="@{/remittances/submit}"
-              method="post">
+        <div class="panel spaced">
 
-            <label>
-                Actual cash handed over
-                <input type="number"
-                       name="declaredCash"
-                       min="0"
-                       step="0.01"
-                       required>
-            </label>
+            <h3>Submit today's remittance</h3>
 
-            <label>
-                Actual GCash confirmed
-                <input type="number"
-                       name="declaredGcash"
-                       min="0"
-                       step="0.01"
-                       required>
-            </label>
+            <p>
+                Cash and GCash are reconciled separately.
+                These expected amounts include transactions
+                attributed to your cashier account.
+            </p>
 
-            <button type="submit">
-                Submit for verification
-            </button>
-        </form>
+            <p class="notice"
+               th:if="${alreadySubmitted}">
+                Today's remittance has already been submitted.
+            </p>
+
+            <form class="rem-form"
+                  th:unless="${alreadySubmitted}"
+                  th:action="@{/remittances/submit}"
+                  method="post">
+
+                <label>
+                    Actual cash handed over
+                    <input type="number"
+                           name="declaredCash"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           required>
+                </label>
+
+                <label>
+                    Actual GCash confirmed
+                    <input type="number"
+                           name="declaredGcash"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           required>
+                </label>
+
+                <button class="button" type="submit">
+                    Submit for verification
+                </button>
+            </form>
+
+        </div>
+
     </section>
 
-    <h2>Remittance history</h2>
+    <!-- ========================================
+         SUMMARY (counts are filled in by remittance-list.js)
+         ======================================== -->
+    <div class="stats triple rem-summary">
 
-    <div class="remittance-table-scroll">
-        <table class="remittance-table">
+        <div class="panel rem-kpi">
+            <span class="kpi-icon"><svg class="ico"><use href="#i-receipt"/></svg></span>
+            <small>Total remittances</small>
+            <h2 data-count="total" th:text="${#lists.size(remittances)}"></h2>
+        </div>
 
-            <thead>
-            <tr>
-                <th>Date</th>
-                <th>Cashier</th>
-                <th>Location</th>
-                <th>Expected cash</th>
-                <th>Declared cash</th>
-                <th>Cashier cash difference</th>
-                <th>Manager-counted cash</th>
-                <th>Actual cash difference</th>
-                <th>Count vs declaration</th>
-                <th>Expected GCash</th>
-                <th>Declared GCash</th>
-                <th>Manager-confirmed GCash</th>
-                <th>Actual GCash difference</th>
-                <th>Status</th>
-                <th>Review</th>
-            </tr>
-            </thead>
+        <div class="panel rem-kpi">
+            <span class="kpi-icon warn"><svg class="ico"><use href="#i-clock"/></svg></span>
+            <small>Awaiting review</small>
+            <h2 data-count="pending">0</h2>
+        </div>
 
-            <tbody>
-            <tr th:if="${#lists.isEmpty(remittances)}">
-                <td colspan="15"
-                    style="text-align:center;padding:32px;color:#64748b">
-                    No remittance records yet.
-                </td>
-            </tr>
-            <tr th:each="r : ${remittances}">
+        <div class="panel rem-kpi">
+            <span class="kpi-icon"><svg class="ico"><use href="#i-clipboard"/></svg></span>
+            <small>Reviewed</small>
+            <h2 data-count="reviewed">0</h2>
+        </div>
 
-                <td th:text="${r.businessDate}"></td>
-                <td th:text="${r.cashier.fullName}"></td>
-                <td th:text="${r.location.name}"></td>
-
-                <td th:text="${r.expectedCash}"></td>
-                <td th:text="${r.declaredCash}"></td>
-                <td th:text="${r.cashVariance}"></td>
-
-                <td th:text="${r.confirmedCash != null ? r.confirmedCash : 'Not recorded'}"></td>
-
-                <td th:text="${r.confirmedCashVariance != null ? r.confirmedCashVariance : '—'}"></td>
-
-                <td th:text="${r.cashDeclarationDifference != null ? r.cashDeclarationDifference : '—'}"></td>
-
-                <td th:text="${r.expectedGcash}"></td>
-                <td th:text="${r.declaredGcash}"></td>
-
-                <td th:text="${r.confirmedGcash != null ? r.confirmedGcash : 'Not recorded'}"></td>
-
-                <td th:text="${r.confirmedGcashVariance != null ? r.confirmedGcashVariance : '—'}"></td>
-
-                <td th:text="${r.status}"></td>
-
-                <td>
-                    <div th:if="${r.verifiedBy != null}">
-                        <strong th:text="${r.verifiedBy.fullName}"></strong>
-
-                        <div th:text="${r.verifiedAt}"></div>
-
-                        <div th:text="${r.reviewNote}"></div>
-
-                        <small th:if="${r.confirmedCash == null}">
-                            Historical review — independent count
-                            was not recorded.
-                        </small>
-                    </div>
-
-                    <form th:if="${reviewer and r.status.name() == 'SUBMITTED'}"
-                          th:action="@{/remittances/verify}"
-                          method="post">
-
-                        <input type="hidden"
-                               name="id"
-                               th:value="${r.id}">
-
-                        <div>
-                            <label>
-                                Manager physically counted cash
-                                <input type="number"
-                                       name="countedCash"
-                                       min="0"
-                                       step="0.01"
-                                       required>
-                            </label>
-                        </div>
-
-                        <div>
-                            <label>
-                                Independently confirmed GCash
-                                <input type="number"
-                                       name="confirmedGcash"
-                                       min="0"
-                                       step="0.01"
-                                       required>
-                            </label>
-                        </div>
-
-                        <div>
-                            <label>
-                                Review note
-                                <input type="text"
-                                       name="note"
-                                       maxlength="1000"
-                                       placeholder="Count method or discrepancy explanation">
-                            </label>
-                        </div>
-
-                        <button type="submit">
-                            Verify / Flag
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
     </div>
 
-    <p>
-        Positive difference = overage.
-        Negative difference = shortage.
+    <!-- ========================================
+         HISTORY
+         ======================================== -->
+    <h3 class="section-title">Remittance history</h3>
+
+    <div class="rem-toolbar"
+         th:if="${!#lists.isEmpty(remittances)}">
+
+        <div class="rem-filters" role="group" aria-label="Filter remittances">
+            <button type="button" class="chip-btn active" data-filter="all">
+                All <span data-count="total"></span>
+            </button>
+            <button type="button" class="chip-btn" data-filter="pending">
+                Awaiting review <span data-count="pending"></span>
+            </button>
+            <button type="button" class="chip-btn" data-filter="reviewed">
+                Reviewed <span data-count="reviewed"></span>
+            </button>
+        </div>
+
+        <input type="search"
+               id="remSearch"
+               class="rem-search"
+               placeholder="Search cashier, location or date…"
+               aria-label="Search remittances">
+    </div>
+
+    <div class="panel rem-empty"
+         th:if="${#lists.isEmpty(remittances)}">
+        <span class="kpi-icon"><svg class="ico"><use href="#i-receipt"/></svg></span>
+        <h3>No remittance records yet</h3>
+        <p>
+            Remittances appear here once a cashier submits the day's
+            cash and GCash for verification.
+        </p>
+    </div>
+
+    <div class="rem-list" id="remList">
+
+        <article class="rem-card"
+                 th:each="r : ${remittances}"
+                 th:attr="data-status=${r.status.name() == 'SUBMITTED' ? 'pending' : 'reviewed'}">
+
+            <header class="rc-head">
+
+                <div class="rc-who">
+                    <span class="rc-avatar"><svg class="ico"><use href="#i-users"/></svg></span>
+                    <div>
+                        <strong class="rc-name" th:text="${r.cashier.fullName}"></strong>
+                        <span class="muted"
+                              th:text="${r.location.name} + '  ·  ' + ${r.businessDate}"></span>
+                    </div>
+                </div>
+
+                <span class="badge"
+                      th:classappend="'status-' + ${#strings.toLowerCase(r.status.name())}"
+                      th:text="${r.status}"></span>
+
+            </header>
+
+            <div class="rc-body">
+
+                <section class="rc-block">
+                    <h4>Cash</h4>
+                    <dl class="rc-grid">
+                        <div>
+                            <dt>Expected</dt>
+                            <dd class="money" th:text="${r.expectedCash}"></dd>
+                        </div>
+                        <div>
+                            <dt>Declared by cashier</dt>
+                            <dd class="money" th:text="${r.declaredCash}"></dd>
+                        </div>
+                        <div>
+                            <dt>Counted by manager</dt>
+                            <dd class="money"
+                                th:text="${r.confirmedCash != null ? r.confirmedCash : 'Not recorded'}"></dd>
+                        </div>
+                        <div>
+                            <dt>Cashier difference</dt>
+                            <dd class="money var" th:text="${r.cashVariance}"></dd>
+                        </div>
+                        <div>
+                            <dt>Actual difference</dt>
+                            <dd class="money var"
+                                th:text="${r.confirmedCashVariance != null ? r.confirmedCashVariance : '—'}"></dd>
+                        </div>
+                        <div>
+                            <dt>Count vs declaration</dt>
+                            <dd class="money var"
+                                th:text="${r.cashDeclarationDifference != null ? r.cashDeclarationDifference : '—'}"></dd>
+                        </div>
+                    </dl>
+                </section>
+
+                <section class="rc-block">
+                    <h4>GCash</h4>
+                    <dl class="rc-grid">
+                        <div>
+                            <dt>Expected</dt>
+                            <dd class="money" th:text="${r.expectedGcash}"></dd>
+                        </div>
+                        <div>
+                            <dt>Declared by cashier</dt>
+                            <dd class="money" th:text="${r.declaredGcash}"></dd>
+                        </div>
+                        <div>
+                            <dt>Confirmed by manager</dt>
+                            <dd class="money"
+                                th:text="${r.confirmedGcash != null ? r.confirmedGcash : 'Not recorded'}"></dd>
+                        </div>
+                        <div>
+                            <dt>Actual difference</dt>
+                            <dd class="money var"
+                                th:text="${r.confirmedGcashVariance != null ? r.confirmedGcashVariance : '—'}"></dd>
+                        </div>
+                    </dl>
+                </section>
+
+            </div>
+
+            <footer class="rc-foot">
+
+                <!-- Already reviewed -->
+                <div class="rc-review"
+                     th:if="${r.verifiedBy != null}">
+
+                    <span class="muted">Reviewed by</span>
+                    <strong th:text="${r.verifiedBy.fullName}"></strong>
+                    <span class="muted dt" th:text="${r.verifiedAt}"></span>
+
+                    <p class="rc-note"
+                       th:if="${!#strings.isEmpty(r.reviewNote)}"
+                       th:text="${r.reviewNote}"></p>
+
+                    <small th:if="${r.confirmedCash == null}">
+                        Historical review — independent count
+                        was not recorded.
+                    </small>
+                </div>
+
+                <!-- Waiting, and the viewer cannot review -->
+                <p class="muted"
+                   th:unless="${r.verifiedBy != null or reviewer}">
+                    Awaiting manager review.
+                </p>
+
+                <!-- Waiting, and the viewer can review -->
+                <form class="review-form"
+                      th:if="${reviewer and r.status.name() == 'SUBMITTED'}"
+                      th:action="@{/remittances/verify}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="id"
+                           th:value="${r.id}">
+
+                    <label>
+                        Manager physically counted cash
+                        <input type="number"
+                               name="countedCash"
+                               min="0"
+                               step="0.01"
+                               placeholder="0.00"
+                               required>
+                    </label>
+
+                    <label>
+                        Independently confirmed GCash
+                        <input type="number"
+                               name="confirmedGcash"
+                               min="0"
+                               step="0.01"
+                               placeholder="0.00"
+                               required>
+                    </label>
+
+                    <label>
+                        Review note
+                        <input type="text"
+                               name="note"
+                               maxlength="1000"
+                               placeholder="Count method or discrepancy explanation">
+                    </label>
+
+                    <button class="button" type="submit">
+                        Verify / Flag
+                    </button>
+                </form>
+
+            </footer>
+
+        </article>
+
+    </div>
+
+    <p class="rem-no-match" id="remNoMatch" hidden>
+        No remittances match your search or filter.
     </p>
 
-    <p>
-        Manager-counted cash must be independently counted.
-        GCash must be independently confirmed from a trusted
-        payment record, not merely copied from the cashier declaration.
-    </p>
+    <div class="form-note">
 
-    <p>
-        Historical transactions without cashier attribution
-        are excluded from employee remittance totals.
-    </p>
+        <p>
+            <strong>Differences:</strong>
+            Positive difference = overage.
+            Negative difference = shortage.
+        </p>
+
+        <p>
+            <strong>Independent counts:</strong>
+            Manager-counted cash must be independently counted.
+            GCash must be independently confirmed from a trusted
+            payment record, not merely copied from the cashier declaration.
+        </p>
+
+        <p>
+            <strong>Historical data:</strong>
+            Historical transactions without cashier attribution
+            are excluded from employee remittance totals.
+        </p>
+
+    </div>
 
 </main>
+
+<script th:src="@{/js/remittance-list.js}"></script>
+
 </body>
 </html>

@@ -1,6 +1,8 @@
 
 package com.smartstock.config;
 
+import com.smartstock.model.PhysicalStockAudit;
+import com.smartstock.repository.PhysicalStockAuditRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -10,6 +12,23 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice(annotations = Controller.class)
 public class NavigationModelAdvice {
 
+    private final PhysicalStockAuditRepository auditRepository;
+
+    public NavigationModelAdvice(PhysicalStockAuditRepository auditRepository) {
+        this.auditRepository = auditRepository;
+    }
+
+    @ModelAttribute("pendingAuditCount")
+    public long pendingAuditCount(Authentication authentication) {
+        NavigationPermissions permissions = new NavigationPermissions(authentication);
+
+        if (!permissions.isAdmin() && !permissions.isManager()) {
+            return 0L;
+        }
+
+        return auditRepository.countByStatus(PhysicalStockAudit.Status.PENDING);
+    }
+
     @ModelAttribute("nav")
     public NavigationPermissions navigationPermissions() {
 
@@ -17,6 +36,14 @@ public class NavigationModelAdvice {
                 SecurityContextHolder.getContext().getAuthentication();
 
         return new NavigationPermissions(authentication);
+    }
+
+    @ModelAttribute("currentUsername")
+    public String currentUsername(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "Account";
+        }
+        return authentication.getName();
     }
 
     public static class NavigationPermissions {
