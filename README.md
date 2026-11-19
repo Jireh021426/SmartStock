@@ -12,3 +12,17 @@ Products: price/kg, cost/kg, stock kg; stock movements; cash/GCash/credit sales;
 
 ## Reporting limitations
 Gross profit = sales - cost at sale. Estimated result = gross profit - expenses - estimated non-sale stock-out cost. Non-sale stock-out costs use CURRENT product cost, not historical batch purchase cost. Stock-in purchase invoices, payment verification, expense payment methods, cash drawer counts, taxes, payroll accruals, multi-user roles, and true reconciliation are not implemented. Existing Phase 3 sales are not imported. Changing purchase cost only affects future sales. Use test data only.
+
+## Admin Account
+Username: admin
+Password: DemoAdmin2026!
+
+## Cashier Account
+Username: cashier.demo
+Password: password12345
+
+## Database Account
+Original database username: SmartStock
+Original database password: SmartStock
+SmartStock admin login password: goodboyalready
+

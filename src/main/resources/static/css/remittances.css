@@ -182,3 +182,6 @@ main.remittances-page {
     .remittances-page .rc-foot, .remittances-page .panel-body { padding: 18px; }
     .remittances-page .form-actions .btn { width: 100%; }
 }
+
+/* Keep the page heading clear of the header */
+main.remittances-page { padding-top: 90px; }

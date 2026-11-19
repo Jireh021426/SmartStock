@@ -1,61 +1,522 @@
-/* SmartStock Sales — page scoped; shared navigation belongs to style.css */
-.sales-page,.sale-entry-page{--sales-good:#059669;--sales-warn:#b45309;--sales-bad:#be123c;--sales-blue:#0284c7;min-width:0;color:var(--ink)}
-.sales-page *,.sale-entry-page *{box-sizing:border-box}
-.sales-page .topbar,.sale-entry-page .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.sales-page .page-title,.sale-entry-page .page-title{font-size:25px;font-weight:750;color:var(--ink);margin:0}
-.sales-page .page-sub,.sale-entry-page .page-sub{font-size:13px;color:var(--muted);margin:6px 0 0}
-.sales-page .back-link,.sale-entry-page .back-link{color:var(--teal);font-size:13px;text-decoration:none;display:inline-block;margin-bottom:10px}
-.sales-page .panel,.sale-entry-page .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;color:var(--ink)}
-.sales-page .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.sales-page .rem-kpi{padding:24px;display:flex;flex-direction:column;gap:9px;position:relative}
-.sales-page .kpi-icon{height:38px;width:38px;display:grid;place-items:center;border-radius:10px;background:var(--cb);color:var(--c)}
-.sales-page .kpi-icon svg{width:19px;height:19px}
-.sales-page .rem-kpi small{font-size:12px;font-weight:650;text-transform:uppercase;color:var(--muted)}
-.sales-page .rem-kpi h2{font-size:27px;font-weight:800;margin:0;color:var(--ink);overflow-wrap:anywhere}
-.sales-page .panel-head{padding:20px 24px;border-bottom:1px solid var(--line)}
-.sales-page .panel-head h3{font-size:15px;font-weight:750;color:var(--ink);margin:0}
-.sales-page .table-wrap{overflow-x:auto;width:100%}
-.sales-page table{width:100%;min-width:900px;border-collapse:collapse}
-.sales-page th{padding:15px 20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:left;background:var(--teal-soft);color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
-.sales-page td{padding:15px 20px;font-size:13px;border-bottom:1px solid var(--line);color:var(--ink)}
-.sales-page tbody tr:hover td{background:var(--teal-soft)}
-.sales-page .product-name{font-weight:700;color:var(--ink)}
-.sales-page .text-muted,.sale-entry-page .text-muted{color:var(--muted)}
-.sales-page .empty-state{text-align:center;padding:40px;color:var(--muted)}
-.sales-page .status-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 11px;font-size:11px;font-weight:750;white-space:nowrap}
-.sales-page .status-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.sales-page .status-in{color:#166534;background:#dcfce7}
-.sales-page .status-accent{color:#075985;background:#e0f2fe}
-.sales-page .status-warn{color:#92400e;background:#fef3c7}
-.sales-page .btn-action{display:inline-flex;align-items:center;border-radius:8px;padding:7px 12px;text-decoration:none;font-size:12px;font-weight:650;border:1px solid var(--line)}
-.sales-page .btn-ghost{background:var(--teal-soft);color:var(--ink)}
-.sales-page .btn.btn-primary,.sale-entry-page .btn.btn-primary{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;padding:12px 20px;background:#18a999;color:#fff;font-weight:750;font-size:13px;text-decoration:none;cursor:pointer}
-.sale-entry-page{width:100%;max-width:900px;margin:0 auto}
-.sale-entry-page .nova-form{padding:24px;display:flex;flex-direction:column;gap:22px}
-.sale-entry-page .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.sale-entry-page .form-grid label{display:flex;flex-direction:column;gap:8px;color:var(--ink);font-size:13px;font-weight:650}
-.sale-entry-page .full-width{grid-column:1/-1}
-.sale-entry-page input,.sale-entry-page select{width:100%;min-width:0;height:44px;border-radius:10px;padding:0 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
-.sale-entry-page input:focus,.sale-entry-page select:focus{outline:2px solid var(--teal);outline-offset:1px}
-.sale-entry-page .form-hint{font-size:12px;color:var(--muted);font-weight:400;line-height:1.5}
-.sale-entry-page .form-hint a{color:var(--teal)!important}
-.sale-entry-page .error-text{color:#e11d48;font-size:12px}
-.sale-entry-page .error-msg{padding:12px 16px;margin:16px 24px 0;border-radius:9px;background:#fff1f2;color:#be123c;border:1px solid #fecdd3}
-.sale-entry-page .form-note{padding:18px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:13px;line-height:1.6;background:var(--teal-soft)}
-.sale-entry-page .form-note p{margin:0 0 8px}.sale-entry-page .form-note p:last-child{margin-bottom:0}
-.sale-entry-page .form-note strong{color:var(--ink)}
-.sale-entry-page .form-actions{display:flex;justify-content:flex-end}
-:root[data-theme="dark"] .sales-page .panel,:root[data-theme="dark"] .sale-entry-page .panel{background:#172033;color:#f8fafc}
-:root[data-theme="dark"] .sales-page .page-title,:root[data-theme="dark"] .sales-page .rem-kpi h2,:root[data-theme="dark"] .sales-page .panel-head h3,:root[data-theme="dark"] .sales-page td,:root[data-theme="dark"] .sales-page .product-name,:root[data-theme="dark"] .sale-entry-page .page-title,:root[data-theme="dark"] .sale-entry-page .form-grid label{color:#f8fafc}
-:root[data-theme="dark"] .sales-page th{background:#203547;color:#cbd5e1}
-:root[data-theme="dark"] .sales-page tbody tr:hover td{background:#202c42}
-:root[data-theme="dark"] .sales-page .status-in{background:#123d32;color:#6ee7b7}
-:root[data-theme="dark"] .sales-page .status-accent{background:#12364a;color:#7dd3fc}
-:root[data-theme="dark"] .sales-page .status-warn{background:#433318;color:#fcd34d}
-:root[data-theme="dark"] .sales-page .btn-ghost{background:#202c42;color:#f8fafc}
-:root[data-theme="dark"] .sale-entry-page input,:root[data-theme="dark"] .sale-entry-page select{background:#202c42;color:#f8fafc;border-color:#334155}
-:root[data-theme="dark"] .sale-entry-page option{background:#202c42;color:#f8fafc}
-:root[data-theme="dark"] .sale-entry-page .form-note{background:#202c42}
-:root[data-theme="dark"] .sale-entry-page .form-note strong{color:#f8fafc}
-@media(max-width:900px){.sales-page .stats{grid-template-columns:1fr}}
-@media(max-width:650px){.sale-entry-page .form-grid{grid-template-columns:1fr}.sale-entry-page .full-width{grid-column:auto}.sale-entry-page .nova-form{padding:16px}.sales-page .rem-kpi{padding:18px}}
+
+/* =========================================================
+   SmartStock Sales
+   Page-scoped styles only.
+   Shared navigation and layout belong to style.css.
+   ========================================================= */
+
+.sales-page,
+.sale-entry-page {
+    --sales-good: #059669;
+    --sales-warn: #b45309;
+    --sales-bad: #be123c;
+    --sales-blue: #0284c7;
+    min-width: 0;
+    color: var(--ink);
+}
+
+.sales-page *,
+.sale-entry-page * {
+    box-sizing: border-box;
+}
+
+/* ================= PAGE HEADERS ================= */
+
+.sales-page .topbar,
+.sale-entry-page .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sales-page .page-title,
+.sale-entry-page .page-title {
+    font-size: 25px;
+    font-weight: 750;
+    color: var(--ink);
+    margin: 0;
+}
+
+.sales-page .page-sub,
+.sale-entry-page .page-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 6px 0 0;
+}
+
+.sales-page .back-link,
+.sale-entry-page .back-link {
+    color: var(--teal);
+    font-size: 13px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.sales-page .back-link:hover,
+.sale-entry-page .back-link:hover {
+    text-decoration: underline;
+}
+
+/* ================= PANELS ================= */
+
+.sales-page .panel,
+.sale-entry-page .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    color: var(--ink);
+}
+
+/* ================= SALES STATISTICS ================= */
+
+.sales-page .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.sales-page .rem-kpi {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    position: relative;
+}
+
+.sales-page .kpi-icon {
+    height: 38px;
+    width: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--cb);
+    color: var(--c);
+}
+
+.sales-page .kpi-icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.sales-page .rem-kpi small {
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.sales-page .rem-kpi h2 {
+    font-size: 27px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+/* ================= PANEL HEADERS ================= */
+
+.sales-page .panel-head {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+}
+
+.sales-page .panel-head h3 {
+    font-size: 15px;
+    font-weight: 750;
+    color: var(--ink);
+    margin: 0;
+}
+
+/* ================= SALES TABLE ================= */
+
+.sales-page .table-wrap {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.sales-page table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.sales-page th {
+    padding: 15px 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    text-align: left;
+    background: var(--teal-soft);
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+}
+
+.sales-page td {
+    padding: 15px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    vertical-align: middle;
+}
+
+.sales-page tbody tr:hover td {
+    background: var(--teal-soft);
+}
+
+.sales-page .product-name {
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.sales-page .text-muted,
+.sale-entry-page .text-muted {
+    color: var(--muted);
+}
+
+.sales-page .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+}
+
+/* ================= STATUS BADGES ================= */
+
+.sales-page .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.sales-page .status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.sales-page .status-in {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.sales-page .status-accent {
+    color: #075985;
+    background: #e0f2fe;
+}
+
+.sales-page .status-warn {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.sales-page .status-out {
+    color: #9f1239;
+    background: #ffe4e6;
+}
+
+/* ================= BUTTONS ================= */
+
+.sales-page .btn-action {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 7px 12px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 650;
+    border: 1px solid var(--line);
+    cursor: pointer;
+}
+
+.sales-page .btn-ghost {
+    background: var(--teal-soft);
+    color: var(--ink);
+}
+
+.sales-page .btn.btn-primary,
+.sale-entry-page .btn.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 20px;
+    background: #18a999;
+    color: #fff;
+    font-weight: 750;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease, transform .15s ease;
+}
+
+.sales-page .btn.btn-primary:hover,
+.sale-entry-page .btn.btn-primary:hover {
+    background: #128e82;
+}
+
+.sales-page .btn.btn-primary:active,
+.sale-entry-page .btn.btn-primary:active {
+    transform: scale(.98);
+}
+
+/* ================= NEW SALE FORM ================= */
+
+.sale-entry-page {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.sale-entry-page .nova-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.sale-entry-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.sale-entry-page .form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.sale-entry-page .full-width {
+    grid-column: 1 / -1;
+}
+
+.sale-entry-page input,
+.sale-entry-page select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    border-radius: 10px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    transition: border-color .15s ease;
+}
+
+.sale-entry-page input:focus,
+.sale-entry-page select:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+}
+
+/* ================= FORM HINTS ================= */
+
+.sale-entry-page .form-hint,
+.sale-entry-page .hint-plain {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.sale-entry-page .form-hint a,
+.sale-entry-page .hint-plain a,
+.sale-entry-page .sale-help-link {
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.sale-entry-page .form-hint a:hover,
+.sale-entry-page .hint-plain a:hover,
+.sale-entry-page .sale-help-link:hover {
+    text-decoration: underline;
+}
+
+/* ================= VALIDATION ================= */
+
+.sale-entry-page .error-text {
+    color: #e11d48;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.sale-entry-page .error-msg {
+    padding: 12px 16px;
+    margin: 16px 24px 0;
+    border-radius: 9px;
+    background: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+}
+
+/* ================= FORM INFORMATION ================= */
+
+.sale-entry-page .form-note {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    background: var(--teal-soft);
+}
+
+.sale-entry-page .form-note p {
+    margin: 0 0 8px;
+}
+
+.sale-entry-page .form-note p:last-child {
+    margin-bottom: 0;
+}
+
+.sale-entry-page .form-note strong {
+    color: var(--ink);
+}
+
+.sale-entry-page .form-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ================= CUSTOMER SECTION ================= */
+
+.sale-entry-page #customerSection[hidden] {
+    display: none !important;
+}
+
+.sale-entry-page #customerSection:not([hidden]) {
+    display: block;
+}
+
+.sale-entry-page #customerSection label {
+    width: 100%;
+}
+
+/* ================= DARK THEME ================= */
+
+:root[data-theme="dark"] .sales-page .panel,
+:root[data-theme="dark"] .sale-entry-page .panel {
+    background: #172033;
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .sales-page .page-title,
+:root[data-theme="dark"] .sales-page .rem-kpi h2,
+:root[data-theme="dark"] .sales-page .panel-head h3,
+:root[data-theme="dark"] .sales-page td,
+:root[data-theme="dark"] .sales-page .product-name,
+:root[data-theme="dark"] .sale-entry-page .page-title,
+:root[data-theme="dark"] .sale-entry-page .form-grid label {
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .sales-page th {
+    background: #203547;
+    color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .sales-page tbody tr:hover td {
+    background: #202c42;
+}
+
+:root[data-theme="dark"] .sales-page .status-in {
+    background: #123d32;
+    color: #6ee7b7;
+}
+
+:root[data-theme="dark"] .sales-page .status-accent {
+    background: #12364a;
+    color: #7dd3fc;
+}
+
+:root[data-theme="dark"] .sales-page .status-warn {
+    background: #433318;
+    color: #fcd34d;
+}
+
+:root[data-theme="dark"] .sales-page .status-out {
+    background: #4c1d2d;
+    color: #fda4af;
+}
+
+:root[data-theme="dark"] .sales-page .btn-ghost {
+    background: #202c42;
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .sale-entry-page input,
+:root[data-theme="dark"] .sale-entry-page select {
+    background: #202c42;
+    color: #f8fafc;
+    border-color: #334155;
+}
+
+:root[data-theme="dark"] .sale-entry-page option {
+    background: #202c42;
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .sale-entry-page .form-note {
+    background: #202c42;
+}
+
+:root[data-theme="dark"] .sale-entry-page .form-note strong {
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .sale-entry-page .error-msg {
+    background: #4c1d2d;
+    color: #fda4af;
+    border-color: #881337;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+    .sales-page .stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .sale-entry-page .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sale-entry-page .full-width {
+        grid-column: auto;
+    }
+
+    .sale-entry-page .nova-form {
+        padding: 16px;
+    }
+
+    .sales-page .rem-kpi {
+        padding: 18px;
+    }
+
+    .sale-entry-page .form-actions .btn {
+        width: 100%;
+    }
+}

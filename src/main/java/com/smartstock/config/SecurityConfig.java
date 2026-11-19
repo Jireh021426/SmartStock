@@ -331,6 +331,8 @@ public class SecurityConfig {
                         "/remittances/verify"
                 ).hasAnyRole("ADMIN", "MANAGER")
 
+                .requestMatchers(HttpMethod.GET, "/remittances/history").hasAnyRole("ADMIN", "MANAGER", "CASHIER")
+
                 .requestMatchers("/remittances/**").denyAll()
 
                 // Expenses
