@@ -15,14 +15,7 @@ Gross profit = sales - cost at sale. Estimated result = gross profit - expenses 
 
 ## Admin Account
 Username: admin
-Password: DemoAdmin2026!
 
 ## Cashier Account
 Username: cashier.demo
-Password: password12345
-
-## Database Account
-Original database username: SmartStock
-Original database password: SmartStock
-SmartStock admin login password: goodboyalready
 
