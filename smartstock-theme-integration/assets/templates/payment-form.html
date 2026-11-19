@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SmartStock | Record Utang Payment</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+<main class="form-page">
+    <div class="topbar">
+        <div>
+            <a class="back-link" th:href="@{/customers}">← Back to Customers</a>
+            <h2 class="page-title">Record Utang Repayment</h2>
+            <p class="page-sub">Log a partial or full payment for a customer's outstanding balance.</p>
+        </div>
+    </div>
+    <div class="panel">
+        <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+        <form class="nova-form" th:action="@{/payments/save}" th:object="${paymentForm}" method="post">
+            <input type="hidden" th:field="*{requestId}">
+            <div class="form-grid">
+                <label class="full-width">
+                    Customer
+                    <select th:field="*{customerId}" required>
+                        <option value="">Select customer</option>
+                        <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.name + ' | balance: ₱' + c.balance}"></option>
+                    </select>
+                    <small class="error-text" th:errors="*{customerId}"></small>
+                </label>
+                <label>
+                    Payment amount (₱)
+                    <input type="number" min="0.01" step="0.01" th:field="*{amount}" required>
+                    <small class="error-text" th:errors="*{amount}"></small>
+                </label>
+                <label>
+                    Received via
+                    <select th:field="*{method}">
+                        <option value="CASH">Cash</option>
+                        <option value="GCASH">GCash</option>
+                    </select>
+                </label>
+            </div>
+            <p class="form-hint">Payment cannot exceed the customer's unpaid balance.</p>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Record Payment</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

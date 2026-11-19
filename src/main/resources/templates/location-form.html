@@ -1,93 +1,61 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmartStock | Location Form</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/locations.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
 </head>
 <body>
 
 <header th:replace="~{fragments/navigation :: siteHeader}"></header>
 
-<main>
-    <div class="narrow">
-
-        <a th:href="@{/locations}">
-            ← Stock Locations
-        </a>
-
-        <h2 th:text="${editing ? 'Edit Stock Location' : 'Add Stock Location'}">
-            Stock Location
-        </h2>
-
-        <div class="panel">
-
-            <p class="error"
-               th:if="${error}"
-               th:text="${error}"></p>
-
-            <form th:object="${locationForm}"
-                  th:action="${editing}
-                    ? @{/locations/{id}/save(id=${locationId})}
-                    : @{/locations/save}"
-                  method="post">
-
-                <label for="code">Location Code</label>
-                <input id="code"
-                       type="text"
-                       th:field="*{code}"
-                       maxlength="30"
-                       placeholder="e.g. CARBON_A"
-                       required>
-
-                <small class="error"
-                       th:if="${#fields.hasErrors('code')}"
-                       th:errors="*{code}"></small>
-
-                <label for="name">Location Name</label>
-                <input id="name"
-                       type="text"
-                       th:field="*{name}"
-                       maxlength="100"
-                       placeholder="e.g. Carbon Stall A"
-                       required>
-
-                <small class="error"
-                       th:if="${#fields.hasErrors('name')}"
-                       th:errors="*{name}"></small>
-
-                <label for="locationType">Location Type</label>
-                <select id="locationType"
-                        th:field="*{locationType}"
-                        required>
-                    <option value="STALL">Chicken Stall</option>
-                    <option value="STORAGE">Storage</option>
-                </select>
-
-                <small class="error"
-                       th:if="${#fields.hasErrors('locationType')}"
-                       th:errors="*{locationType}"></small>
-
-                <p>
-                    Location codes must be unique.
-                    Existing historical transactions
-                    remain associated with their location.
-                </p>
-
-                <button class="button"
-                        type="submit"
-                        th:text="${editing ? 'Save Changes' : 'Create Location'}">
-                    Save
-                </button>
-
-            </form>
-
+<main class="form-page">
+    <div class="topbar">
+        <div>
+            <a class="back-link" th:href="@{/locations}">← Back to Stock Locations</a>
+            <h2 class="page-title" th:text="${editing ? 'Edit Stock Location' : 'Add Stock Location'}">Stock Location</h2>
+            <p class="page-sub">Manage location codes, names, and operational types.</p>
         </div>
     </div>
-</main>
 
+    <div class="panel">
+        <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+
+        <form class="nova-form" th:object="${locationForm}" th:action="${editing} ? @{/locations/{id}/save(id=${locationId})} : @{/locations/save}" method="post">
+            <div class="form-grid">
+                <label>
+                    Location Code
+                    <input type="text" th:field="*{code}" maxlength="30" placeholder="e.g. CARBON_A" required>
+                    <small class="error-text" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></small>
+                </label>
+
+                <label>
+                    Location Name
+                    <input type="text" th:field="*{name}" maxlength="100" placeholder="e.g. Carbon Stall A" required>
+                    <small class="error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+                </label>
+
+                <label class="full-width">
+                    Location Type
+                    <select th:field="*{locationType}" required>
+                        <option value="STALL">Chicken Stall</option>
+                        <option value="STORAGE">Storage</option>
+                    </select>
+                    <small class="error-text" th:if="${#fields.hasErrors('locationType')}" th:errors="*{locationType}"></small>
+                </label>
+            </div>
+
+            <p class="form-hint">Location codes must be unique. Existing historical transactions remain associated with their location.</p>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit" th:text="${editing ? 'Save Changes' : 'Create Location'}">Save</button>
+            </div>
+        </form>
+    </div>
+</main>
 </body>
 </html>

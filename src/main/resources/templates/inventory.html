@@ -1,555 +1,151 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmartStock | Inventory History</title>
-
-    <link rel="stylesheet"
-          th:href="@{/css/style.css}">
-
-    <style>
-        .inventory-summary {
-            display: grid;
-            grid-template-columns: repeat(
-                auto-fit, minmax(180px, 1fr)
-            );
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .summary-box {
-            padding: 18px;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            background: #ffffff;
-        }
-
-        .summary-box h3 {
-            margin: 0 0 8px;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        .summary-box strong {
-            font-size: 23px;
-            color: #111827;
-        }
-
-        .inventory-table-wrapper {
-            overflow-x: auto;
-        }
-
-        .inventory-table-wrapper table {
-            width: 100%;
-            min-width: 750px;
-        }
-
-        .inventory-table-wrapper th,
-        .inventory-table-wrapper td {
-            padding: 12px;
-            text-align: left;
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        .inventory-table-wrapper td:last-child {
-            white-space: normal;
-            min-width: 180px;
-        }
-
-        .movement-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .movement-in {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .movement-out {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .movement-sale {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .money {
-            font-variant-numeric: tabular-nums;
-        }
-
-        .loss-value {
-            color: #b91c1c;
-            font-weight: 600;
-        }
-
-        .inventory-note {
-            margin-top: 16px;
-            padding: 14px;
-            border-radius: 8px;
-            background: #f8fafc;
-            color: #475569;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .empty {
-            text-align: center;
-            color: #64748b;
-            padding: 24px;
-        }
-
-        /* Stock history pagination */
-        .inventory-pagination {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 20px;
-            padding-top: 18px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .pagination-info {
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .pagination-info strong {
-            color: #1e293b;
-        }
-
-        .pagination-controls {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .page-button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            min-width: 36px;
-            min-height: 36px;
-            padding: 8px 12px;
-            border: 1px solid #dbe3ee;
-            border-radius: 7px;
-            background: #ffffff;
-            color: #334155;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .page-button:hover:not(.disabled) {
-            background: #eff6ff;
-            border-color: #93c5fd;
-        }
-
-        .page-button.active {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #ffffff;
-        }
-
-        .page-button.disabled {
-            color: #a1a1aa;
-            background: #f8fafc;
-            cursor: not-allowed;
-        }
-
-        @media (max-width: 650px) {
-            .inventory-pagination {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .pagination-controls {
-                width: 100%;
-            }
-        }
-
-        /* Pagination size selector */
-        .pagination-size-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-right: 12px;
-        }
-
-        .pagination-size-form label {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
-            white-space: nowrap;
-        }
-
-        .pagination-size-form select {
-            width: auto;
-            min-width: 70px;
-            margin: 0;
-            padding: 8px 10px;
-            border: 1px solid #dbe3ee;
-            border-radius: 7px;
-            background: #ffffff;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .pagination-size-form select:focus-visible,
-        .page-button:focus-visible {
-            outline: 2px solid #2563eb;
-            outline-offset: 2px;
-        }
-
-        @media (max-width: 650px) {
-            .pagination-size-form {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 8px;
-            }
-        }
-
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/inventory.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
 </head>
-
 <body>
 
-<header th:replace="~{fragments/navigation :: siteHeader}">
-</header>
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
 
 <main>
-
     <!-- PAGE HEADING -->
-    <div class="heading">
-
+    <div class="topbar">
         <div>
-            <h2>Stock Movement History</h2>
-
-            <p>
-                Track supplier deliveries, sales deductions,
-                spoilage, and inventory adjustments.
-            </p>
+            <h2 class="page-title">Stock Movement History</h2>
+            <p class="page-sub">Track supplier deliveries, sales deductions, spoilage, and inventory adjustments.</p>
         </div>
-
         <!-- ADMIN ONLY -->
-        <a class="button"
-           th:if="${canRecordMovement}"
-           th:href="@{/inventory/new}">
+        <a class="btn btn-primary" th:if="${canRecordMovement}" th:href="@{/inventory/new}">
             + Record Movement
         </a>
-
     </div>
 
     <!-- SUMMARY CARDS -->
     <div class="inventory-summary">
-
-        <div class="summary-box">
-            <h3>Total Movements</h3>
-
-            <strong th:text="${totalMovements}">
-                0
-            </strong>
+        <div class="stat" style="--c:#4cc9f0;--cb:rgba(76,201,240,.14)">
+            <div class="stat-top">
+                <span class="stat-label">Total Movements</span>
+            </div>
+            <div class="stat-value" th:text="${totalMovements}">0</div>
+            <div class="stat-foot">All time records</div>
         </div>
 
-        <div class="summary-box">
-            <h3>Stock-In Records</h3>
-
-            <strong
-                th:text="${stockInRecords}">
-                0
-            </strong>
+        <div class="stat" style="--c:#34d399;--cb:rgba(52,211,153,.14)">
+            <div class="stat-top">
+                <span class="stat-label">Stock-In Records</span>
+            </div>
+            <div class="stat-value" th:text="${stockInRecords}">0</div>
+            <div class="stat-foot"><b>Deliveries & Additions</b></div>
         </div>
 
-        <div class="summary-box">
-            <h3>Stock-Out Records</h3>
-
-            <strong
-                th:text="${stockOutRecords}">
-                0
-            </strong>
+        <div class="stat" style="--c:#fb7185;--cb:rgba(251,113,133,.14)">
+            <div class="stat-top">
+                <span class="stat-label">Stock-Out Records</span>
+            </div>
+            <div class="stat-value" th:text="${stockOutRecords}">0</div>
+            <div class="stat-foot"><b class="down">Sales & Deductions</b></div>
         </div>
-
     </div>
 
-    <!-- MOVEMENT HISTORY -->
+    <!-- MOVEMENT HISTORY PANEL -->
     <div class="panel">
-
         <div class="inventory-table-wrapper">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Date / Time</th>
                         <th>Product</th>
                         <th>Movement</th>
-                        <th>Weight (kg)</th>
-
-                        <!-- FINANCIAL COLUMNS -->
-                        <th th:if="${canSeeInventoryFinancials}">
-                            Purchase Cost / kg
-                        </th>
-
-                        <th th:if="${canSeeInventoryFinancials}">
-                            Total Purchase Cost
-                        </th>
-
-                        <th th:if="${canSeeInventoryFinancials}">
-                            Average Cost After
-                        </th>
-
-                        <th th:if="${canSeeInventoryFinancials}">
-                            Inventory Loss
-                        </th>
-
+                        <th style="text-align: right;">Weight (kg)</th>
+                        <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Purchase Cost / kg</th>
+                        <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Total Purchase Cost</th>
+                        <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Average Cost After</th>
+                        <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Inventory Loss</th>
                         <th>Reason / Reference</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr th:each="m : ${movements}">
-
-                        <!-- DATE -->
-                        <td
-                            th:text="${#temporals.format(m.recordedAt, 'yyyy-MM-dd HH:mm:ss')}">
-                        </td>
-
-                        <!-- PRODUCT -->
-                        <td th:text="${m.productName}">
-                        </td>
-
-                        <!-- MOVEMENT TYPE -->
+                        <td th:text="${#temporals.format(m.recordedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td class="product-name" th:text="${m.productName}"></td>
                         <td>
-                            <span
-                                class="movement-badge"
-                                th:classappend="${m.type == T(com.smartstock.model.MovementType).STOCK_IN ? 'movement-in' : (m.reason != null and #strings.startsWith(m.reason, 'SALE #') ? 'movement-sale' : 'movement-out')}"
-                                th:text="${m.type == T(com.smartstock.model.MovementType).STOCK_IN ? 'STOCK IN' : (m.reason != null and #strings.startsWith(m.reason, 'SALE #') ? 'SALE' : 'STOCK OUT')}">
+                            <span class="movement-badge"
+                                  th:classappend="${m.type == T(com.smartstock.model.MovementType).STOCK_IN ? 'movement-in' : (m.reason != null and #strings.startsWith(m.reason, 'SALE #') ? 'movement-sale' : 'movement-out')}"
+                                  th:text="${m.type == T(com.smartstock.model.MovementType).STOCK_IN ? 'STOCK IN' : (m.reason != null and #strings.startsWith(m.reason, 'SALE #') ? 'SALE' : 'STOCK OUT')}">
                             </span>
                         </td>
-
-                        <!-- WEIGHT -->
-                        <td
-                            th:text="${#numbers.formatDecimal(m.weightKg, 1, 3)}">
+                        <td class="money" th:text="${#numbers.formatDecimal(m.weightKg, 1, 3)}"></td>
+                        
+                        <td class="money" th:if="${canSeeInventoryFinancials}">
+                            <span th:if="${m.purchaseCostPerKg != null}" th:text="${'₱' + #numbers.formatDecimal(m.purchaseCostPerKg, 1, 2)}"></span>
+                            <span th:unless="${m.purchaseCostPerKg != null}" style="color: #5c6b88;">—</span>
                         </td>
-
-                        <!-- PURCHASE COST PER KG -->
-                        <td class="money"
-                            th:if="${canSeeInventoryFinancials}">
-
-                            <span
-                                th:if="${m.purchaseCostPerKg != null}"
-                                th:text="${'₱' + #numbers.formatDecimal(m.purchaseCostPerKg, 1, 2)}">
-                            </span>
-
-                            <span
-                                th:unless="${m.purchaseCostPerKg != null}">
-                                —
-                            </span>
+                        <td class="money" th:if="${canSeeInventoryFinancials}">
+                            <span th:if="${m.totalPurchaseCost != null}" th:text="${'₱' + #numbers.formatDecimal(m.totalPurchaseCost, 1, 2)}"></span>
+                            <span th:unless="${m.totalPurchaseCost != null}" style="color: #5c6b88;">—</span>
                         </td>
-
-                        <!-- TOTAL PURCHASE COST -->
-                        <td class="money"
-                            th:if="${canSeeInventoryFinancials}">
-
-                            <span
-                                th:if="${m.totalPurchaseCost != null}"
-                                th:text="${'₱' + #numbers.formatDecimal(m.totalPurchaseCost, 1, 2)}">
-                            </span>
-
-                            <span
-                                th:unless="${m.totalPurchaseCost != null}">
-                                —
-                            </span>
+                        <td class="money" th:if="${canSeeInventoryFinancials}">
+                            <span th:if="${m.averageCostAfter != null}" th:text="${'₱' + #numbers.formatDecimal(m.averageCostAfter, 1, 2)}"></span>
+                            <span th:unless="${m.averageCostAfter != null}" style="color: #5c6b88;">—</span>
                         </td>
-
-                        <!-- AVERAGE COST AFTER -->
-                        <td class="money"
-                            th:if="${canSeeInventoryFinancials}">
-
-                            <span
-                                th:if="${m.averageCostAfter != null}"
-                                th:text="${'₱' + #numbers.formatDecimal(m.averageCostAfter, 1, 2)}">
-                            </span>
-
-                            <span
-                                th:unless="${m.averageCostAfter != null}">
-                                —
-                            </span>
+                        <td class="money" th:if="${canSeeInventoryFinancials}">
+                            <span class="loss-value" th:if="${m.inventoryLossValue != null}" th:text="${'₱' + #numbers.formatDecimal(m.inventoryLossValue, 1, 2)}"></span>
+                            <span th:unless="${m.inventoryLossValue != null}" style="color: #5c6b88;">—</span>
                         </td>
-
-                        <!-- INVENTORY LOSS VALUE -->
-                        <td class="money"
-                            th:if="${canSeeInventoryFinancials}">
-
-                            <span
-                                class="loss-value"
-                                th:if="${m.inventoryLossValue != null}"
-                                th:text="${'₱' + #numbers.formatDecimal(m.inventoryLossValue, 1, 2)}">
-                            </span>
-
-                            <span
-                                th:unless="${m.inventoryLossValue != null}">
-                                —
-                            </span>
-                        </td>
-
-                        <!-- REASON -->
-                        <td th:text="${m.reason}">
-                        </td>
-
+                        <td th:text="${m.reason}"></td>
                     </tr>
-
                     <!-- EMPTY HISTORY -->
                     <tr th:if="${#lists.isEmpty(movements)}">
-
-                        <td
-                            th:colspan="${canSeeInventoryFinancials ? 9 : 5}"
-                            class="empty">
-
+                        <td th:colspan="${canSeeInventoryFinancials ? 9 : 5}" class="empty-state">
                             No stock movements recorded yet.
-
                         </td>
                     </tr>
-
                 </tbody>
-
             </table>
-
         </div>
 
         <!-- PAGINATION -->
-        <div class="inventory-pagination"
-             th:if="${totalPages > 0}">
-
+        <div class="inventory-pagination" th:if="${totalPages > 0}">
             <div class="pagination-info">
-                Showing
-                <strong th:text="${showingStart}"></strong>
-                to
-                <strong th:text="${showingEnd}"></strong>
-                of
-                <strong th:text="${totalMovements}"></strong>
-                movements
+                Showing <strong th:text="${showingStart}"></strong> to <strong th:text="${showingEnd}"></strong> of <strong th:text="${totalMovements}"></strong> movements
             </div>
-
             <div class="pagination-controls">
-
-                <form method="get"
-                      th:action="@{/inventory}"
-                      class="pagination-size-form">
+                <form method="get" th:action="@{/inventory}" class="pagination-size-form">
                     <label for="page-size">Rows per page</label>
-                    <select id="page-size"
-                            name="size"
-                            onchange="this.form.submit()">
-                        <option th:each="option : ${pageSizes}"
-                                th:value="${option}"
-                                th:text="${option}"
-                                th:selected="${option == pageSize}">
-                        </option>
+                    <select id="page-size" name="size" onchange="this.form.submit()" class="select">
+                        <option th:each="option : ${pageSizes}" th:value="${option}" th:text="${option}" th:selected="${option == pageSize}"></option>
                     </select>
                 </form>
 
-                <a th:if="${currentPage > 0}"
-                   th:href="@{/inventory(page=0,size=${pageSize})}"
-                   class="page-button">
-                    First
-                </a>
+                <a th:if="${currentPage > 0}" th:href="@{/inventory(page=0,size=${pageSize})}" class="page-button">First</a>
+                <a th:if="${currentPage > 0}" th:href="@{/inventory(page=${currentPage - 1},size=${pageSize})}" class="page-button">Previous</a>
+                <span th:unless="${currentPage > 0}" class="page-button disabled">Previous</span>
 
-                <a th:if="${currentPage > 0}"
-                   th:href="@{/inventory(page=${currentPage - 1},size=${pageSize})}"
-                   class="page-button">
-                    Previous
-                </a>
+                <a th:each="pageNumber : ${pageNumbers}" th:href="@{/inventory(page=${pageNumber},size=${pageSize})}" th:text="${pageNumber + 1}" th:classappend="${pageNumber == currentPage} ? ' active' : ''" class="page-button"></a>
 
-                <span th:unless="${currentPage > 0}"
-                      class="page-button disabled">
-                    Previous
-                </span>
-
-                <a th:each="pageNumber : ${pageNumbers}"
-                   th:href="@{/inventory(page=${pageNumber},size=${pageSize})}"
-                   th:text="${pageNumber + 1}"
-                   th:classappend="${pageNumber == currentPage} ? ' active' : ''"
-                   class="page-button">
-                </a>
-
-                <a th:if="${currentPage < totalPages - 1}"
-                   th:href="@{/inventory(page=${currentPage + 1},size=${pageSize})}"
-                   class="page-button">
-                    Next
-                </a>
-
-                <a th:if="${currentPage < totalPages - 1}"
-                   th:href="@{/inventory(page=${totalPages - 1},size=${pageSize})}"
-                   class="page-button">
-                    Last
-                </a>
-
-                <span th:unless="${currentPage < totalPages - 1}"
-                      class="page-button disabled">
-                    Next
-                </span>
-
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/inventory(page=${currentPage + 1},size=${pageSize})}" class="page-button">Next</a>
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/inventory(page=${totalPages - 1},size=${pageSize})}" class="page-button">Last</a>
+                <span th:unless="${currentPage < totalPages - 1}" class="page-button disabled">Next</span>
             </div>
         </div>
 
         <!-- ACCOUNTING INFORMATION -->
-        <div class="inventory-note"
-             th:if="${canSeeInventoryFinancials}">
-
-            <strong>Inventory Accounting</strong>
-
-            <p>
-                <strong>Stock In:</strong>
-                Supplier deliveries increase inventory.
-                SmartStock records the purchase price,
-                total purchase value, and updated
-                weighted-average cost.
-            </p>
-
-            <p>
-                <strong>Sales:</strong>
-                Customer sales reduce inventory.
-                Their purchase costs and gross profits
-                are recorded separately in the Sales module.
-            </p>
-
-            <p>
-                <strong>Stock Out:</strong>
-                Manual stock deductions record the
-                inventory cost of the removed items.
-                These should be classified separately
-                if they represent transfers or corrections
-                rather than actual losses.
-            </p>
-
-            <p>
-                <strong>Historical Records:</strong>
-                Older movements without financial
-                information remain unchanged.
-                Missing values are displayed as a dash.
-            </p>
-
-        </div>
-
+        <details class="inventory-note" th:if="${canSeeInventoryFinancials}">
+            <summary>Inventory Accounting</summary>
+            <div class="note-content">
+                <p><strong>Stock In:</strong> Supplier deliveries increase inventory. SmartStock records the purchase price, total purchase value, and updated weighted-average cost.</p>
+                <p><strong>Sales:</strong> Customer sales reduce inventory. Their purchase costs and gross profits are recorded separately in the Sales module.</p>
+                <p><strong>Stock Out:</strong> Manual stock deductions record the inventory cost of the removed items. These should be classified separately if they represent transfers or corrections rather than actual losses.</p>
+                <p><strong>Historical Records:</strong> Older movements without financial information remain unchanged. Missing values are displayed as a dash.</p>
+            </div>
+        </details>
     </div>
-
 </main>
 
 </body>

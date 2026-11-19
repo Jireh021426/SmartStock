@@ -1,0 +1,61 @@
+/* SmartStock — common data-entry forms | scoped to main.form-page */
+main.form-page {
+    min-width: 0;
+    max-width: 1080px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--ink);
+}
+.form-page, .form-page * { box-sizing: border-box; }
+.form-page .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.form-page .back-link { display: inline-block; margin-bottom: 12px; color: var(--teal-dark); font-size: 13px; font-weight: 650; text-decoration: none; }
+.form-page .back-link:hover { text-decoration: underline; }
+.form-page .page-title { margin: 0; color: var(--ink); font-size: 26px; font-weight: 750; letter-spacing: -.4px; }
+.form-page .page-sub { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.form-page .panel { min-width: 0; padding: 26px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: var(--shadow); }
+.form-page .nova-form { display: flex; flex-direction: column; gap: 22px; }
+.form-page .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
+.form-page .form-grid label { display: flex; flex-direction: column; min-width: 0; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 650; }
+.form-page .form-grid label.full-width { grid-column: 1/-1; }
+.form-page .form-grid input, .form-page .form-grid select, .form-page .form-grid textarea {
+    width: 100%; min-height: 44px; padding: 10px 14px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--card); color: var(--ink); font: inherit;
+    font-size: 13px; outline: none; transition: border-color .2s,box-shadow .2s;
+}
+.form-page .form-grid input::placeholder, .form-page .form-grid textarea::placeholder { color: var(--muted); opacity: .8; }
+.form-page .form-grid input:focus, .form-page .form-grid select:focus, .form-page .form-grid textarea:focus {
+    border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft);
+}
+.form-page .form-grid input:disabled, .form-page .form-grid select:disabled { opacity: .5; cursor: not-allowed; }
+.form-page .error-text { color: #be123c; font-size: 11px; font-weight: 550; }
+.form-page .error-msg { padding: 12px 16px; margin: 0 0 20px; border: 1px solid #fecdd3; border-radius: 10px; background: #fff1f2; color: #be123c; }
+.form-page .form-hint { margin: 0; padding: 12px 14px; border: 1px dashed var(--line); border-radius: 9px; color: var(--muted); font-size: 12px; }
+.form-page .form-note { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--teal-soft); color: var(--muted); font-size: 12px; line-height: 1.65; }
+.form-page .form-note p { margin: 0 0 10px; }
+.form-page .form-note p:last-child { margin-bottom: 0; }
+.form-page .form-note strong { color: var(--ink); }
+.form-page .form-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.form-page .btn.btn-primary {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 42px; padding: 10px 22px; border: 1px solid transparent;
+    border-radius: 10px; background: #18a999; color: #fff;
+    font: inherit; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.form-page .btn.btn-primary:hover { background: #128779; color: #fff; }
+:root[data-theme="dark"] .form-page .page-title,
+:root[data-theme="dark"] .form-page .form-grid label,
+:root[data-theme="dark"] .form-page .form-note strong { color: #f8fafc; }
+:root[data-theme="dark"] .form-page .form-grid input,
+:root[data-theme="dark"] .form-page .form-grid select,
+:root[data-theme="dark"] .form-page .form-grid textarea { background: #202c42; color: #f8fafc; border-color: #334155; }
+:root[data-theme="dark"] .form-page .form-grid select option { background: #202c42; color: #f8fafc; }
+:root[data-theme="dark"] .form-page .error-msg { background: #4c1d2a; border-color: #713247; color: #fda4af; }
+:root[data-theme="dark"] .form-page .error-text { color: #fda4af; }
+@media (max-width: 650px) {
+    .form-page .panel { padding: 18px; }
+    .form-page .form-grid { grid-template-columns: 1fr; }
+    .form-page .form-grid label.full-width { grid-column: auto; }
+    .form-page .form-actions { justify-content: stretch; }
+    .form-page .form-actions .btn { width: 100%; }
+}

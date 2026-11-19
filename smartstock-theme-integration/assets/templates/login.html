@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SmartStock | Sign in</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
+</head>
+<body class="login-body">
+<div class="login-card">
+    <button type="button" class="topbar-icon-link theme-toggle login-theme-toggle"
+            data-theme-toggle aria-label="Switch to dark mode" aria-pressed="false" title="Dark mode">
+        <svg class="ico theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+        </svg>
+        <svg class="ico theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>
+        </svg>
+    </button>
+
+    <div class="brand">
+        <span class="brand-mark">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/>
+            </svg>
+        </span>
+        <div class="brand-text">
+            <h1>SmartStock</h1>
+            <span>Chicken Stall &amp; Storage Management</span>
+        </div>
+    </div>
+
+    <h2>Sign in</h2>
+    <p class="login-sub">Enter your username and password.</p>
+    <p class="error-msg" th:if="${param.error}">Invalid username or password.</p>
+    <p class="notice-msg" th:if="${param.logout}">You have been logged out.</p>
+    <p class="notice-msg" th:each="k : ${param.keySet()}" th:if="${#strings.startsWith(k, 'session')}">
+        Your session has ended. Please sign in again.
+    </p>
+
+    <form th:action="@{/login}" method="post" class="nova-form">
+        <label>
+            Username
+            <input name="username" type="text" autocomplete="username" autofocus required placeholder="Enter username">
+        </label>
+        <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" required placeholder="Enter password">
+        </label>
+        <button class="btn btn-primary" type="submit">Sign in</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,437 @@
+
+/* ==================================================
+   SMARTSTOCK — EMPLOYEE MANAGEMENT
+   Light / Dark Mode Compatible
+   ================================================== */
+
+/* Page layout */
+main.employees-page {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--ink);
+}
+
+.employees-page,
+.employees-page * {
+    box-sizing: border-box;
+}
+
+/* Heading */
+.employees-page .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.employees-page .page-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: 26px;
+    font-weight: 750;
+    letter-spacing: -0.5px;
+}
+
+.employees-page .page-sub {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Notifications */
+.employees-page .error-msg,
+.employees-page .notice-msg {
+    margin: 0;
+    padding: 13px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.employees-page .error-msg {
+    background: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+}
+
+.employees-page .notice-msg {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+/* Panels */
+.employees-page .panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+}
+
+.employees-page .panel-head {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--card);
+}
+
+.employees-page .panel-head h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 750;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Employee form */
+.employees-page .nova-form {
+    padding: 24px;
+}
+
+.employees-page .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.employees-page .form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 650;
+}
+
+.employees-page .form-grid label.full-width {
+    grid-column: 1 / -1;
+}
+
+.employees-page .form-grid input,
+.employees-page .form-grid select {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.employees-page .form-grid input::placeholder {
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+.employees-page .form-grid input:focus,
+.employees-page .form-grid select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px var(--teal-soft);
+}
+
+.employees-page .form-hint {
+    margin: 14px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.employees-page .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+/* Primary button */
+.employees-page .btn.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 22px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: #18a999;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+
+.employees-page .btn.btn-primary:hover {
+    background: #128779;
+    color: #ffffff;
+}
+
+.employees-page .btn.btn-primary:active {
+    transform: translateY(1px);
+}
+
+/* Employee table */
+.employees-page .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.employees-page .table-wrap table {
+    width: 100%;
+    min-width: 860px;
+    border-collapse: collapse;
+    color: var(--ink);
+    background: var(--card);
+}
+
+.employees-page .table-wrap th {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--teal-soft);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.4px;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.employees-page .table-wrap td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+.employees-page .table-wrap tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.employees-page .table-wrap tbody tr:hover td {
+    background: var(--teal-soft);
+}
+
+.employees-page .table-wrap td.product-name {
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.employees-page .table-wrap td.text-muted,
+.employees-page .table-wrap .text-muted {
+    color: var(--muted);
+}
+
+.employees-page .empty-state {
+    padding: 40px 20px !important;
+    color: var(--muted) !important;
+    text-align: center;
+}
+
+/* Role badge */
+.employees-page .role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Status badges */
+.employees-page .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.employees-page .status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.employees-page .status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.employees-page .status-inactive {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+/* Employee action buttons */
+.employees-page .btn-action {
+    min-height: 34px;
+    padding: 7px 13px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.employees-page .btn-deactivate {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
+}
+
+.employees-page .btn-deactivate:hover {
+    background: #ffe4e6;
+}
+
+.employees-page .btn-activate {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+.employees-page .btn-activate:hover {
+    background: #d1fae5;
+}
+
+/* ==================================================
+   DARK MODE
+   ================================================== */
+
+:root[data-theme="dark"] .employees-page {
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .employees-page .panel {
+    background: #172033;
+    border-color: #2b3850;
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .employees-page .panel-head {
+    background: #172033;
+    border-color: #2b3850;
+}
+
+:root[data-theme="dark"] .employees-page .panel-head h3,
+:root[data-theme="dark"] .employees-page .page-title,
+:root[data-theme="dark"] .employees-page .form-grid label,
+:root[data-theme="dark"] .employees-page .table-wrap td,
+:root[data-theme="dark"] .employees-page .table-wrap td.product-name {
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .employees-page .form-grid input,
+:root[data-theme="dark"] .employees-page .form-grid select {
+    background: #202c42;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .employees-page .form-grid select option {
+    background: #202c42;
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .employees-page .table-wrap table {
+    background: #172033;
+}
+
+:root[data-theme="dark"] .employees-page .table-wrap th {
+    background: #203547;
+    border-color: #2b3850;
+    color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .employees-page .table-wrap td {
+    border-color: #2b3850;
+}
+
+:root[data-theme="dark"] .employees-page .table-wrap tbody tr:hover td {
+    background: #202c42;
+}
+
+:root[data-theme="dark"] .employees-page .role-badge {
+    background: #173344;
+    color: #7dd3fc;
+}
+
+:root[data-theme="dark"] .employees-page .status-active {
+    background: #123d32;
+    color: #6ee7b7;
+}
+
+:root[data-theme="dark"] .employees-page .status-inactive {
+    background: #334155;
+    color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .employees-page .error-msg,
+:root[data-theme="dark"] .employees-page .btn-deactivate {
+    background: #4c1d2a;
+    border-color: #713247;
+    color: #fda4af;
+}
+
+:root[data-theme="dark"] .employees-page .notice-msg,
+:root[data-theme="dark"] .employees-page .btn-activate {
+    background: #123d32;
+    border-color: #245a48;
+    color: #6ee7b7;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+    .employees-page .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .employees-page .form-grid label.full-width {
+        grid-column: auto;
+    }
+
+    .employees-page .nova-form {
+        padding: 18px;
+    }
+
+    .employees-page .panel-head {
+        padding: 18px;
+    }
+
+    .employees-page .form-actions {
+        justify-content: stretch;
+    }
+
+    .employees-page .form-actions .btn {
+        width: 100%;
+    }
+}

@@ -1,0 +1,60 @@
+/* SmartStock — Login | independent layout; shared color tokens */
+body.login-body {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Inter, system-ui, sans-serif;
+}
+body.login-body, body.login-body * { box-sizing: border-box; }
+.login-body .login-card {
+    position: relative;
+    width: min(100%, 440px);
+    padding: 42px 34px 34px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: 0 15px 50px rgba(16,24,40,.10);
+    color: var(--ink);
+}
+.login-body .login-theme-toggle { position: absolute; top: 14px; right: 14px; }
+.login-body .login-card .brand { display: flex; align-items: center; gap: 12px; padding: 0; margin: 0 0 30px; }
+.login-body .login-card .brand-mark {
+    display: grid; place-items: center; width: 48px; height: 48px;
+    border-radius: 14px; background: linear-gradient(135deg,#0d9d91,#67c4fa); color: #fff;
+}
+.login-body .login-card .brand-mark svg { width: 24px; height: 24px; }
+.login-body .login-card .brand-text h1 { margin: 0; color: var(--ink); font-size: 19px; font-weight: 780; }
+.login-body .login-card .brand-text span { display: block; color: var(--muted); font-size: 11px; }
+.login-body .login-card h2 { margin: 0 0 6px; color: var(--ink); font-size: 24px; font-weight: 750; }
+.login-body .login-sub { margin: 0 0 22px; color: var(--muted); font-size: 13px; }
+.login-body .error-msg, .login-body .notice-msg { padding: 12px 14px; margin: 0 0 16px; border-radius: 9px; font-size: 12px; line-height: 1.5; }
+.login-body .error-msg { background: #fff1f2; border: 1px solid #fecdd3; color: #be123c; }
+.login-body .notice-msg { background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; }
+.login-body .nova-form { display: flex; flex-direction: column; gap: 16px; }
+.login-body .nova-form label { display: flex; flex-direction: column; gap: 8px; color: var(--ink); font-size: 12px; font-weight: 650; }
+.login-body .nova-form input {
+    width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--card); color: var(--ink);
+    font: inherit; font-size: 14px; outline: none;
+}
+.login-body .nova-form input::placeholder { color: var(--muted); opacity: .8; }
+.login-body .nova-form input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+.login-body .nova-form button.btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; width: 100%;
+    min-height: 46px; margin-top: 6px; padding: 10px 18px;
+    border: 0; border-radius: 10px; background: #18a999;
+    color: #fff; font-size: 14px; font-weight: 750; cursor: pointer;
+}
+.login-body .nova-form button.btn-primary:hover { background: #128779; }
+:root[data-theme="dark"] body.login-body .login-card { box-shadow: 0 24px 60px rgba(0,0,0,.3); }
+:root[data-theme="dark"] .login-body .login-card .brand-text h1,
+:root[data-theme="dark"] .login-body .login-card h2,
+:root[data-theme="dark"] .login-body .nova-form label { color: #f8fafc; }
+:root[data-theme="dark"] .login-body .nova-form input { background: #202c42; border-color: #334155; color: #f8fafc; }
+:root[data-theme="dark"] .login-body .error-msg { background: #4c1d2a; border-color: #713247; color: #fda4af; }
+:root[data-theme="dark"] .login-body .notice-msg { background: #123d32; border-color: #245a48; color: #6ee7b7; }
+@media (max-width: 480px) { .login-body .login-card { padding: 42px 22px 26px; } }

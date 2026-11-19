@@ -1,73 +1,64 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const list = document.getElementById("remList");
-    if (!list) return;
+/* SmartStock — Remittance history filters, search, and counters */
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
 
-    const cards = Array.from(list.querySelectorAll(".rem-card"));
-    const search = document.getElementById("remSearch");
-    const buttons = Array.from(
-        document.querySelectorAll(".rem-filters [data-filter]")
-    );
-    const noMatch = document.getElementById("remNoMatch");
+    const remList = document.getElementById("remList");
+    if (!remList) return;
+
+    const cards = Array.from(remList.querySelectorAll(".rem-card"));
+    const filterButtons = Array.from(document.querySelectorAll(".rem-filters .chip-btn"));
+    const searchInput = document.getElementById("remSearch");
+    const noMatchMessage = document.getElementById("remNoMatch");
 
     const counts = {
         total: cards.length,
-        pending: cards.filter(
-            card => card.dataset.status === "pending"
-        ).length,
-        reviewed: cards.filter(
-            card => card.dataset.status === "reviewed"
-        ).length
+        pending: cards.filter(card => card.dataset.status === "pending").length,
+        reviewed: cards.filter(card => card.dataset.status === "reviewed").length
     };
 
-    document.querySelectorAll("[data-count]").forEach(element => {
-        const key = element.dataset.count;
-        if (Object.prototype.hasOwnProperty.call(counts, key)) {
-            element.textContent = counts[key];
-        }
-    });
+    for (const [type, count] of Object.entries(counts)) {
+        document.querySelectorAll('[data-count="' + type + '"]').forEach(element => {
+            element.textContent = String(count);
+        });
+    }
 
-    let activeFilter = "all";
+    let currentFilter = "all";
+    let currentSearch = "";
 
-    function updateList() {
-        const query = (search?.value || "").trim().toLowerCase();
-        let visible = 0;
+    function applyFilters() {
+        let visibleCount = 0;
 
         cards.forEach(card => {
-            const matchesFilter =
-                activeFilter === "all" ||
-                card.dataset.status === activeFilter;
-
-            const header = card.querySelector(".rc-head");
-            const searchableText =
-                (header?.textContent || "").toLowerCase();
-
-            const matchesSearch = searchableText.includes(query);
-            const show = matchesFilter && matchesSearch;
-
-            card.hidden = !show;
-            if (show) visible++;
+            const matchesFilter = currentFilter === "all" || card.dataset.status === currentFilter;
+            const matchesSearch = card.textContent.toLowerCase().includes(currentSearch);
+            const visible = matchesFilter && matchesSearch;
+            card.hidden = !visible;
+            if (visible) visibleCount++;
         });
 
-        if (noMatch) {
-            noMatch.hidden = cards.length === 0 || visible > 0;
+        if (noMatchMessage) {
+            noMatchMessage.hidden = cards.length === 0 || visibleCount !== 0;
         }
     }
 
-    buttons.forEach(button => {
-        button.addEventListener("click", () => {
-            activeFilter = button.dataset.filter;
-
-            buttons.forEach(item => {
-                const active = item === button;
-                item.classList.toggle("active", active);
-                item.setAttribute("aria-pressed", String(active));
+    filterButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            currentFilter = button.dataset.filter || "all";
+            filterButtons.forEach(item => {
+                const selected = item === button;
+                item.classList.toggle("active", selected);
+                item.setAttribute("aria-pressed", String(selected));
             });
-
-            updateList();
+            applyFilters();
         });
     });
 
-    search?.addEventListener("input", updateList);
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            currentSearch = searchInput.value.trim().toLowerCase();
+            applyFilters();
+        });
+    }
 
-    updateList();
+    applyFilters();
 });

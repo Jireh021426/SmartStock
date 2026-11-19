@@ -1,0 +1,386 @@
+/* ==================================================
+   SMARTSTOCK — INVENTORY HISTORY
+   Scoped page styling; shared layout stays in style.css
+   ================================================== */
+
+/* Page heading */
+main .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+main .page-title {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(22px, 2.5vw, 28px);
+    font-weight: 750;
+    letter-spacing: -0.5px;
+}
+
+main .page-sub {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Summary cards */
+.inventory-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.inventory-summary .stat {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+}
+
+.inventory-summary .stat::after {
+    content: "";
+    position: absolute;
+    top: -35px;
+    right: -35px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--cb, transparent);
+    pointer-events: none;
+}
+
+.inventory-summary .stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.inventory-summary .stat-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.2px;
+}
+
+.inventory-summary .stat-value {
+    color: var(--ink);
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 800;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.inventory-summary .stat-foot {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.inventory-summary .stat-foot b {
+    color: var(--teal-dark);
+    font-weight: 650;
+}
+
+.inventory-summary .stat-foot .down {
+    color: #e11d48;
+}
+
+/* Movement history panel */
+main .panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+}
+
+/* Scroll the table, not the entire application */
+.inventory-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.inventory-table-wrapper table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+    background: var(--card);
+    color: var(--ink);
+}
+
+.inventory-table-wrapper th {
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--teal-soft);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.35px;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.inventory-table-wrapper td {
+    padding: 15px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 12px;
+    line-height: 1.5;
+    vertical-align: middle;
+}
+
+.inventory-table-wrapper tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.inventory-table-wrapper tbody tr:hover {
+    background: var(--teal-soft);
+}
+
+.inventory-table-wrapper .product-name {
+    font-weight: 700;
+}
+
+.inventory-table-wrapper .money {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.inventory-table-wrapper .loss-value {
+    color: #e11d48;
+    font-weight: 700;
+}
+
+/* Movement badges */
+.movement-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+.movement-in {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.movement-out {
+    background: #ffe4e6;
+    color: #be123c;
+}
+
+.movement-sale {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.empty-state {
+    padding: 40px 20px !important;
+    color: var(--muted) !important;
+    text-align: center;
+}
+
+/* Pagination */
+.inventory-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 18px 20px;
+    border-top: 1px solid var(--line);
+}
+
+.pagination-info {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.pagination-info strong {
+    color: var(--ink);
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pagination-size-form {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 8px;
+}
+
+.pagination-size-form label {
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.pagination-size-form .select {
+    width: auto;
+    min-width: 65px;
+    padding: 7px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+}
+
+.page-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.page-button:hover {
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+}
+
+.page-button.active {
+    border-color: var(--teal);
+    background: var(--teal);
+    color: #fff;
+}
+
+.page-button.disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+/* Accounting information */
+.inventory-note {
+    padding: 18px 20px;
+    border-top: 1px solid var(--line);
+}
+
+.inventory-note summary {
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.inventory-note .note-content {
+    padding-top: 14px;
+}
+
+.inventory-note .note-content p {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.inventory-note .note-content strong {
+    color: var(--ink);
+}
+
+/* Dark theme adjustments */
+:root[data-theme="dark"] .movement-in {
+    background: #123d32;
+    color: #6ee7b7;
+}
+
+:root[data-theme="dark"] .movement-out {
+    background: #4c1d2a;
+    color: #fda4af;
+}
+
+:root[data-theme="dark"] .movement-sale {
+    background: #1e3a5f;
+    color: #93c5fd;
+}
+
+:root[data-theme="dark"] .inventory-summary .stat-foot .down,
+:root[data-theme="dark"] .inventory-table-wrapper .loss-value {
+    color: #fda4af;
+}
+
+/* Responsive Inventory content only */
+@media (max-width: 900px) {
+    .inventory-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .inventory-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-summary .stat {
+        padding: 18px;
+    }
+
+    .inventory-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .pagination-controls {
+        width: 100%;
+    }
+
+    main .topbar {
+        align-items: stretch;
+    }
+}
+
+/* Record Movement action button */
+main .topbar a.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: #18a999;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+main .topbar a.btn-primary:hover {
+    background: #128779;
+    color: #ffffff;
+    text-decoration: none;
+}

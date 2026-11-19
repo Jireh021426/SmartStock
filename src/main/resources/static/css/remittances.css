@@ -1,0 +1,184 @@
+/* ==================================================
+   SMARTSTOCK — REMITTANCES
+   Light / Dark compatible, page-scoped styles only
+   ================================================== */
+
+main.remittances-page {
+    --rem-good: #047857;
+    --rem-warn: #a16207;
+    --rem-bad: #be123c;
+    --accent: var(--teal-dark);
+    --good: var(--rem-good);
+    --warn: var(--rem-warn);
+    --bad: var(--rem-bad);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+    color: var(--ink);
+}
+
+.remittances-page, .remittances-page * { box-sizing: border-box; }
+.remittances-page .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.remittances-page .page-title { margin: 0; color: var(--ink); font-size: clamp(22px, 2.5vw, 28px); font-weight: 750; letter-spacing: -.5px; }
+.remittances-page .page-sub { margin: 7px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+/* Feedback */
+.remittances-page .notice-msg, .remittances-page .error-msg {
+    padding: 13px 16px; margin: 0; border: 1px solid transparent; border-radius: 10px;
+    font-size: 13px; font-weight: 600; line-height: 1.6;
+}
+.remittances-page .notice-msg { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.remittances-page .error-msg { background: #fff1f2; color: #be123c; border-color: #fecdd3; }
+
+/* Panels and key figures */
+.remittances-page .panel, .remittances-page .rem-card {
+    min-width: 0; overflow: hidden; background: var(--card); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+}
+.remittances-page .panel-head { padding: 19px 24px; border-bottom: 1px solid var(--line); }
+.remittances-page .panel-head h3 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 750; letter-spacing: .3px; }
+.remittances-page .panel-body { padding: 24px; }
+.remittances-page .panel-desc { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.remittances-page .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.remittances-page .stats.triple { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.remittances-page .rem-kpi { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 22px 24px; }
+.remittances-page .rem-kpi::after {
+    content: ""; position: absolute; width: 115px; height: 115px; right: -32px; top: -32px;
+    border-radius: 50%; background: var(--cb, var(--teal-soft)); pointer-events: none;
+}
+.remittances-page .kpi-icon {
+    display: grid; place-items: center; width: 38px; height: 38px; border-radius: 11px;
+    background: var(--cb, var(--teal-soft)); color: var(--c, var(--teal-dark));
+}
+.remittances-page .kpi-icon.warn { background: #fef3c7; color: #92400e; }
+.remittances-page .kpi-icon svg { width: 19px; height: 19px; }
+.remittances-page .rem-kpi small { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: .2px; }
+.remittances-page .rem-kpi h2 { margin: 0; color: var(--ink); font-size: 30px; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
+
+/* Forms */
+.remittances-page .nova-form { width: 100%; }
+.remittances-page .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.remittances-page .form-grid label { display: flex; flex-direction: column; gap: 8px; min-width: 0; color: var(--ink); font-size: 12.5px; font-weight: 650; }
+.remittances-page .form-grid label.full-width { grid-column: 1 / -1; }
+.remittances-page .form-grid input {
+    width: 100%; min-height: 43px; padding: 0 14px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    font-family: inherit; font-size: 13px; outline: none;
+}
+.remittances-page .form-grid input::placeholder { color: var(--muted); opacity: .85; }
+.remittances-page .form-grid input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-soft); }
+.remittances-page .form-actions { display: flex; justify-content: flex-end; margin-top: 18px; }
+.remittances-page .btn.btn-primary {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 42px;
+    padding: 10px 22px; border: 1px solid transparent; border-radius: 10px;
+    background: #18a999; color: #fff; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+    text-decoration: none; transition: background .18s;
+}
+.remittances-page .btn.btn-primary:hover { background: #128779; color: #fff; }
+
+/* Toolbar and filters */
+.remittances-page .section-header { margin-top: 4px; }
+.remittances-page .section-title { margin: 0; color: var(--ink); font-size: 18px; font-weight: 750; }
+.remittances-page .rem-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+.remittances-page .rem-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.remittances-page .chip-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 36px; padding: 7px 13px; border: 1px solid var(--line);
+    border-radius: 999px; background: var(--card); color: var(--muted);
+    font-family: inherit; font-size: 12px; font-weight: 650; cursor: pointer;
+}
+.remittances-page .chip-btn:hover { background: var(--teal-soft); color: var(--teal-dark); }
+.remittances-page .chip-btn.active { background: var(--teal-soft); border-color: var(--teal); color: var(--teal-dark); }
+.remittances-page .chip-btn span { padding: 2px 6px; border-radius: 99px; background: rgba(100, 116, 139, .12); font-size: 10px; }
+.remittances-page .search-wrap {
+    display: flex; align-items: center; gap: 10px; width: min(100%, 340px);
+    min-height: 39px; padding: 0 13px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--card);
+}
+.remittances-page .search-wrap svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); }
+.remittances-page .search-wrap input {
+    width: 100%; min-width: 0; padding: 0; border: 0; outline: 0;
+    background: transparent; color: var(--ink); font-family: inherit; font-size: 13px;
+}
+.remittances-page .search-wrap input::placeholder { color: var(--muted); }
+
+/* Remittance cards */
+.remittances-page .rem-list { display: flex; flex-direction: column; gap: 16px; }
+.remittances-page .rem-card[hidden], .remittances-page .rem-no-match[hidden] { display: none !important; }
+.remittances-page .rc-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 19px 24px; border-bottom: 1px solid var(--line); }
+.remittances-page .rc-who { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.remittances-page .rc-who > div { min-width: 0; }
+.remittances-page .rc-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--teal-soft); color: var(--teal-dark); }
+.remittances-page .rc-avatar svg { width: 18px; height: 18px; }
+.remittances-page .rc-name { display: block; margin-bottom: 3px; color: var(--ink); font-size: 15px; font-weight: 750; }
+.remittances-page .muted { color: var(--muted); font-size: 12px; }
+.remittances-page .status-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border-radius: 99px; font-size: 11px; font-weight: 750; white-space: nowrap; text-transform: uppercase; }
+.remittances-page .status-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.remittances-page .status-submitted { background: #fef3c7; color: #92400e; }
+.remittances-page .status-verified { background: #d1fae5; color: #065f46; }
+.remittances-page .status-rejected { background: #ffe4e6; color: #9f1239; }
+.remittances-page .rc-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 24px; }
+.remittances-page .rc-block { min-width: 0; }
+.remittances-page .rc-block h4 { margin: 0 0 16px; padding-bottom: 9px; border-bottom: 1px solid var(--line); color: var(--teal-dark); font-size: 12px; font-weight: 750; letter-spacing: .5px; text-transform: uppercase; }
+.remittances-page .rc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 20px; margin: 0; }
+.remittances-page .rc-grid div { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.remittances-page .rc-grid dt { color: var(--muted); font-size: 11.5px; font-weight: 650; }
+.remittances-page .rc-grid dd { margin: 0; color: var(--ink); font-size: 14px; font-weight: 750; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.remittances-page .money.var.negative { color: #e11d48; }
+.remittances-page .money.var.positive { color: #047857; }
+.remittances-page .rc-foot { padding: 18px 24px; border-top: 1px solid var(--line); }
+.remittances-page .review-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; margin-bottom: 9px; }
+.remittances-page .review-meta strong { color: var(--ink); }
+.remittances-page .review-meta .dt { margin-left: auto; }
+.remittances-page .rc-note { margin: 0 0 8px; padding: 11px 13px; border-left: 3px solid var(--teal); border-radius: 8px; background: var(--teal-soft); color: var(--ink); font-size: 12px; line-height: 1.6; }
+
+/* Empty states and explanatory note */
+.remittances-page .rem-empty { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 50px 20px; text-align: center; }
+.remittances-page .rem-empty .kpi-icon { width: 46px; height: 46px; }
+.remittances-page .rem-empty h3 { margin: 0; color: var(--ink); font-size: 16px; }
+.remittances-page .rem-empty p { max-width: 420px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.remittances-page .rem-no-match { padding: 38px 20px; color: var(--muted); font-size: 13px; text-align: center; }
+.remittances-page .form-note { padding: 19px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--muted); font-size: 12px; line-height: 1.7; }
+.remittances-page .form-note p { margin: 0 0 9px; }
+.remittances-page .form-note p:last-child { margin-bottom: 0; }
+.remittances-page .form-note strong { color: var(--ink); }
+
+/* Dark mode — retain white text on dark surfaces */
+:root[data-theme="dark"] .remittances-page { --rem-good: #6ee7b7; --rem-warn: #fbbf24; --rem-bad: #fda4af; --accent: #7dd3fc; }
+:root[data-theme="dark"] .remittances-page .panel,
+:root[data-theme="dark"] .remittances-page .rem-card,
+:root[data-theme="dark"] .remittances-page .form-note { background: #172033; border-color: #2b3850; color: #f8fafc; }
+:root[data-theme="dark"] .remittances-page .panel-head h3,
+:root[data-theme="dark"] .remittances-page .rem-kpi h2,
+:root[data-theme="dark"] .remittances-page .rc-name,
+:root[data-theme="dark"] .remittances-page .rc-grid dd,
+:root[data-theme="dark"] .remittances-page .form-grid label { color: #f8fafc; }
+:root[data-theme="dark"] .remittances-page .notice-msg { background: #123d32; border-color: #245a48; color: #6ee7b7; }
+:root[data-theme="dark"] .remittances-page .error-msg { background: #4c1d2a; border-color: #713247; color: #fda4af; }
+:root[data-theme="dark"] .remittances-page .status-submitted { background: #42351b; color: #fcd34d; }
+:root[data-theme="dark"] .remittances-page .status-verified { background: #123d32; color: #6ee7b7; }
+:root[data-theme="dark"] .remittances-page .status-rejected { background: #4c1d2a; color: #fda4af; }
+:root[data-theme="dark"] .remittances-page .money.var.negative { color: #fda4af; }
+:root[data-theme="dark"] .remittances-page .money.var.positive { color: #6ee7b7; }
+:root[data-theme="dark"] .remittances-page .chip-btn,
+:root[data-theme="dark"] .remittances-page .search-wrap { background: #172033; color: #cbd5e1; border-color: #2b3850; }
+:root[data-theme="dark"] .remittances-page .chip-btn.active { background: #173344; border-color: #38b9e3; color: #7dd3fc; }
+:root[data-theme="dark"] .remittances-page .form-grid input { background: #202c42; color: #f8fafc; border-color: #334155; }
+:root[data-theme="dark"] .remittances-page .search-wrap input { background: transparent; color: #f8fafc; }
+:root[data-theme="dark"] .remittances-page .rem-kpi .kpi-icon.warn { background: #42351b; color: #fcd34d; }
+
+@media (max-width: 900px) {
+    .remittances-page .stats.triple { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .remittances-page .rc-body { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+    .remittances-page .stats, .remittances-page .stats.triple,
+    .remittances-page .form-grid, .remittances-page .rc-grid { grid-template-columns: 1fr; }
+    .remittances-page .form-grid label.full-width { grid-column: auto; }
+    .remittances-page .rem-toolbar { align-items: stretch; flex-direction: column; }
+    .remittances-page .search-wrap { width: 100%; }
+    .remittances-page .rc-head, .remittances-page .rc-body,
+    .remittances-page .rc-foot, .remittances-page .panel-body { padding: 18px; }
+    .remittances-page .form-actions .btn { width: 100%; }
+}

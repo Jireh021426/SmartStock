@@ -1,0 +1,294 @@
+/* ==================================================
+   SMARTSTOCK — SHARED LIGHT / DARK THEME
+   ================================================== */
+
+/* Light theme: preserve existing SmartStock colors */
+:root,
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --bg: #f1f1f1;
+    --card: #ffffff;
+    --ink: #111827;
+    --muted: #6b7280;
+    --line: #e7e7e7;
+
+    --teal: #1aab8f;
+    --teal-dark: #14917a;
+    --teal-soft: #e6f6f2;
+
+    --orange: #f59e0b;
+    --orange-soft: #fff4e0;
+
+    --shadow:
+        0 1px 2px rgba(16, 24, 40, 0.04),
+        0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+/* Dark theme: Nova-inspired palette */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0b1020;
+    --card: #172033;
+    --ink: #e9eefb;
+    --muted: #94a3b8;
+    --line: #2b3850;
+
+    --teal: #4cc9f0;
+    --teal-dark: #38b9e3;
+    --teal-soft: #173344;
+
+    --orange: #fbbf24;
+    --orange-soft: #392d19;
+
+    --shadow:
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* ==================================================
+   THEME TOGGLE — SHARED NAVIGATION
+   ================================================== */
+
+.theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 3px;
+}
+
+.theme-toggle .ico {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+}
+
+.theme-icon-sun {
+    display: none;
+}
+
+.theme-icon-moon {
+    display: block;
+}
+
+:root[data-theme="dark"] .theme-icon-sun {
+    display: block;
+}
+
+:root[data-theme="dark"] .theme-icon-moon {
+    display: none;
+}
+
+/* Dark mode — shared top navigation */
+:root[data-theme="dark"] body > header .smart-topbar {
+    background: #172033;
+    border-bottom-color: var(--line);
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] .topbar-search {
+    background: #202c42;
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] .topbar-search input {
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] .topbar-profile summary,
+:root[data-theme="dark"] .topbar-notifications summary {
+    color: var(--ink);
+}
+
+/* Dark mode — readable text and controls */
+:root[data-theme="dark"] body {
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] body > main h1,
+:root[data-theme="dark"] body > main h2,
+:root[data-theme="dark"] body > main h3,
+:root[data-theme="dark"] body > main h4,
+:root[data-theme="dark"] body > main label,
+:root[data-theme="dark"] body > main strong {
+    color: #f8fafc;
+}
+
+/* Dashboard cards that retain white backgrounds */
+:root[data-theme="dark"] body > main .card,
+:root[data-theme="dark"] body > main .dashboard-card {
+    color: #172033;
+}
+
+:root[data-theme="dark"] body > main a:not(.btn):not(.page-button) {
+    color: #7dd3fc;
+}
+
+:root[data-theme="dark"] body > main input,
+:root[data-theme="dark"] body > main select {
+    color: #f8fafc;
+    background: #202c42;
+    border-color: #334155;
+}
+
+:root[data-theme="dark"] body > main input::placeholder {
+    color: #94a3b8;
+}
+
+/* Dark mode — readable dashboard panels */
+:root[data-theme="dark"] body > main .dashboard-panel,
+:root[data-theme="dark"] body > main .dashboard-card,
+:root[data-theme="dark"] body > main .card {
+    color: #172033;
+}
+
+:root[data-theme="dark"] body > main .dashboard-panel h1,
+:root[data-theme="dark"] body > main .dashboard-panel h2,
+:root[data-theme="dark"] body > main .dashboard-panel h3,
+:root[data-theme="dark"] body > main .dashboard-panel label,
+:root[data-theme="dark"] body > main .dashboard-card h1,
+:root[data-theme="dark"] body > main .dashboard-card h2,
+:root[data-theme="dark"] body > main .dashboard-card h3,
+:root[data-theme="dark"] body > main .dashboard-card label,
+:root[data-theme="dark"] body > main .card h1,
+:root[data-theme="dark"] body > main .card h2,
+:root[data-theme="dark"] body > main .card h3,
+:root[data-theme="dark"] body > main .card label {
+    color: #172033;
+}
+
+/* Shared navigation — center quick-add icon */
+body > header .topbar-quick-add summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+body > header .topbar-quick-add summary .ico {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Dark mode — readable active navigation */
+:root[data-theme="dark"] body > header nav a.active,
+:root[data-theme="dark"] body > header nav a.active span {
+    color: #172033;
+}
+
+/* Dark mode — readable dashboard panels */
+:root[data-theme="dark"] body > main .dashboard-panel,
+:root[data-theme="dark"] body > main .dashboard-card,
+:root[data-theme="dark"] body > main .card {
+    color: #172033;
+}
+
+:root[data-theme="dark"] body > main .dashboard-panel h1,
+:root[data-theme="dark"] body > main .dashboard-panel h2,
+:root[data-theme="dark"] body > main .dashboard-panel h3,
+:root[data-theme="dark"] body > main .dashboard-panel label,
+:root[data-theme="dark"] body > main .dashboard-card h1,
+:root[data-theme="dark"] body > main .dashboard-card h2,
+:root[data-theme="dark"] body > main .dashboard-card h3,
+:root[data-theme="dark"] body > main .dashboard-card label,
+:root[data-theme="dark"] body > main .card h1,
+:root[data-theme="dark"] body > main .card h2,
+:root[data-theme="dark"] body > main .card h3,
+:root[data-theme="dark"] body > main .card label {
+    color: #172033;
+}
+
+/* Shared navigation — center quick-add icon */
+body > header .topbar-quick-add summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+body > header .topbar-quick-add summary .ico {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Dark mode — readable active navigation */
+:root[data-theme="dark"] body > header nav a.active,
+:root[data-theme="dark"] body > header nav a.active span {
+    color: #172033;
+}
+
+
+/* ==================================================
+   DARK MODE — WHITE SURFACES NEED DARK TEXT
+   Buttons, chips and dropdown menus keep a white background in both
+   themes (style.css), but their text used var(--ink) / inherited body
+   colour, which is near-white in dark mode.
+   ================================================== */
+
+/* Ghost buttons (Export, Go to sales) and chips (Last 6 months, Last 7 days).
+   ".button" is repeated so this beats the dark-mode link colour rule above. */
+:root[data-theme="dark"] body > main .button.ghost.button,
+:root[data-theme="dark"] body > main a.button.ghost.button {
+    color: #172033;
+}
+
+:root[data-theme="dark"] body > main .chip {
+    color: #172033;
+}
+
+/* Quick Add dropdown */
+:root[data-theme="dark"] .topbar-dropdown strong {
+    color: #172033;
+}
+
+:root[data-theme="dark"] .topbar-dropdown a {
+    color: #172033;
+}
+
+:root[data-theme="dark"] .topbar-dropdown a:hover {
+    background: #e6f6f2;
+}
+
+/* Notifications dropdown */
+:root[data-theme="dark"] .topbar-notification-menu strong {
+    color: #172033;
+}
+
+:root[data-theme="dark"] .topbar-notification-menu p {
+    color: #5b6b7f;
+}
+
+:root[data-theme="dark"] .topbar-notification-menu a {
+    background: #e6f6f2;
+    color: #14917a;
+}
+
+/* Profile (admin) dropdown */
+:root[data-theme="dark"] .topbar-profile-menu strong {
+    color: #172033;
+}
+
+:root[data-theme="dark"] .topbar-profile-menu .topbar-profile-role {
+    color: #5b6b7f !important;
+}
