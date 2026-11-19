@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -6,220 +5,177 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmartStock | Physical Stock Audits</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/audits.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
 
 <header th:replace="~{fragments/navigation :: siteHeader}"></header>
 
-<main>
-    <div class="heading">
+<main class="audits-page">
+
+    <div class="topbar">
         <div>
-            <h2>Physical Stock Audits</h2>
-            <p>
-                Compare counted stock with recorded inventory.
-                Independent review is required before adjustments.
-            </p>
+            <h2 class="page-title">Physical Stock Audits</h2>
+            <p class="page-sub">Compare counted stock with recorded inventory. Independent review is required before adjustments.</p>
         </div>
     </div>
 
-    <p class="error" th:if="${error}" th:text="${error}"></p>
-    <p th:if="${notice}" th:text="${notice}"></p>
+    <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+    <p class="notice-msg" th:if="${notice}" th:text="${notice}"></p>
 
+    <!-- AUDITOR FORM -->
     <div class="panel" th:if="${isAuditor}">
-        <h3>Submit Physical Stock Count</h3>
+        <div class="panel-head">
+            <h3>Submit Physical Stock Count</h3>
+            <span class="text-muted" style="font-size: 12px;">Count stock physically before entering the quantity.</span>
+        </div>
+        
+        <form class="nova-form" th:action="@{/audits/count}" method="post">
+            <div class="form-grid">
+                <label>
+                    Product
+                    <select name="productId" required>
+                        <option value="">Select product</option>
+                        <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option>
+                    </select>
+                </label>
 
-        <p>
-            Count stock physically before entering the quantity.
-            Submitting an audit does not change inventory.
-        </p>
+                <label>
+                    Location
+                    <select name="locationId" required>
+                        <option value="">Select location</option>
+                        <option th:each="loc : ${locations}" th:if="${loc.code != 'LEGACY'}" th:value="${loc.id}" th:text="${loc.name + ' (' + loc.code + ')'}"></option>
+                    </select>
+                </label>
 
-        <form th:action="@{/audits/count}" method="post">
+                <label>
+                    Actual counted weight (kg)
+                    <input type="number" name="countedKg" min="0" step="0.001" placeholder="0.000" required>
+                </label>
 
-            <label>
-                Product
-                <select name="productId" required>
-                    <option value="">Select product</option>
-                    <option th:each="p : ${products}"
-                            th:value="${p.id}"
-                            th:text="${p.name}"></option>
-                </select>
-            </label>
-
-            <label>
-                Location
-                <select name="locationId" required>
-                    <option value="">Select location</option>
-                    <option th:each="loc : ${locations}"
-                            th:if="${loc.code != 'LEGACY'}"
-                            th:value="${loc.id}"
-                            th:text="${loc.name + ' (' + loc.code + ')'}">
-                    </option>
-                </select>
-            </label>
-
-            <label>
-                Actual counted weight (kg)
-                <input type="number"
-                       name="countedKg"
-                       min="0"
-                       step="0.001"
-                       required>
-            </label>
-
-            <label>
-                Count notes / evidence reference
-                <textarea name="note"
-                          rows="4"
-                          maxlength="1000"
-                          required></textarea>
-            </label>
-
-            <button class="button" type="submit">
-                Submit Count for Review
-            </button>
+                <label class="full-width">
+                    Count notes / evidence reference
+                    <textarea name="note" rows="3" maxlength="1000" placeholder="e.g. Counted with digital scale, witnessed by supervisor..." required></textarea>
+                </label>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Submit Count for Review</button>
+            </div>
         </form>
     </div>
 
+    <!-- MANAGER REVIEW -->
     <div class="panel" th:if="${isManager}">
-        <h3>Pending Manager Reviews</h3>
-
-        <div th:each="a : ${audits}"
-             th:if="${a.status == pendingStatus}">
-
-            <hr>
-
-            <h4 th:text="'Physical Audit #' + ${a.id}"></h4>
-
-            <p>
-                Product:
-                <strong th:text="${a.product.name}"></strong>
-            </p>
-
-            <p>
-                Location:
-                <strong th:text="${a.location.name}"></strong>
-            </p>
-
-            <p>
-                Expected:
-                <strong th:text="${a.expectedKg} + ' kg'"></strong>
-            </p>
-
-            <p>
-                Counted:
-                <strong th:text="${a.countedKg} + ' kg'"></strong>
-            </p>
-
-            <p>
-                Variance:
-                <strong th:text="${a.varianceKg} + ' kg'"></strong>
-            </p>
-
-            <p>
-                Auditor:
-                <strong th:text="${a.auditor.fullName}"></strong>
-            </p>
-
-            <p>
-                Count note:
-                <span th:text="${a.countNote}"></span>
-            </p>
-
-            <form th:action="@{/audits/review}" method="post">
-                <input type="hidden"
-                       name="auditId"
-                       th:value="${a.id}">
-
-                <label>
-                    Review explanation
-                    <textarea name="note"
-                              rows="3"
-                              maxlength="1000"
-                              required></textarea>
-                </label>
-
-                <button class="button"
-                        type="submit"
-                        name="decision"
-                        value="APPROVE">
-                    Approve Adjustment
-                </button>
-
-                <button class="button"
-                        type="submit"
-                        name="decision"
-                        value="REJECT">
-                    Reject Audit
-                </button>
-            </form>
+        <div class="panel-head">
+            <h3>Pending Manager Reviews</h3>
+            <span class="text-muted" style="font-size: 12px;">Only pending audits appear below.</span>
         </div>
+        
+        <div class="panel-body">
+            <div th:each="a : ${audits}" th:if="${a.status == pendingStatus}" class="review-card">
+                
+                <div class="rc-header">
+                    <h4 th:text="'Physical Audit #' + ${a.id}"></h4>
+                    <span class="status-badge status-warn">PENDING REVIEW</span>
+                </div>
+                
+                <div class="rc-details">
+                    <p><span>Product:</span> <strong th:text="${a.product.name}"></strong></p>
+                    <p><span>Location:</span> <strong th:text="${a.location.name}"></strong></p>
+                    <p><span>Expected:</span> <strong th:text="${a.expectedKg} + ' kg'"></strong></p>
+                    <p><span>Counted:</span> <strong th:text="${a.countedKg} + ' kg'"></strong></p>
+                    <p><span>Variance:</span> <strong class="text-danger" th:text="${a.varianceKg} + ' kg'"></strong></p>
+                    <p><span>Auditor:</span> <strong th:text="${a.auditor.fullName}"></strong></p>
+                    <p class="full-width"><span>Count note:</span> <span th:text="${a.countNote}"></span></p>
+                </div>
 
-        <p>
-            <small>
-                Only pending audits appear above.
-                Approval requires inventory to match the
-                recorded snapshot at the time of counting.
-            </small>
-        </p>
+                <form class="nova-form rc-form" th:action="@{/audits/review}" method="post">
+                    <input type="hidden" name="auditId" th:value="${a.id}">
+                    
+                    <label>
+                        Review explanation
+                        <textarea name="note" rows="3" maxlength="1000" placeholder="Explain the reasoning for approval or rejection..." required></textarea>
+                    </label>
+                    
+                    <div class="form-actions rc-actions">
+                        <button class="btn btn-reject" type="submit" name="decision" value="REJECT">Reject Audit</button>
+                        <button class="btn btn-approve" type="submit" name="decision" value="APPROVE">Approve Adjustment</button>
+                    </div>
+                </form>
+            </div>
+            
+            <p class="text-muted" style="font-size: 13px;" th:if="${#lists.isEmpty(audits.?[status == pendingStatus])}">
+                No pending audits to review.
+            </p>
+        </div>
     </div>
 
+    <!-- AUDIT HISTORY -->
     <div class="panel">
-        <h3>Physical Audit History</h3>
-
-        <div style="overflow-x:auto">
+        <div class="panel-head">
+            <h3>Physical Audit History</h3>
+        </div>
+        
+        <div class="table-wrap">
             <table>
                 <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Location</th>
-                    <th>Expected</th>
-                    <th>Counted</th>
-                    <th>Variance</th>
-                    <th>Auditor</th>
-                    <th>Counted At</th>
-                    <th>Status</th>
-                    <th>Reviewer</th>
-                    <th>Reviewed At</th>
-                    <th>Count Note</th>
-                    <th>Review Note</th>
-                </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Product</th>
+                        <th>Location</th>
+                        <th style="text-align: right;">Expected</th>
+                        <th style="text-align: right;">Counted</th>
+                        <th style="text-align: right;">Variance</th>
+                        <th>Auditor</th>
+                        <th>Counted At</th>
+                        <th>Status</th>
+                        <th>Reviewer</th>
+                        <th>Reviewed At</th>
+                        <th>Count Note</th>
+                        <th>Review Note</th>
+                    </tr>
                 </thead>
-
                 <tbody>
-                <tr th:each="a : ${audits}">
-                    <td th:text="${a.id}"></td>
-                    <td th:text="${a.product.name}"></td>
-                    <td th:text="${a.location.name}"></td>
-                    <td th:text="${a.expectedKg} + ' kg'"></td>
-                    <td th:text="${a.countedKg} + ' kg'"></td>
-                    <td th:text="${a.varianceKg} + ' kg'"></td>
-                    <td th:text="${a.auditor.fullName}"></td>
-                    <td th:text="${#temporals.format(a.countedAt, 'yyyy-MM-dd HH:mm')}"></td>
-                    <td th:text="${a.status}"></td>
-                    <td th:text="${a.reviewer != null ? a.reviewer.fullName : '-'}"></td>
-                    <td th:text="${a.reviewedAt != null ? #temporals.format(a.reviewedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
-                    <td th:text="${a.countNote}"></td>
-                    <td th:text="${a.reviewNote != null ? a.reviewNote : '-'}"></td>
-                </tr>
-
-                <tr th:if="${#lists.isEmpty(audits)}">
-                    <td colspan="13">No physical audits recorded.</td>
-                </tr>
+                    <tr th:each="a : ${audits}">
+                        <td class="text-muted" th:text="${a.id}"></td>
+                        <td class="product-name" th:text="${a.product.name}"></td>
+                        <td th:text="${a.location.name}"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="${a.expectedKg} + ' kg'"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="${a.countedKg} + ' kg'"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700;" 
+                            th:classappend="${a.varianceKg.signum() != 0} ? 'text-danger' : ''" 
+                            th:text="${a.varianceKg} + ' kg'"></td>
+                        <td th:text="${a.auditor.fullName}"></td>
+                        <td class="text-muted" th:text="${#temporals.format(a.countedAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${a.status.name() == 'PENDING' ? 'status-warn' : (a.status.name() == 'APPROVED' ? 'status-in' : 'status-out')}" 
+                                  th:text="${a.status}">
+                            </span>
+                        </td>
+                        
+                        <td th:text="${a.reviewer != null ? a.reviewer.fullName : '-'}"></td>
+                        <td class="text-muted" th:text="${a.reviewedAt != null ? #temporals.format(a.reviewedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                        <td th:text="${a.countNote}"></td>
+                        <td th:text="${a.reviewNote != null ? a.reviewNote : '-'}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(audits)}">
+                        <td colspan="13" class="empty-state">No physical audits recorded.</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <p>
-        <small>
-            A variance is a difference between counted and
-            recorded stock, not automatic proof of theft.
-            Approved adjustments are recorded in stock movement
-            history. Rejected counts remain in audit history.
-        </small>
-    </p>
-</main>
+    <div class="form-note">
+        <p>A variance is a difference between counted and recorded stock, not automatic proof of theft.</p>
+        <p>Approved adjustments are recorded in stock movement history. Rejected counts remain in audit history.</p>
+    </div>
 
+</main>
 </body>
 </html>

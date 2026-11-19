@@ -1,0 +1,56 @@
+/* Scoped Transfers theme — does not override SmartStock shared navigation */
+.transfers-page { --tr-surface:var(--card,#fff);--tr-text:var(--ink,#172033);--tr-subtle:var(--muted,#64748b);--tr-border:var(--line,#e2e8f0);--tr-soft:var(--teal-soft,#eaf7f6);--tr-good:#047857;--tr-bad:#be123c;--tr-warn:#a16207;min-width:0;display:flex;flex-direction:column;gap:24px;color:var(--tr-text)}
+.transfers-page *{box-sizing:border-box}
+.transfers-page .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.transfers-page .page-title{font-size:25px;font-weight:750;color:var(--tr-text);margin:0}
+.transfers-page .page-sub{font-size:13px;color:var(--tr-subtle);margin-top:5px}
+.transfers-page .panel{background:var(--tr-surface);border:1px solid var(--tr-border);border-radius:16px;box-shadow:var(--shadow,0 5px 25px #0001);overflow:hidden;color:var(--tr-text)}
+.transfers-page .panel-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding:20px 24px;border-bottom:1px solid var(--tr-border)}
+.transfers-page .panel-head h3{font-size:15px;font-weight:750;margin:0;color:var(--tr-text)}
+.transfers-page .panel-body{padding:24px}
+.transfers-page .text-muted,.transfers-page .form-hint{color:var(--tr-subtle);font-size:13px}
+.transfers-page .text-danger{color:var(--tr-bad)!important}
+.transfers-page .notice-msg,.transfers-page .error-msg{padding:13px 16px;border-radius:10px;font-size:13px}
+.transfers-page .notice-msg{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.transfers-page .error-msg{background:#fff1f2;color:#be123c;border:1px solid #fecdd3}
+.transfers-page .nova-form{padding:24px}
+.transfers-page .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.transfers-page .form-grid label{display:flex;flex-direction:column;gap:8px;color:var(--tr-text);font-size:13px;font-weight:650}
+.transfers-page .form-grid label.full-width{grid-column:1/-1}
+.transfers-page input,.transfers-page select,.transfers-page textarea{width:100%;border:1px solid var(--tr-border);border-radius:10px;background:var(--tr-surface);color:var(--tr-text);font:inherit;font-size:13px;padding:10px 13px;outline:none}
+.transfers-page input,.transfers-page select{min-height:43px}
+.transfers-page textarea{resize:vertical;min-height:90px}
+.transfers-page input:focus,.transfers-page select:focus,.transfers-page textarea:focus{border-color:var(--teal,#14a99a);box-shadow:0 0 0 3px #14a99a20}
+.transfers-page .form-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.transfers-page .btn-primary{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border:0;border-radius:10px;background:#14a99a;color:white;font-size:13px;font-weight:750;cursor:pointer}
+.transfers-page .transfer-card{background:var(--tr-surface);border:1px solid var(--tr-border);border-radius:12px;overflow:hidden;margin-bottom:18px}
+.transfers-page .tc-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--tr-border);background:var(--tr-soft)}
+.transfers-page .tc-header h4{font-size:14px;color:var(--tr-text);margin:0}
+.transfers-page .tc-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:20px;border-bottom:1px solid var(--tr-border)}
+.transfers-page .tc-details p{font-size:13px;margin:0;color:var(--tr-subtle)}
+.transfers-page .tc-details p span{display:block;font-size:11px;text-transform:uppercase;margin-bottom:5px}
+.transfers-page .tc-details strong{color:var(--tr-text)}
+.transfers-page .tc-form{padding:20px}
+.transfers-page .table-wrap{width:100%;overflow-x:auto}
+.transfers-page table{border-collapse:collapse;width:100%;min-width:1100px}
+.transfers-page th{padding:15px 18px;text-align:left;white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--tr-subtle);background:var(--tr-soft);border-bottom:1px solid var(--tr-border)}
+.transfers-page td{padding:15px 18px;font-size:13px;color:var(--tr-text);border-bottom:1px solid var(--tr-border);vertical-align:middle}
+.transfers-page tbody tr:hover td{background:var(--tr-soft)}
+.transfers-page .product-name{font-weight:700;color:var(--tr-text)}
+.transfers-page .empty-state{text-align:center;padding:35px;color:var(--tr-subtle)}
+.transfers-page .status-badge{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:6px 11px;font-size:11px;font-weight:750;white-space:nowrap}
+.transfers-page .status-badge:before{content:"";height:6px;width:6px;border-radius:50%;background:currentColor}
+.transfers-page .status-in{background:#dcfce7;color:#166534}
+.transfers-page .status-warn{background:#fef3c7;color:#92400e}
+.transfers-page .status-out{background:#ffe4e6;color:#be123c}
+.transfers-page .form-note{border:1px solid var(--tr-border);border-radius:12px;background:var(--tr-surface);padding:20px;color:var(--tr-subtle);font-size:13px;line-height:1.65}
+.transfers-page .form-note p{margin:0 0 8px}
+:root[data-theme="dark"] .transfers-page{--tr-surface:#172033;--tr-text:#f8fafc;--tr-subtle:#a7b6cb;--tr-border:#334155;--tr-soft:#203547;--tr-good:#6ee7b7;--tr-bad:#fda4af;--tr-warn:#fcd34d}
+:root[data-theme="dark"] .transfers-page input,:root[data-theme="dark"] .transfers-page select,:root[data-theme="dark"] .transfers-page textarea{background:#202c42;color:#f8fafc}
+:root[data-theme="dark"] .transfers-page select option{background:#202c42;color:#f8fafc}
+:root[data-theme="dark"] .transfers-page .status-in{background:#123d32;color:#6ee7b7}
+:root[data-theme="dark"] .transfers-page .status-warn{background:#42351a;color:#fcd34d}
+:root[data-theme="dark"] .transfers-page .status-out{background:#4c1d2a;color:#fda4af}
+:root[data-theme="dark"] .transfers-page .notice-msg{background:#123d32;color:#6ee7b7;border-color:#245a48}
+:root[data-theme="dark"] .transfers-page .error-msg{background:#4c1d2a;color:#fda4af;border-color:#713247}
+@media(max-width:700px){.transfers-page .form-grid{grid-template-columns:1fr}.transfers-page .form-grid label.full-width{grid-column:auto}.transfers-page .panel-body,.transfers-page .nova-form{padding:16px}}

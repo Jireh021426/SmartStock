@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SmartStock | New Sale</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/sales.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
+</head>
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="form-page sale-entry-page">
+    <div class="topbar">
+        <div>
+            <a class="back-link" th:href="@{/sales}">← Back to Sales</a>
+            <h2 class="page-title">New Chicken Sale</h2>
+            <p class="page-sub">Record a chicken sale from a specific stall or storage location.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+
+        <form class="nova-form" th:action="@{/sales/save}" th:object="${saleForm}" method="post">
+            
+            <div class="form-grid">
+                <!-- SELLING LOCATION -->
+                <label class="full-width">
+                    Selling Location / Chicken Stall
+                    <select id="locationId" th:field="*{locationId}" required>
+                        <option value="">Assigned selling location</option>
+                        <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name + ' (' + loc.code + ')'}"></option>
+                    </select>
+                    <small class="error-text" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></small>
+                    <span class="form-hint" style="border: none; padding: 4px 0 0 0; background: transparent;">Only your assigned stall is available. Changing the request cannot bypass this restriction.</span>
+                </label>
+
+                <!-- PRODUCT -->
+                <label class="full-width">
+                    Chicken Product
+                    <select id="productId" th:field="*{productId}" required>
+                        <option value="">Select chicken product</option>
+                        <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name + ' | ₱' + p.price + '/kg | Company total: ' + p.stockKg + ' kg'}"></option>
+                    </select>
+                    <small class="error-text" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></small>
+                    <span class="form-hint" style="border: none; padding: 4px 0 0 0; background: transparent;">The displayed quantity is the company-wide stock total, not necessarily the quantity available at the selected stall.</span>
+                </label>
+
+                <!-- WEIGHT -->
+                <label>
+                    Weight Sold (kg)
+                    <input id="weightKg" type="number" step="0.001" min="0.001" th:field="*{weightKg}" required placeholder="e.g. 5.250">
+                    <small class="error-text" th:if="${#fields.hasErrors('weightKg')}" th:errors="*{weightKg}"></small>
+                </label>
+
+                <!-- PAYMENT METHOD -->
+                <label>
+                    Payment Method
+                    <select id="paymentMethod" th:field="*{paymentMethod}" required>
+                        <option value="CASH">Cash</option>
+                        <option value="GCASH">GCash</option>
+                        <option value="CREDIT">Customer Credit (Utang)</option>
+                    </select>
+                    <small class="error-text" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></small>
+                </label>
+
+                <!-- CUSTOMER (Hidden by default, shown via JS) -->
+                <div id="customerSection" class="full-width" style="display: none;">
+                    <label>
+                        Customer (Required for Utang)
+                        <select id="customerId" th:field="*{customerId}">
+                            <option value="">Select customer</option>
+                            <option th:each="c : ${customers}" th:value="${c.id}" th:text="${c.name + ' (' + c.phone + ')'}"></option>
+                        </select>
+                        <small class="error-text" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></small>
+                        <span class="form-hint" style="border: none; padding: 4px 0 0 0; background: transparent;">
+                            Customer not registered? <a th:href="@{/customers/new}" style="color: var(--accent); text-decoration: none;">Register the customer first.</a>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- INFO NOTES -->
+            <div class="form-note">
+                <p><strong>Selling Price:</strong> The current selling price is taken from the selected product.</p>
+                <p><strong>Purchase Cost:</strong> SmartStock uses the product's weighted-average purchase cost to calculate gross profit.</p>
+                <p><strong>Inventory:</strong> The sale is deducted from the selected location and the company total in one database transaction.</p>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Record Sale</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    function updateCustomerSection() {
+        const paymentMethod = document.getElementById("paymentMethod");
+        const customerSection = document.getElementById("customerSection");
+        const customerId = document.getElementById("customerId");
+
+        if (!paymentMethod || !customerSection || !customerId) {
+            return;
+        }
+
+        const isCredit = paymentMethod.value === "CREDIT";
+
+        customerSection.style.display = isCredit ? "block" : "none";
+        customerId.required = isCredit;
+
+        // Preserve selected customer when switching
+        // payment methods, but do not submit it for
+        // non-credit sales.
+        customerId.disabled = !isCredit;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const paymentMethod = document.getElementById("paymentMethod");
+        if (paymentMethod) {
+            paymentMethod.addEventListener("change", updateCustomerSection);
+            updateCustomerSection();
+        }
+    });
+</script>
+
+</body>
+</html>

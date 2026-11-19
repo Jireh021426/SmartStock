@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SmartStock | Add Customer</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/customers.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}" defer></script>
+</head>
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="form-page customer-form-page">
+    <div class="topbar">
+        <div>
+            <a class="back-link" th:href="@{/customers}">← Back to Customers</a>
+            <h2 class="page-title">Register Customer</h2>
+            <p class="page-sub">Add a new customer to track their utang and repayments.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+
+        <form class="nova-form" th:action="@{/customers/save}" th:object="${customerForm}" method="post">
+            <div class="form-grid">
+                <label class="full-width">
+                    Customer name
+                    <input th:field="*{name}" maxlength="150" placeholder="e.g. Maria Santos" required>
+                    <small class="error-text" th:errors="*{name}"></small>
+                </label>
+
+                <label class="full-width">
+                    Contact / unique customer reference
+                    <input th:field="*{phone}" maxlength="80" placeholder="e.g. 09171234567" required>
+                    <small class="error-text" th:errors="*{phone}"></small>
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">Save Customer</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

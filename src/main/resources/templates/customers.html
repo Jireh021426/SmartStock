@@ -1,143 +1,108 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmartStock | Customers / Utang</title>
-
-    <link rel="stylesheet"
-          th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/customers.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}"></script>
 </head>
-
 <body>
 
 <header th:replace="~{fragments/navigation :: siteHeader}"></header>
 
-<main>
+<main class="customers-page">
 
-    <div class="heading">
-
+    <div class="topbar">
         <div>
-            <h2>Customers &amp; Utang</h2>
-            <p>Outstanding customer credit and repayments.</p>
+            <h2 class="page-title">Customers &amp; Utang</h2>
+            <p class="page-sub">Outstanding customer credit and repayments.</p>
         </div>
 
-        <div class="actions" th:if="${isCashier}">
-
-            <a class="button" th:href="@{/customers/new}">
-                + Customer
-            </a>
-
-            <a class="button" th:href="@{/payments/new}">
-                + Record Payment
-            </a>
-
+        <div class="topbar-actions" th:if="${isCashier}">
+            <a class="btn btn-ghost" th:href="@{/customers/new}">+ Customer</a>
+            <a class="btn btn-primary" th:href="@{/payments/new}">+ Record Payment</a>
         </div>
-
     </div>
 
+    <!-- Stats -->
     <div class="stats">
-
-        <div class="panel">
+        <div class="panel rem-kpi" style="--c: var(--warn); --cb: rgba(251,191,36,.1)">
+            <span class="kpi-icon"><svg class="ico"><use href="#i-users"/></svg></span>
             <small>Total unpaid customer balances</small>
-            <h2 th:text="'₱' + ${outstanding}"></h2>
+            <h2 th:text="'₱' + ${outstanding}">₱0</h2>
         </div>
-
     </div>
 
+    <!-- Customer Balances -->
     <div class="panel">
-
-        <h3>Customer Balances</h3>
-
-        <div style="overflow-x:auto">
-
+        <div class="panel-head">
+            <h3>Customer Balances</h3>
+        </div>
+        
+        <div class="table-wrap">
             <table>
-
                 <thead>
                     <tr>
                         <th>Customer</th>
                         <th>Contact</th>
-                        <th>Unpaid Balance</th>
+                        <th style="text-align: right;">Unpaid Balance</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr th:each="c : ${customers}">
-
-                        <td th:text="${c.name}"></td>
-
-                        <td th:text="${c.phone}"></td>
-
-                        <td th:text="'₱' + ${c.balance}"></td>
-
+                        <td class="product-name" th:text="${c.name}"></td>
+                        <td class="text-muted" th:text="${c.phone}"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700;" 
+                            th:classappend="${c.balance > 0} ? 'text-warn' : 'text-good'"
+                            th:text="'₱' + ${c.balance}"></td>
                     </tr>
-
                     <tr th:if="${#lists.isEmpty(customers)}">
-                        <td colspan="3" class="empty">
-                            No customers yet.
-                        </td>
+                        <td colspan="3" class="empty-state">No customers yet.</td>
                     </tr>
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
 
-    <div class="panel spaced">
-
-        <h3>Credit Repayments</h3>
-
-        <div style="overflow-x:auto">
-
+    <!-- Credit Repayments -->
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Credit Repayments</h3>
+        </div>
+        
+        <div class="table-wrap">
             <table>
-
                 <thead>
                     <tr>
                         <th>Date</th>
                         <th>Customer</th>
                         <th>Method</th>
-                        <th>Amount</th>
+                        <th style="text-align: right;">Amount</th>
                     </tr>
                 </thead>
-
                 <tbody>
-
                     <tr th:each="p : ${payments}">
-
-                        <td th:text="${#temporals.format(p.paidAt, 'yyyy-MM-dd HH:mm')}">
+                        <td class="text-muted" th:text="${#temporals.format(p.paidAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="product-name" th:text="${p.customer.name}"></td>
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${p.method.name() == 'CASH' ? 'status-in' : 'status-accent'}" 
+                                  th:text="${p.method}">
+                            </span>
                         </td>
-
-                        <td th:text="${p.customer.name}"></td>
-
-                        <td th:text="${p.method}"></td>
-
-                        <td th:text="'₱' + ${p.amount}"></td>
-
+                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700;" th:text="'₱' + ${p.amount}"></td>
                     </tr>
-
                     <tr th:if="${#lists.isEmpty(payments)}">
-                        <td colspan="4" class="empty">
-                            No repayments yet.
-                        </td>
+                        <td colspan="4" class="empty-state">No repayments yet.</td>
                     </tr>
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
 
 </main>
-
 </body>
 </html>

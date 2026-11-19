@@ -1,0 +1,60 @@
+/* SmartStock Audits — scoped styles, shared sidebar owned by style.css */
+.audits-page { padding:32px 40px; min-width:0; display:flex; flex-direction:column; gap:22px; color:var(--ink); }
+.audits-page * {box-sizing:border-box}
+.audits-page .topbar {display:flex;justify-content:space-between;align-items:flex-start}
+.audits-page .page-title {font-size:25px;font-weight:750;margin:0;color:var(--ink)}
+.audits-page .page-sub {font-size:13px;color:var(--muted);margin:6px 0 0}
+.audits-page .panel {background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.audits-page .panel-head {padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.audits-page .panel-head h3 {font-size:15px;font-weight:700;color:var(--ink);margin:0}
+.audits-page .panel-body {padding:24px}
+.audits-page .text-muted {color:var(--muted)}
+.audits-page .text-danger {color:#dc3545!important}
+.audits-page .error-msg,.audits-page .notice-msg {padding:12px 16px;border-radius:10px;font-size:13px}
+.audits-page .error-msg {color:#b91c1c;background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.2)}
+.audits-page .notice-msg {color:#047857;background:rgba(16,185,129,.09);border:1px solid rgba(16,185,129,.2)}
+.audits-page .nova-form {padding:24px;display:flex;flex-direction:column;gap:20px}
+.audits-page .form-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.audits-page label {display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.audits-page .full-width {grid-column:1/-1}
+.audits-page input,.audits-page select,.audits-page textarea {width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:10px 14px;font:inherit;font-size:14px;outline:none}
+.audits-page input,.audits-page select {min-height:44px}
+.audits-page textarea {resize:vertical;min-height:85px}
+.audits-page input:focus,.audits-page select:focus,.audits-page textarea:focus {border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.12)}
+.audits-page select option {background:var(--card);color:var(--ink)}
+.audits-page .form-actions {display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.audits-page .btn {display:inline-flex;align-items:center;justify-content:center;padding:11px 20px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.audits-page .btn-primary {background:var(--teal);border-color:var(--teal);color:#fff}
+.audits-page .btn-approve {background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.35);color:#059669}
+.audits-page .btn-reject {background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#dc3545}
+.audits-page .review-card {border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px;background:var(--card)}
+.audits-page .rc-header {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.audits-page .rc-header h4 {font-size:14px;font-weight:700;color:var(--ink);margin:0}
+.audits-page .rc-details {padding:18px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;border-bottom:1px solid var(--line)}
+.audits-page .rc-details p {font-size:13px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.audits-page .rc-details p span {display:block;font-size:11px;font-weight:600;margin-bottom:4px}
+.audits-page .rc-details p strong {font-size:14px;color:var(--ink)}
+.audits-page .rc-form {padding:20px}
+.audits-page .rc-actions {justify-content:flex-start}
+.audits-page .table-wrap {width:100%;overflow-x:auto}
+.audits-page table {width:100%;min-width:1200px;border-collapse:collapse}
+.audits-page th {text-align:left;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:15px 18px;border-bottom:1px solid var(--line);white-space:nowrap}
+.audits-page td {padding:15px 18px;font-size:13px;color:var(--ink);border-bottom:1px solid var(--line);vertical-align:middle}
+.audits-page tbody tr:hover {background:var(--teal-soft)}
+.audits-page .product-name {font-weight:700;color:var(--ink)}
+.audits-page .empty-state {text-align:center;padding:36px;color:var(--muted)}
+.audits-page .status-badge {display:inline-flex;align-items:center;gap:7px;border-radius:30px;padding:6px 11px;font-size:11px;font-weight:700;white-space:nowrap}
+.audits-page .status-badge:before {content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.audits-page .status-in {color:#059669;background:rgba(16,185,129,.12)}
+.audits-page .status-warn {color:#b45309;background:rgba(245,158,11,.12)}
+.audits-page .status-out {color:#dc3545;background:rgba(239,68,68,.12)}
+.audits-page .form-note {padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13px;line-height:1.6;color:var(--muted)}
+.audits-page .form-note p {margin:0 0 6px}
+:root[data-theme="dark"] .audits-page .text-danger {color:#fb7185!important}
+:root[data-theme="dark"] .audits-page .btn-primary {color:#07111d}
+:root[data-theme="dark"] .audits-page .status-warn {color:#fbbf24}
+:root[data-theme="dark"] .audits-page .status-in {color:#34d399}
+:root[data-theme="dark"] .audits-page .status-out {color:#fb7185}
+:root[data-theme="dark"] .audits-page .btn-reject {color:#fb7185}
+:root[data-theme="dark"] .audits-page .btn-approve {color:#34d399}
+@media(max-width:760px){.audits-page{padding:20px 16px}.audits-page .form-grid{grid-template-columns:1fr}.audits-page .panel-body{padding:16px}.audits-page .rc-details{grid-template-columns:1fr}.audits-page .rc-actions .btn{flex:1}}
