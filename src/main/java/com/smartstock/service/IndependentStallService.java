@@ -82,14 +82,18 @@ public class IndependentStallService {
                 form.getWeightKg().scale() > 3 || form.getPricePerKg() == null ||
                 form.getPricePerKg().signum() <= 0 || form.getPricePerKg().scale() > 2 ||
                 form.getBusinessDate() == null ||
-                form.getBusinessDate().isAfter(LocalDate.now(BUSINESS_ZONE)) ||
-                form.getDeliveryReference() == null || form.getDeliveryReference().isBlank() ||
-                form.getDeliveryReference().trim().length() > 80) {
-            throw new IllegalArgumentException("Complete the delivery date, stall, product, source, quantity, price and reference");
+                form.getBusinessDate().isAfter(LocalDate.now(BUSINESS_ZONE))) {
+            throw new IllegalArgumentException("Complete the delivery date, stall, product, source, quantity and price");
         }
-        String reference = form.getDeliveryReference().trim().toUpperCase(java.util.Locale.ROOT);
-        if (sales.existsByDeliveryReference(reference)) {
-            throw new IllegalArgumentException("Delivery reference already recorded; check delivery history");
+
+        String requestId;
+        try {
+            requestId = UUID.fromString(form.getRequestId()).toString();
+        } catch (RuntimeException ex) {
+            throw new IllegalArgumentException("Invalid delivery submission ID");
+        }
+        if (sales.existsByDeliveryRequestId(requestId)) {
+            throw new IllegalArgumentException("Delivery already submitted; check the delivery history before retrying");
         }
 
         // Keep the lock order the same as stock-in and cashier sales: product first.
@@ -120,9 +124,15 @@ public class IndependentStallService {
         }
 
         // All of these operations commit or roll back together.
-        Sale sale = sales.saveAndFlush(Sale.independentDelivery(
+        Sale pendingSale = Sale.independentDelivery(
                 product, stall, location, weight, form.getPricePerKg(),
-                form.getBusinessDate(), reference));
+                form.getBusinessDate());
+        pendingSale.assignDeliveryRequestId(requestId);
+        Sale sale = sales.saveAndFlush(pendingSale);
+        // The database-generated sale ID makes this reference unique without
+        // a pre-save counter, manual entry, or race condition between users.
+        sale.assignGeneratedDeliveryReference();
+        sales.flush();
         balance.changeStock(weight.negate());
         product.changeStock(weight.negate());
         stall.charge(sale.getTotal());

@@ -10,6 +10,7 @@ public interface SaleRepository extends JpaRepository<Sale,Long>{
   java.util.List<Sale> findByBusinessDateGreaterThanEqualAndBusinessDateLessThan(LocalDate start, LocalDate end);
   java.util.List<Sale> findByBusinessDateIsNullAndSoldAtGreaterThanEqualAndSoldAtLessThan(LocalDateTime start, LocalDateTime end);
   boolean existsByDeliveryReference(String deliveryReference);
+  boolean existsByDeliveryRequestId(String deliveryRequestId);
   java.util.List<Sale> findByDeliveryReferenceIsNotNullOrderBySoldAtDescIdDesc();
  List<Sale> findAllByOrderBySoldAtDescIdDesc();
  List<Sale> findBySoldAtGreaterThanEqualAndSoldAtLessThan(LocalDateTime start,LocalDateTime end);

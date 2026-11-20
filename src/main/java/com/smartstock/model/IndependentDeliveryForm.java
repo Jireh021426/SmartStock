@@ -19,8 +19,8 @@ public class IndependentDeliveryForm {
     private BigDecimal pricePerKg;
     @NotNull @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate businessDate = LocalDate.now(ZoneId.of("Asia/Manila"));
-    @NotBlank @Size(max = 80)
-    private String deliveryReference;
+    @NotBlank(message = "Submission ID is required")
+    private String requestId = java.util.UUID.randomUUID().toString();
 
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long x) { customerId = x; }
@@ -34,6 +34,6 @@ public class IndependentDeliveryForm {
     public void setPricePerKg(BigDecimal x) { pricePerKg = x; }
     public LocalDate getBusinessDate() { return businessDate; }
     public void setBusinessDate(LocalDate x) { businessDate = x; }
-    public String getDeliveryReference() { return deliveryReference; }
-    public void setDeliveryReference(String x) { deliveryReference = x; }
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String x) { requestId = x; }
 }

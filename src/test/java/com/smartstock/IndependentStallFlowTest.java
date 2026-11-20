@@ -67,7 +67,7 @@ class IndependentStallFlowTest {
         businessDate = LocalDate.now(ZoneId.of("Asia/Manila")).minusDays(4);
     }
 
-    private IndependentDeliveryForm delivery(String reference, String weight) {
+    private IndependentDeliveryForm delivery(String weight) {
         IndependentDeliveryForm form = new IndependentDeliveryForm();
         form.setCustomerId(customerId);
         form.setProductId(productId);
@@ -75,16 +75,16 @@ class IndependentStallFlowTest {
         form.setWeightKg(new BigDecimal(weight));
         form.setPricePerKg(new BigDecimal("180.00"));
         form.setBusinessDate(businessDate);
-        form.setDeliveryReference(reference);
         return form;
     }
 
     @Test
     void fullDeliveryBecomesDebtAndDeductsCompanyStockOnce() {
         BigDecimal previousRevenue = (BigDecimal) reports.daily(businessDate).get("revenue");
-        Sale sale = service.recordDelivery(delivery(UUID.randomUUID().toString(), "100.000"));
+        Sale sale = service.recordDelivery(delivery("100.000"));
         assertEquals(0, sale.getTotal().compareTo(new BigDecimal("18000.00")));
         assertEquals(businessDate, sale.getBusinessDate());
+        assertNotNull(sale.getDeliveryReference());
         assertEquals(0, customers.findById(customerId).orElseThrow().getBalance().compareTo(new BigDecimal("18000.00")));
         assertEquals(0, products.findById(productId).orElseThrow().getStockKg().compareTo(new BigDecimal("100.000")));
         assertEquals(0, inventories.findByLocationIdAndProductId(locationId, productId).orElseThrow().getStockKg().compareTo(new BigDecimal("100.000")));
@@ -96,7 +96,7 @@ class IndependentStallFlowTest {
     @Test
     void partialPaymentReducesDebtAndCountsOnBusinessDateNotRecordedDay() {
         BigDecimal previousCollections = (BigDecimal) reports.daily(businessDate).get("collected");
-        service.recordDelivery(delivery(UUID.randomUUID().toString(), "100.000"));
+        service.recordDelivery(delivery("100.000"));
         IndependentPaymentForm payment = new IndependentPaymentForm();
         payment.setCustomerId(customerId);
         payment.setAmount(new BigDecimal("12000.00"));
@@ -114,17 +114,38 @@ class IndependentStallFlowTest {
     }
 
     @Test
-    void deliveryReferenceCannotBeReused() {
-        String ref = UUID.randomUUID().toString();
-        service.recordDelivery(delivery(ref, "100.000"));
-        assertThrows(IllegalArgumentException.class, () -> service.recordDelivery(delivery(ref, "50.000")));
-        assertEquals(0, products.findById(productId).orElseThrow().getStockKg().compareTo(new BigDecimal("100.000")));
+    void deliveryReferenceIsAutomaticAndUniqueForSameStallAndDay() {
+        Sale first = service.recordDelivery(delivery("60.000"));
+        Sale second = service.recordDelivery(delivery("40.000"));
+        String expectedPrefix = "DR-" + businessDate.format(
+                java.time.format.DateTimeFormatter.BASIC_ISO_DATE)
+                + "-IS" + String.format(java.util.Locale.ROOT, "%03d", customerId) + "-";
+        assertTrue(first.getDeliveryReference().startsWith(expectedPrefix));
+        assertTrue(second.getDeliveryReference().startsWith(expectedPrefix));
+        assertNotEquals(first.getDeliveryReference(), second.getDeliveryReference());
+        assertTrue(sales.existsByDeliveryReference(first.getDeliveryReference()));
+        assertTrue(sales.existsByDeliveryReference(second.getDeliveryReference()));
+        assertEquals(0, products.findById(productId).orElseThrow().getStockKg()
+                .compareTo(new BigDecimal("100.000")));
+    }
+
+    @Test
+    void repeatedSubmissionCannotChargeTheCustomerOrDeductStockTwice() {
+        IndependentDeliveryForm form = delivery("100.000");
+        Sale saved = service.recordDelivery(form);
+        assertNotNull(saved.getDeliveryReference());
+        assertEquals(form.getRequestId(), saved.getDeliveryRequestId());
+        assertThrows(IllegalArgumentException.class, () -> service.recordDelivery(form));
+        assertEquals(0, products.findById(productId).orElseThrow().getStockKg()
+                .compareTo(new BigDecimal("100.000")));
+        assertEquals(0, customers.findById(customerId).orElseThrow().getBalance()
+                .compareTo(new BigDecimal("18000.00")));
     }
 
     @Test
     void deliveryCannotExceedCompanyStock() {
         assertThrows(IllegalArgumentException.class,
-                () -> service.recordDelivery(delivery(UUID.randomUUID().toString(), "201.000")));
+                () -> service.recordDelivery(delivery("201.000")));
         assertEquals(0, customers.findById(customerId).orElseThrow().getBalance().compareTo(BigDecimal.ZERO));
     }
 

@@ -72,12 +72,12 @@ public class IndependentStallController {
         }
         try {
             Sale sale = service.recordDelivery(form);
-            flash.addFlashAttribute("notice", "Credit delivery #" + sale.getId() + " recorded");
+            flash.addFlashAttribute("notice", "Credit delivery recorded: " + sale.getDeliveryReference());
             return "redirect:/independent-stalls";
         } catch (IllegalArgumentException | IllegalStateException ex) {
             model.addAttribute("error", ex.getMessage());
         } catch (DataIntegrityViolationException ex) {
-            model.addAttribute("error", "Database conflict. Check whether this delivery reference already exists before retrying.");
+            model.addAttribute("error", "Database conflict. No delivery was recorded; check history and contact an administrator before retrying.");
         }
         loadDeliveryOptions(model);
         return "independent-delivery-form";

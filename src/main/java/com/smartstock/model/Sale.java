@@ -8,6 +8,8 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Entity
 public class Sale {
@@ -98,6 +100,11 @@ public class Sale {
     // Only populated for independent-stall credit deliveries.
     @Column(name = "delivery_reference", length = 80, unique = true)
     private String deliveryReference;
+
+    // One hidden UUID per form submission prevents double-clicks and retries
+    // from deducting stock or charging the customer more than once.
+    @Column(name = "delivery_request_id", length = 36, unique = true)
+    private String deliveryRequestId;
 
     // Required by JPA
     protected Sale() {
@@ -231,8 +238,7 @@ public class Sale {
             StockLocation source,
             BigDecimal weightKg,
             BigDecimal agreedPricePerKg,
-            LocalDate date,
-            String deliveryReference) {
+            LocalDate date) {
 
         if (customer == null || !customer.isIndependentStall()) {
             throw new IllegalArgumentException("Select a registered independent stall");
@@ -245,10 +251,8 @@ public class Sale {
         }
         if (agreedPricePerKg == null || agreedPricePerKg.signum() <= 0 ||
                 agreedPricePerKg.scale() > 2 ||
-                date == null || date.isAfter(LocalDate.now(ZoneId.of("Asia/Manila"))) ||
-                deliveryReference == null || deliveryReference.isBlank() ||
-                deliveryReference.trim().length() > 80) {
-            throw new IllegalArgumentException("Valid price, delivery date and reference are required");
+                date == null || date.isAfter(LocalDate.now(ZoneId.of("Asia/Manila")))) {
+            throw new IllegalArgumentException("Valid price and delivery date are required");
         }
 
         Sale sale = new Sale(product, customer, source, weightKg, PaymentMethod.CREDIT);
@@ -257,8 +261,41 @@ public class Sale {
                 .setScale(2, RoundingMode.HALF_UP);
         sale.grossProfit = sale.total.subtract(sale.costAtSale);
         sale.businessDate = date;
-        sale.deliveryReference = deliveryReference.trim().toUpperCase(java.util.Locale.ROOT);
+        // The unique reference is assigned after JPA generates the sale ID.
         return sale;
+    }
+
+    /**
+     * Generate the reference only after the database has assigned an ID.
+     * The sale ID guarantees uniqueness across dates, stalls and concurrent users.
+     * Example: DR-20261116-IS005-000123
+     */
+    public void assignGeneratedDeliveryReference() {
+        if (id == null || id <= 0 ||
+                customer == null || !customer.isIndependentStall() ||
+                customer.getId() == null || businessDate == null ||
+                deliveryReference != null) {
+            throw new IllegalStateException("Cannot assign a delivery reference to this sale");
+        }
+        this.deliveryReference = String.format(Locale.ROOT,
+                "DR-%s-IS%03d-%06d",
+                businessDate.format(DateTimeFormatter.BASIC_ISO_DATE),
+                customer.getId(), id);
+    }
+
+    public void assignDeliveryRequestId(String requestId) {
+        if (deliveryRequestId != null || requestId == null) {
+            throw new IllegalStateException("Delivery request ID cannot be reassigned");
+        }
+        try {
+            deliveryRequestId = java.util.UUID.fromString(requestId).toString();
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Invalid delivery request ID");
+        }
+    }
+
+    public String getDeliveryRequestId() {
+        return deliveryRequestId;
     }
 
     public boolean isIndependentDelivery() {

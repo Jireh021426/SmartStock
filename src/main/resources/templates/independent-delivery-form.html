@@ -16,6 +16,7 @@
 <div class="topbar"><div><a class="back-link" th:href="@{/independent-stalls}">← Independent Stalls</a><h2 class="page-title">Record Credit Delivery</h2><p class="page-sub">Full quantity is charged to the independent stall and deducted from company stock.</p></div></div>
 <div class="panel"><p class="error-msg" th:if="${error}" th:text="${error}"></p>
 <form class="nova-form" th:object="${deliveryForm}" th:action="@{/independent-stalls/deliveries/save}" method="post">
+<input type="hidden" th:field="*{requestId}">
 <div class="form-grid">
 <label>Independent Stall<select th:field="*{customerId}" required><option value="">Choose independent stall</option><option th:each="s : ${stalls}" th:value="${s.id}" th:text="${s.name + ' (utang: ₱' + s.balance + ')'}"></option></select><small class="error-text" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></small></label>
 <label>Product<select th:field="*{productId}" required><option value="">Choose product</option><option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name + ' — available company total: ' + p.stockKg + ' kg'}"></option></select><small class="error-text" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></small></label>
@@ -23,7 +24,7 @@
 <label>Delivery Business Date<input type="date" th:field="*{businessDate}" required><small class="error-text" th:if="${#fields.hasErrors('businessDate')}" th:errors="*{businessDate}"></small></label>
 <label>Weight (kg)<input type="number" th:field="*{weightKg}" step="0.001" min="0.001" required placeholder="100.000"><small class="error-text" th:if="${#fields.hasErrors('weightKg')}" th:errors="*{weightKg}"></small></label>
 <label>Agreed Selling Price / kg (₱)<input type="number" th:field="*{pricePerKg}" step="0.01" min="0.01" required placeholder="180.00"><small class="error-text" th:if="${#fields.hasErrors('pricePerKg')}" th:errors="*{pricePerKg}"></small></label>
-<label>Unique Delivery Reference<input th:field="*{deliveryReference}" maxlength="80" required placeholder="e.g. ISTALL-DR-0001"><small class="error-text" th:if="${#fields.hasErrors('deliveryReference')}" th:errors="*{deliveryReference}"></small></label>
+<div><strong>Delivery Reference</strong><p class="page-sub">Generated automatically when you save. Example: DR-20261116-IS005-000123.</p></div>
 </div>
 <div class="form-note"><p><strong>Important:</strong> The full delivery value becomes utang immediately, including unsold chickens. This is not an internal stock transfer. The selected date is the business date; actual entry time is preserved. Entering a past delivery adjusts current inventory immediately; it does not recreate historical opening/closing stock.</p></div>
 <div class="form-actions"><button class="btn btn-primary" type="submit">Record Full Credit Delivery</button></div>
