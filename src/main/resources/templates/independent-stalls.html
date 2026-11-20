@@ -26,10 +26,15 @@
   <div class="panel"><h3>Outstanding independent-stall credit</h3><h2 th:text="'₱' + ${outstanding}">₱0</h2></div>
   <div class="panel">
     <div class="panel-head"><h3>Independent Stall Accounts</h3></div>
-    <div class="table-wrap"><table><thead><tr><th>Stall</th><th>Contact / ID</th><th>Unpaid Balance</th></tr></thead>
+    <div class="table-wrap"><table><thead><tr><th>Stall</th><th>Contact / ID</th><th>Unpaid Balance</th><th>Actions</th></tr></thead>
     <tbody>
-      <tr th:each="s : ${stalls}"><td th:text="${s.name}"></td><td th:text="${s.phone}"></td><td th:text="'₱' + ${s.balance}"></td></tr>
-      <tr th:if="${#lists.isEmpty(stalls)}"><td colspan="3">Register an independent stall to begin.</td></tr>
+      <tr th:each="s : ${stalls}">
+        <td th:text="${s.name}"></td>
+        <td th:text="${s.phone}"></td>
+        <td th:text="'₱' + ${s.balance}"></td>
+        <td><a class="btn btn-ghost" th:href="@{/independent-stalls/{id}/edit(id=${s.id})}">Edit</a></td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(stalls)}"><td colspan="4">Register an independent stall to begin.</td></tr>
     </tbody></table></div>
   </div>
   <div class="panel">

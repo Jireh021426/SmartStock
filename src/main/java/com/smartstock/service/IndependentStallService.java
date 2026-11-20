@@ -74,6 +74,42 @@ public class IndependentStallService {
         customers.save(new Customer(form.getName(), phone, CustomerType.INDEPENDENT_STALL));
     }
 
+    @Transactional(readOnly = true)
+    public Customer stall(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Independent stall not found");
+        }
+        Customer stall = customers.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Independent stall not found"));
+        if (!stall.isIndependentStall()) {
+            throw new IllegalArgumentException("Independent stall not found");
+        }
+        return stall;
+    }
+
+    @Transactional
+    public void updateStall(Long id, IndependentStallForm form) {
+        if (id == null || form == null || form.getName() == null ||
+                form.getName().isBlank() || form.getName().trim().length() > 255 ||
+                form.getPhone() == null || form.getPhone().isBlank() ||
+                form.getPhone().trim().length() > 255) {
+            throw new IllegalArgumentException("Enter a valid stall name and contact / ID");
+        }
+        Customer stall = customers.findLockedById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Independent stall not found"));
+        if (!stall.isIndependentStall()) {
+            throw new IllegalArgumentException("Independent stall not found");
+        }
+        String newPhone = form.getPhone().trim();
+        if (!stall.getPhone().equals(newPhone) && customers.existsByPhone(newPhone)) {
+            throw new IllegalArgumentException("Contact / account identifier is already in use");
+        }
+        stall.updateProfile(form.getName(), newPhone);
+        // Flush within this transaction so a concurrent unique-ID conflict is
+        // caught by the controller; original transactions and debt are untouched.
+        customers.saveAndFlush(stall);
+    }
+
     @Transactional
     public Sale recordDelivery(IndependentDeliveryForm form) {
         if (form == null || form.getCustomerId() == null ||

@@ -38,6 +38,16 @@ public class Customer {
         this.customerType = type;
     }
 
+    // Only profile details are editable. Account identity, type and debt stay unchanged.
+    public void updateProfile(String name, String phone) {
+        if (name == null || name.isBlank() || name.trim().length() > 255 ||
+                phone == null || phone.isBlank() || phone.trim().length() > 255) {
+            throw new IllegalArgumentException("Stall name and contact / ID are required (maximum 255 characters)");
+        }
+        this.name = name.trim();
+        this.phone = phone.trim();
+    }
+
     public void charge(BigDecimal amount) {
         if (amount == null || amount.signum() <= 0 || amount.scale() > 2) {
             throw new IllegalArgumentException("Invalid charge");

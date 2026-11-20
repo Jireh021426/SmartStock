@@ -6,6 +6,8 @@ import com.smartstock.service.IndependentStallService;
 import com.smartstock.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -54,6 +56,50 @@ public class IndependentStallController {
             model.addAttribute("error", "Unable to register stall. Check the contact identifier is unique.");
             return "independent-stall-form";
         }
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editStall(@PathVariable Long id, Model model) {
+        Customer stall;
+        try {
+            stall = service.stall(id);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Independent stall not found");
+        }
+        IndependentStallForm form = new IndependentStallForm();
+        form.setName(stall.getName());
+        form.setPhone(stall.getPhone());
+        model.addAttribute("stallId", stall.getId());
+        model.addAttribute("balance", stall.getBalance());
+        model.addAttribute("stallForm", form);
+        return "independent-stall-edit";
+    }
+
+    @PostMapping("/{id}/update")
+    public String updateStall(@PathVariable Long id,
+                              @Valid @ModelAttribute("stallForm") IndependentStallForm form,
+                              BindingResult errors, Model model, RedirectAttributes flash) {
+        Customer stall;
+        try {
+            stall = service.stall(id);
+        } catch (IllegalArgumentException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Independent stall not found");
+        }
+        model.addAttribute("stallId", id);
+        model.addAttribute("balance", stall.getBalance());
+        if (errors.hasErrors()) {
+            return "independent-stall-edit";
+        }
+        try {
+            service.updateStall(id, form);
+            flash.addFlashAttribute("notice", "Independent stall information updated");
+            return "redirect:/independent-stalls";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+        } catch (DataIntegrityViolationException ex) {
+            model.addAttribute("error", "Contact / account identifier is already in use.");
+        }
+        return "independent-stall-edit";
     }
 
     @GetMapping("/deliveries/new")

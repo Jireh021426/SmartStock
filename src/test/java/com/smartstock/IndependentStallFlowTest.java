@@ -22,7 +22,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, properties = {
@@ -147,6 +149,89 @@ class IndependentStallFlowTest {
         assertThrows(IllegalArgumentException.class,
                 () -> service.recordDelivery(delivery("201.000")));
         assertEquals(0, customers.findById(customerId).orElseThrow().getBalance().compareTo(BigDecimal.ZERO));
+    }
+
+    @Test
+    void editingIndependentStallPreservesDebtAndTransactionHistory() {
+        Sale delivery = service.recordDelivery(delivery("50.000"));
+        String oldContact = customers.findById(customerId).orElseThrow().getPhone();
+        IndependentStallForm form = new IndependentStallForm();
+        form.setName("  Updated Marife Stall  ");
+        form.setPhone("  EDIT_" + UUID.randomUUID().toString().substring(0, 12) + "  ");
+
+        service.updateStall(customerId, form);
+
+        Customer updated = customers.findById(customerId).orElseThrow();
+        assertEquals("Updated Marife Stall", updated.getName());
+        assertEquals(form.getPhone().trim(), updated.getPhone());
+        assertEquals(0, updated.getBalance().compareTo(new BigDecimal("9000.00")));
+        assertEquals(delivery.getId(), sales.findById(delivery.getId()).orElseThrow().getId());
+        assertEquals(customerId, sales.findById(delivery.getId()).orElseThrow().getCustomer().getId());
+        assertEquals(0, products.findById(productId).orElseThrow().getStockKg()
+                .compareTo(new BigDecimal("150.000")));
+        assertFalse(customers.existsByPhone(oldContact));
+        assertEquals(CustomerType.INDEPENDENT_STALL, updated.getCustomerType());
+    }
+
+    @Test
+    void editingStallRejectsContactUsedByAnotherAccount() {
+        String originalName = customers.findById(customerId).orElseThrow().getName();
+        String originalContact = customers.findById(customerId).orElseThrow().getPhone();
+        Customer retail = customers.save(new Customer(
+                "Retail " + UUID.randomUUID(), "RET_" + UUID.randomUUID(), CustomerType.RETAIL));
+        IndependentStallForm form = new IndependentStallForm();
+        form.setName("Changed Name");
+        form.setPhone(retail.getPhone());
+
+        assertThrows(IllegalArgumentException.class, () -> service.updateStall(customerId, form));
+        Customer unchanged = customers.findById(customerId).orElseThrow();
+        assertEquals(originalName, unchanged.getName());
+        assertEquals(originalContact, unchanged.getPhone());
+    }
+
+    @Test
+    void retailCustomerCannotBeEditedThroughIndependentStallFlow() {
+        Customer retail = customers.save(new Customer(
+                "Retail " + UUID.randomUUID(), "RET_" + UUID.randomUUID(), CustomerType.RETAIL));
+        IndependentStallForm form = new IndependentStallForm();
+        form.setName("Not allowed");
+        form.setPhone(retail.getPhone());
+        assertThrows(IllegalArgumentException.class, () -> service.stall(retail.getId()));
+        assertThrows(IllegalArgumentException.class, () -> service.updateStall(retail.getId(), form));
+    }
+
+    @Test
+    void adminCanOpenEditPageButCashierCannot() throws Exception {
+        mvc.perform(get("/independent-stalls/" + customerId + "/edit")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
+        mvc.perform(get("/independent-stalls/" + customerId + "/edit")
+                        .with(user("cashier").roles("CASHIER")))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/independent-stalls/999999999/edit")
+                        .with(user("admin").roles("ADMIN")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void adminCanSaveEditsViaFormButCashierCannot() throws Exception {
+        String phone = "WEB_" + UUID.randomUUID();
+        mvc.perform(post("/independent-stalls/" + customerId + "/update")
+                        .with(user("admin").roles("ADMIN"))
+                        .with(csrf())
+                        .param("name", "Updated Via Web")
+                        .param("phone", phone))
+                .andExpect(status().is3xxRedirection());
+        assertEquals("Updated Via Web", customers.findById(customerId).orElseThrow().getName());
+        assertEquals(phone, customers.findById(customerId).orElseThrow().getPhone());
+
+        mvc.perform(post("/independent-stalls/" + customerId + "/update")
+                        .with(user("cashier").roles("CASHIER"))
+                        .with(csrf())
+                        .param("name", "Forbidden Edit")
+                        .param("phone", phone))
+                .andExpect(status().isForbidden());
+        assertEquals("Updated Via Web", customers.findById(customerId).orElseThrow().getName());
     }
 
     @Test
