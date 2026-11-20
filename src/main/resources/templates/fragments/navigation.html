@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org">
@@ -6,7 +7,7 @@
 
 <header th:fragment="siteHeader">
 
-    <!-- Icon sprite: every page that includes this header can reuse these -->
+    <!-- Shared icon sprite -->
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
         <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
         <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></symbol>
@@ -99,6 +100,7 @@
                     </p>
                 </div>
             </details>
+
             <!-- Light / Dark Mode toggle -->
             <button type="button"
                     class="topbar-icon-link theme-toggle"
@@ -114,6 +116,7 @@
                     <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>
                 </svg>
             </button>
+
             <details class="topbar-profile">
                 <summary aria-label="Account menu">
                     <span class="topbar-avatar" aria-hidden="true">
@@ -227,7 +230,15 @@
             <span>Remittances</span>
         </a>
 
-        <div class="nav-label" th:if="${nav.admin}">Admin</div>
+        <div class="nav-label" th:if="${nav.admin}">
+            Admin
+        </div>
+
+        <a th:if="${nav.admin}"
+           th:href="@{/suppliers}">
+            <svg class="ico"><use href="#i-truck"/></svg>
+            <span>Suppliers</span>
+        </a>
 
         <a th:if="${nav.admin}"
            th:href="@{/employees}">
@@ -237,9 +248,8 @@
 
     </nav>
 
-
-
     <script th:src="@{/js/navigation-search.js}" defer></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const currentPath = window.location.pathname;

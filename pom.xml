@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -94,10 +95,32 @@
 
     <build>
         <plugins>
+
+            <!-- Spring Boot application packaging -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <!-- Isolated automated tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+
+                <configuration>
+
+                    <!-- Use a separate JVM for each test class -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+
+                    <!-- Available only inside forked test JVMs -->
+                    <environmentVariables>
+                        <SMARTSTOCK_ADMIN_PASSWORD>SmartStockTestOnly-2026!</SMARTSTOCK_ADMIN_PASSWORD>
+                    </environmentVariables>
+
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

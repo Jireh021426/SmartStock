@@ -1,9 +1,9 @@
+
 package com.smartstock.config;
 
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
 import com.smartstock.repository.EmployeeRepository;
-
 import com.smartstock.service.EmployeeUserDetailsService;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -99,15 +99,14 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // Public static resources
                 // Public static resources and error handling
-.requestMatchers(
-        "/css/**",
-        "/js/**",
-        "/images/**",
-        "/favicon.ico",
-        "/error"
-).permitAll()
+                .requestMatchers(
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/favicon.ico",
+                        "/error"
+                ).permitAll()
 
                 // Financial dashboard
                 .requestMatchers(
@@ -127,6 +126,13 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/employees",
                         "/employees/**"
+                ).hasRole("ADMIN")
+
+                // Supplier administration
+                // Only administrators can access and modify suppliers
+                .requestMatchers(
+                        "/suppliers",
+                        "/suppliers/**"
                 ).hasRole("ADMIN")
 
                 // Product administration
@@ -331,7 +337,14 @@ public class SecurityConfig {
                         "/remittances/verify"
                 ).hasAnyRole("ADMIN", "MANAGER")
 
-                .requestMatchers(HttpMethod.GET, "/remittances/history").hasAnyRole("ADMIN", "MANAGER", "CASHIER")
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/remittances/history"
+                ).hasAnyRole(
+                        "ADMIN",
+                        "MANAGER",
+                        "CASHIER"
+                )
 
                 .requestMatchers("/remittances/**").denyAll()
 
@@ -345,28 +358,28 @@ public class SecurityConfig {
                 .anyRequest().denyAll()
             )
 
-           .formLogin(form -> form
-        .loginPage("/login")
-        .successHandler((request, response, authentication) -> {
+            .formLogin(form -> form
+                .loginPage("/login")
+                .successHandler((request, response, authentication) -> {
 
-            boolean isAdminOrManager =
-                    authentication.getAuthorities()
-                            .stream()
-                            .anyMatch(authority ->
-                                    authority.getAuthority().equals("ROLE_ADMIN")
-                                    || authority.getAuthority().equals("ROLE_MANAGER")
-                            );
+                    boolean isAdminOrManager =
+                            authentication.getAuthorities()
+                                    .stream()
+                                    .anyMatch(authority ->
+                                            authority.getAuthority().equals("ROLE_ADMIN")
+                                            || authority.getAuthority().equals("ROLE_MANAGER")
+                                    );
 
-            String destination = isAdminOrManager
-                    ? "/dashboard"
-                    : "/products";
+                    String destination = isAdminOrManager
+                            ? "/dashboard"
+                            : "/products";
 
-            response.sendRedirect(
-                    request.getContextPath() + destination
-            );
-        })
-        .permitAll()
-)
+                    response.sendRedirect(
+                            request.getContextPath() + destination
+                    );
+                })
+                .permitAll()
+            )
 
             .logout(logout -> logout
                     .logoutSuccessUrl("/login?logout")

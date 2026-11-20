@@ -1,0 +1,446 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Supplier Form</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+
+    <script th:src="@{/js/theme.js}"></script>
+
+    <style>
+        /* ========================================
+           SUPPLIER FORM — LIGHT THEME
+           ======================================== */
+
+        .supplier-form-page {
+            --supplier-input-bg: #ffffff;
+            --supplier-input-text: #172338;
+            --supplier-input-border: #bdcbdc;
+            --supplier-placeholder: #708099;
+
+            --supplier-note-bg: #eaf8fc;
+            --supplier-note-text: #35596f;
+            --supplier-note-border: #38bde5;
+
+            --supplier-cancel-bg: #ffffff;
+            --supplier-cancel-text: #344054;
+            --supplier-cancel-border: #c9d3e0;
+
+            --supplier-error-bg: #fff0ef;
+            --supplier-error-text: #963b32;
+            --supplier-error-border: #e8b9b4;
+        }
+
+        /* ========================================
+           SUPPLIER FORM — DARK THEME
+           ======================================== */
+
+        :root[data-theme="dark"] .supplier-form-page {
+            --supplier-input-bg: #26344d;
+            --supplier-input-text: #f5f8ff;
+            --supplier-input-border: #50617c;
+            --supplier-placeholder: #bdcbe0;
+
+            --supplier-note-bg: #173242;
+            --supplier-note-text: #c1e2f2;
+            --supplier-note-border: #38bde5;
+
+            --supplier-cancel-bg: #25344d;
+            --supplier-cancel-text: #e0eaf7;
+            --supplier-cancel-border: #50627e;
+
+            --supplier-error-bg: #4b252a;
+            --supplier-error-text: #ffd7dc;
+            --supplier-error-border: #98515a;
+        }
+
+        /* ========================================
+           FORM LAYOUT
+           ======================================== */
+
+        .supplier-form-page .supplier-form-shell {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .supplier-form-page .supplier-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--teal-dark);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .supplier-form-page .supplier-back-link:hover {
+            text-decoration: underline;
+        }
+
+        .supplier-form-page .supplier-form-card {
+            padding: 30px;
+        }
+
+        .supplier-form-page .supplier-form-heading {
+            margin: 0 0 10px;
+            color: var(--ink);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .supplier-form-page .supplier-form-description {
+            margin: 0 0 28px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .supplier-form-page .supplier-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        /* ========================================
+           FORM FIELDS
+           ======================================== */
+
+        .supplier-form-page .supplier-field {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            gap: 10px;
+        }
+
+        .supplier-form-page .supplier-field--full {
+            grid-column: 1 / -1;
+        }
+
+        .supplier-form-page .supplier-field label {
+            display: block;
+            margin: 0;
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .supplier-form-page .supplier-optional {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* Inputs automatically follow the
+           active light or dark theme. */
+
+        main.supplier-form-page .supplier-field input,
+        main.supplier-form-page .supplier-field textarea {
+            display: block;
+            width: 100%;
+            min-height: 46px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 12px 14px;
+
+            background: var(--supplier-input-bg);
+            color: var(--supplier-input-text);
+
+            border: 1px solid var(--supplier-input-border);
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+
+            transition:
+                background 0.2s,
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+        main.supplier-form-page .supplier-field input::placeholder,
+        main.supplier-form-page .supplier-field textarea::placeholder {
+            color: var(--supplier-placeholder);
+            opacity: 1;
+        }
+
+        main.supplier-form-page .supplier-field input:focus,
+        main.supplier-form-page .supplier-field textarea:focus {
+            outline: none;
+            border-color: #38bde5;
+            box-shadow: 0 0 0 3px rgba(56, 189, 229, 0.2);
+        }
+
+        main.supplier-form-page .supplier-field textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        /* ========================================
+           INFORMATION NOTE
+           ======================================== */
+
+        .supplier-form-page .supplier-form-note {
+            margin: 28px 0 0;
+            padding: 14px 16px;
+
+            background: var(--supplier-note-bg);
+            color: var(--supplier-note-text);
+
+            border-left: 3px solid var(--supplier-note-border);
+            border-radius: 6px;
+
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           FORM ACTIONS
+           ======================================== */
+
+        .supplier-form-page .supplier-form-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .supplier-form-page .supplier-save-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 44px;
+            padding: 10px 24px;
+
+            background: #38bde5;
+            color: #071b2d !important;
+
+            border: 1px solid transparent;
+            border-radius: 10px;
+
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .supplier-form-page .supplier-save-btn:hover {
+            background: #65d6f5;
+        }
+
+        .supplier-form-page .supplier-cancel-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 44px;
+            padding: 10px 22px;
+
+            background: var(--supplier-cancel-bg);
+            color: var(--supplier-cancel-text) !important;
+
+            border: 1px solid var(--supplier-cancel-border);
+            border-radius: 10px;
+
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .supplier-form-page .supplier-cancel-btn:hover {
+            background: var(--supplier-note-bg);
+            text-decoration: none;
+        }
+
+        .supplier-form-page .supplier-save-btn:focus-visible,
+        .supplier-form-page .supplier-cancel-btn:focus-visible {
+            outline: 3px solid var(--teal);
+            outline-offset: 3px;
+        }
+
+        /* ========================================
+           VALIDATION ERROR
+           ======================================== */
+
+        .supplier-form-page .supplier-form-error {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+
+            background: var(--supplier-error-bg);
+            color: var(--supplier-error-text);
+
+            border: 1px solid var(--supplier-error-border);
+            border-radius: 10px;
+
+            font-size: 14px;
+        }
+
+        /* ========================================
+           RESPONSIVE LAYOUT
+           ======================================== */
+
+        @media (max-width: 768px) {
+            .supplier-form-page .supplier-form-card {
+                padding: 20px;
+            }
+
+            .supplier-form-page .supplier-form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .supplier-form-page .supplier-field--full {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="locations-page supplier-form-page">
+
+    <div class="supplier-form-shell">
+
+        <a class="supplier-back-link"
+           th:href="@{/suppliers}">
+            ← Back to Suppliers
+        </a>
+
+        <section class="panel supplier-form-card">
+
+            <h2 class="supplier-form-heading"
+                th:text="${editing} ? 'Edit Supplier' : 'Add Supplier'">
+                Add Supplier
+            </h2>
+
+            <p class="supplier-form-description">
+                Enter the supplier's information below.
+                Required fields are marked with an asterisk.
+            </p>
+
+            <div class="supplier-form-error"
+                 role="alert"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <form class="supplier-entry-form"
+                  th:action="${editing} ? @{/suppliers/{id}/save(id=${supplierId})} : @{/suppliers/save}"
+                  method="post">
+
+                <div class="supplier-form-grid">
+
+                    <div class="supplier-field">
+
+                        <label for="code">
+                            Supplier Code *
+                        </label>
+
+                        <input id="code"
+                               name="code"
+                               type="text"
+                               th:value="${code}"
+                               placeholder="e.g. SUP-001"
+                               maxlength="40"
+                               autocomplete="off"
+                               required>
+
+                    </div>
+
+                    <div class="supplier-field">
+
+                        <label for="name">
+                            Supplier Name *
+                        </label>
+
+                        <input id="name"
+                               name="name"
+                               type="text"
+                               th:value="${name}"
+                               placeholder="e.g. Marcela Farms"
+                               maxlength="150"
+                               required>
+
+                    </div>
+
+                    <div class="supplier-field">
+
+                        <label for="contactNumber">
+                            Contact Number
+                            <span class="supplier-optional">
+                                (Optional)
+                            </span>
+                        </label>
+
+                        <input id="contactNumber"
+                               name="contactNumber"
+                               type="tel"
+                               th:value="${contactNumber}"
+                               maxlength="50"
+                               placeholder="e.g. 09XXXXXXXXX">
+
+                    </div>
+
+                    <div class="supplier-field supplier-field--full">
+
+                        <label for="address">
+                            Supplier Address
+                            <span class="supplier-optional">
+                                (Optional)
+                            </span>
+                        </label>
+
+                        <textarea id="address"
+                                  name="address"
+                                  rows="4"
+                                  maxlength="255"
+                                  placeholder="Enter the supplier's complete address"
+                                  th:text="${address}"></textarea>
+
+                    </div>
+
+                </div>
+
+                <p class="supplier-form-note">
+                    Supplier records can be updated or
+                    deactivated later. Deactivating a supplier
+                    does not delete its information.
+                </p>
+
+                <div class="supplier-form-actions">
+
+                    <button class="supplier-save-btn"
+                            type="submit"
+                            th:text="${editing} ? 'Update Supplier' : 'Save Supplier'">
+                        Save Supplier
+                    </button>
+
+                    <a class="supplier-cancel-btn"
+                       th:href="@{/suppliers}">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</main>
+
+</body>
+</html>

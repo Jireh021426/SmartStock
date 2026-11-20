@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Suppliers</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+
+    <script th:src="@{/js/theme.js}"></script>
+
+    <style>
+        /* ========================================
+           SUPPLIERS — LIGHT THEME
+           ======================================== */
+
+        .suppliers-page {
+            --supplier-edit-bg: #e5f5fb;
+            --supplier-edit-border: #a7dbea;
+            --supplier-edit-text: #145a73;
+
+            --supplier-deactivate-bg: #fff0eb;
+            --supplier-deactivate-border: #efb6a6;
+            --supplier-deactivate-text: #923c27;
+
+            --supplier-activate-bg: #e1f5e9;
+            --supplier-activate-border: #a2d9b9;
+            --supplier-activate-text: #17653d;
+
+            --supplier-active-bg: #def5e8;
+            --supplier-active-text: #14633e;
+            --supplier-active-border: #a6ddbf;
+
+            --supplier-inactive-bg: #fff1d6;
+            --supplier-inactive-text: #795000;
+            --supplier-inactive-border: #efce87;
+
+            --supplier-success-bg: #e2f6eb;
+            --supplier-success-border: #a8dec1;
+            --supplier-success-text: #176344;
+
+            --supplier-error-bg: #fff0ef;
+            --supplier-error-border: #efb7b2;
+            --supplier-error-text: #9d3028;
+        }
+
+        /* ========================================
+           SUPPLIERS — DARK THEME
+           ======================================== */
+
+        :root[data-theme="dark"] .suppliers-page {
+            --supplier-edit-bg: #163c50;
+            --supplier-edit-border: #397895;
+            --supplier-edit-text: #c5edff;
+
+            --supplier-deactivate-bg: #4b2c29;
+            --supplier-deactivate-border: #975c50;
+            --supplier-deactivate-text: #ffd7cd;
+
+            --supplier-activate-bg: #173f31;
+            --supplier-activate-border: #377b5e;
+            --supplier-activate-text: #c2ffe0;
+
+            --supplier-active-bg: #184434;
+            --supplier-active-text: #b7f6d0;
+            --supplier-active-border: #397e5d;
+
+            --supplier-inactive-bg: #4b3b22;
+            --supplier-inactive-text: #ffe0a2;
+            --supplier-inactive-border: #8b7143;
+
+            --supplier-success-bg: #173e33;
+            --supplier-success-border: #367a61;
+            --supplier-success-text: #baf8d8;
+
+            --supplier-error-bg: #4b252a;
+            --supplier-error-border: #99515b;
+            --supplier-error-text: #ffd7dc;
+        }
+
+        /* ========================================
+           PAGE HEADER
+           ======================================== */
+
+        .suppliers-page .supplier-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .suppliers-page .page-title {
+            margin-bottom: 8px;
+        }
+
+        .suppliers-page .supplier-add-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 42px;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            background: #38bde5;
+            color: #071b2d !important;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .suppliers-page .supplier-add-btn:hover {
+            background: #65d6f5;
+            text-decoration: none;
+        }
+
+        .suppliers-page .supplier-add-btn:focus-visible {
+            outline: 3px solid var(--teal);
+            outline-offset: 3px;
+        }
+
+        /* ========================================
+           FEEDBACK MESSAGES
+           ======================================== */
+
+        .suppliers-page .supplier-message {
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            border: 1px solid;
+            border-radius: 9px;
+            font-size: 14px;
+        }
+
+        .suppliers-page .supplier-message--success {
+            background: var(--supplier-success-bg);
+            border-color: var(--supplier-success-border);
+            color: var(--supplier-success-text);
+        }
+
+        .suppliers-page .supplier-message--error {
+            background: var(--supplier-error-bg);
+            border-color: var(--supplier-error-border);
+            color: var(--supplier-error-text);
+        }
+
+        /* ========================================
+           SUPPLIER TABLE
+           ======================================== */
+
+        .suppliers-page .supplier-panel {
+            padding: 24px;
+        }
+
+        .suppliers-page .supplier-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .suppliers-page .supplier-table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        .suppliers-page .supplier-table th {
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .suppliers-page .supplier-table td {
+            vertical-align: middle;
+        }
+
+        .suppliers-page .supplier-name {
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .suppliers-page .supplier-empty {
+            padding: 24px 12px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        /* ========================================
+           STATUS BADGES
+           ======================================== */
+
+        .suppliers-page .supplier-status {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 6px 12px;
+            border: 1px solid;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .suppliers-page .supplier-status--active {
+            background: var(--supplier-active-bg);
+            color: var(--supplier-active-text);
+            border-color: var(--supplier-active-border);
+        }
+
+        .suppliers-page .supplier-status--inactive {
+            background: var(--supplier-inactive-bg);
+            color: var(--supplier-inactive-text);
+            border-color: var(--supplier-inactive-border);
+        }
+
+        /* ========================================
+           ACTION BUTTONS
+
+           The .button class prevents conflicts
+           with generic table button rules.
+           ======================================== */
+
+        .suppliers-page .supplier-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suppliers-page .supplier-actions form {
+            display: inline-flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .suppliers-page .supplier-table .button.supplier-action-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 34px;
+            margin: 0;
+            padding: 7px 13px;
+            border: 1px solid;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            box-shadow: none;
+            transition: background 0.2s;
+        }
+
+        .suppliers-page .supplier-table .button.supplier-edit-btn {
+            background: var(--supplier-edit-bg);
+            border-color: var(--supplier-edit-border);
+            color: var(--supplier-edit-text) !important;
+        }
+
+        .suppliers-page .supplier-table .button.supplier-edit-btn:hover {
+            background: var(--supplier-edit-border);
+        }
+
+        .suppliers-page .supplier-table .button.supplier-deactivate-btn {
+            background: var(--supplier-deactivate-bg);
+            border-color: var(--supplier-deactivate-border);
+            color: var(--supplier-deactivate-text) !important;
+        }
+
+        .suppliers-page .supplier-table .button.supplier-deactivate-btn:hover {
+            background: var(--supplier-deactivate-border);
+        }
+
+        .suppliers-page .supplier-table .button.supplier-activate-btn {
+            background: var(--supplier-activate-bg);
+            border-color: var(--supplier-activate-border);
+            color: var(--supplier-activate-text) !important;
+        }
+
+        .suppliers-page .supplier-table .button.supplier-activate-btn:hover {
+            background: var(--supplier-activate-border);
+        }
+
+        .suppliers-page .supplier-table .button.supplier-action-btn:focus-visible {
+            outline: 3px solid var(--teal);
+            outline-offset: 3px;
+        }
+
+        /* ========================================
+           RESPONSIVE LAYOUT
+           ======================================== */
+
+        @media (max-width: 768px) {
+            .suppliers-page .supplier-toolbar {
+                align-items: flex-start;
+            }
+
+            .suppliers-page .supplier-panel {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="locations-page suppliers-page">
+
+    <div class="supplier-toolbar">
+
+        <div>
+            <h2 class="page-title">Suppliers</h2>
+
+            <p class="page-sub">
+                Manage chicken suppliers and their contact information.
+            </p>
+        </div>
+
+        <a class="supplier-add-btn"
+           th:href="@{/suppliers/new}">
+            + Add Supplier
+        </a>
+
+    </div>
+
+    <div class="supplier-message supplier-message--success"
+         role="status"
+         th:if="${success}"
+         th:text="${success}">
+    </div>
+
+    <div class="supplier-message supplier-message--error"
+         role="alert"
+         th:if="${error}"
+         th:text="${error}">
+    </div>
+
+    <section class="panel supplier-panel">
+
+        <div class="panel-head">
+            <h3>Registered Suppliers</h3>
+        </div>
+
+        <div class="supplier-table-wrap">
+
+            <table class="supplier-table">
+
+                <thead>
+                    <tr>
+                        <th>Supplier Code</th>
+                        <th>Supplier Name</th>
+                        <th>Contact Number</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:if="${#lists.isEmpty(suppliers)}">
+                        <td colspan="6" class="supplier-empty">
+                            No suppliers registered yet.
+                        </td>
+                    </tr>
+
+                    <tr th:each="supplier : ${suppliers}">
+
+                        <td th:text="${supplier.code}">
+                            SUP-001
+                        </td>
+
+                        <td>
+                            <strong class="supplier-name"
+                                    th:text="${supplier.name}">
+                                Marcela Farms
+                            </strong>
+                        </td>
+
+                        <td th:text="${#strings.isEmpty(supplier.contactNumber) ? '—' : supplier.contactNumber}">
+                            —
+                        </td>
+
+                        <td th:text="${#strings.isEmpty(supplier.address) ? '—' : supplier.address}">
+                            —
+                        </td>
+
+                        <td>
+                            <span class="supplier-status"
+                                  th:classappend="${supplier.active} ? 'supplier-status--active' : 'supplier-status--inactive'"
+                                  th:text="${supplier.active} ? 'Active' : 'Inactive'">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="supplier-actions">
+
+                                <a class="button supplier-action-btn supplier-edit-btn"
+                                   th:href="@{/suppliers/{id}/edit(id=${supplier.id})}">
+                                    Edit
+                                </a>
+
+                                <form th:if="${supplier.active}"
+                                      th:action="@{/suppliers/{id}/deactivate(id=${supplier.id})}"
+                                      method="post">
+
+                                    <button class="button supplier-action-btn supplier-deactivate-btn"
+                                            type="submit">
+                                        Deactivate
+                                    </button>
+
+                                </form>
+
+                                <form th:unless="${supplier.active}"
+                                      th:action="@{/suppliers/{id}/activate(id=${supplier.id})}"
+                                      method="post">
+
+                                    <button class="button supplier-action-btn supplier-activate-btn"
+                                            type="submit">
+                                        Activate
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

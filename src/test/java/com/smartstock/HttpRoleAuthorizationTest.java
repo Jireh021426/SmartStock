@@ -5,6 +5,8 @@ import com.smartstock.service.LegacyInventoryMigration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -301,6 +303,74 @@ public class HttpRoleAuthorizationTest {
     @Test
     void cashierCannotViewInventoryHistory() throws Exception {
         deniedGet("/inventory", "CASHIER");
+    }
+
+    // Supplier administration
+
+    @Test
+    void anonymousCannotViewSuppliers() throws Exception {
+        mvc.perform(get("/suppliers"))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    void adminCanViewSuppliers() throws Exception {
+        allowedGet("/suppliers", "ADMIN");
+    }
+
+    @Test
+    void adminCanOpenSupplierRegistrationForm() throws Exception {
+        allowedGet("/suppliers/new", "ADMIN");
+    }
+
+    @Test
+    void adminCanReachSupplierCreateEndpoint() throws Exception {
+        // Empty input may return HTTP 400.
+        // This test verifies authorization, not input validation.
+        allowedPost("/suppliers/save", "ADMIN");
+    }
+
+    @Test
+    void supplierCreateRequiresCsrfToken() throws Exception {
+        mvc.perform(
+                post("/suppliers/save")
+                        .with(user("admin").roles("ADMIN"))
+        ).andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest(
+            name = "Non-admin role {0} cannot manage suppliers"
+    )
+    @ValueSource(strings = {
+            "MANAGER",
+            "AUDITOR",
+            "CASHIER",
+            "SENDER",
+            "RECEIVER"
+    })
+    void nonAdminRolesCannotAccessSupplierAdministration(
+            String role) throws Exception {
+
+        // Supplier listing
+        deniedGet("/suppliers", role);
+
+        // Supplier registration form
+        deniedGet("/suppliers/new", role);
+
+        // Supplier editing form
+        deniedGet("/suppliers/999999/edit", role);
+
+        // Supplier creation
+        deniedPost("/suppliers/save", role);
+
+        // Supplier updates
+        deniedPost("/suppliers/999999/save", role);
+
+        // Supplier deactivation
+        deniedPost("/suppliers/999999/deactivate", role);
+
+        // Supplier reactivation
+        deniedPost("/suppliers/999999/activate", role);
     }
 
     // Default deny behavior
