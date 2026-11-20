@@ -1,0 +1,55 @@
+SmartStock Independent Stalls Update (local-first)
+
+IMPORTANT: Stop the local SmartStock server before extracting.
+Apply the existing business-date migration first if not already applied:
+  database/migrations/2026-11-20_stock_movement_business_date.sql
+Then apply:
+  database/migrations/2026-11-20_independent_stalls.sql
+Run focused tests with `mvn -Dtest=IndependentStallFlowTest test`.
+Then run the full suite `mvn test` before committing or deploying.
+
+New pages (ADMIN or MANAGER only):
+ /independent-stalls
+ /independent-stalls/new
+ /independent-stalls/deliveries/new
+ /independent-stalls/payments/new
+
+Each independent-stall delivery is one CREDIT sale and one SALE-category
+stock movement. The delivery deducts company source inventory and charges
+the customer's full value; no destination company stock is created.
+Payments reduce the debt and have no cashier attribution, therefore are
+excluded from cashier remittances.
+
+Limitations: backdated deliveries adjust present inventory immediately;
+historical closing stock and historical weighted-average cost are NOT
+reconstructed. Daily expenses still use entered timestamps. Do not deploy
+to Railway until both database migrations and the entire test suite pass.
+
+Change list:
+database/migrations/2026-11-20_independent_stalls.sql
+src/main/java/com/smartstock/config/SecurityConfig.java
+src/main/java/com/smartstock/controller/IndependentStallController.java
+src/main/java/com/smartstock/controller/InventoryController.java
+src/main/java/com/smartstock/controller/SalesController.java
+src/main/java/com/smartstock/model/CreditPayment.java
+src/main/java/com/smartstock/model/Customer.java
+src/main/java/com/smartstock/model/CustomerType.java
+src/main/java/com/smartstock/model/IndependentDeliveryForm.java
+src/main/java/com/smartstock/model/IndependentPaymentForm.java
+src/main/java/com/smartstock/model/IndependentStallForm.java
+src/main/java/com/smartstock/model/InventoryMovementView.java
+src/main/java/com/smartstock/model/Sale.java
+src/main/java/com/smartstock/repository/CreditPaymentRepository.java
+src/main/java/com/smartstock/repository/CustomerRepository.java
+src/main/java/com/smartstock/repository/SaleRepository.java
+src/main/java/com/smartstock/service/IndependentStallService.java
+src/main/java/com/smartstock/service/ReportService.java
+src/main/java/com/smartstock/service/SalesService.java
+src/main/resources/templates/fragments/navigation.html
+src/main/resources/templates/independent-delivery-form.html
+src/main/resources/templates/independent-payment-form.html
+src/main/resources/templates/independent-stall-form.html
+src/main/resources/templates/independent-stalls.html
+src/main/resources/templates/inventory.html
+src/main/resources/templates/receipt.html
+src/test/java/com/smartstock/IndependentStallFlowTest.java
