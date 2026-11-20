@@ -50,6 +50,9 @@
                     <a th:if="${nav.cashier}" th:href="@{/sales/new}">
                         New Sale
                     </a>
+                    <a th:if="${nav.admin or nav.manager}" th:href="@{/independent-stalls/deliveries/new}">
+                        Independent Delivery
+                    </a>
                 </div>
             </details>
 
@@ -222,6 +225,12 @@
            th:href="@{/customers}">
             <svg class="ico"><use href="#i-users"/></svg>
             <span>Customers / Utang</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager}"
+           th:href="@{/independent-stalls}">
+            <svg class="ico"><use href="#i-truck"/></svg>
+            <span>Independent Stalls</span>
         </a>
 
         <a th:if="${nav.canViewRemittances}"

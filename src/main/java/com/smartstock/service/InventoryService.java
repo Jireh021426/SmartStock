@@ -7,14 +7,20 @@ import com.smartstock.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+
 @Service
 public class InventoryService {
+
+    private static final ZoneId BUSINESS_ZONE =
+            ZoneId.of("Asia/Manila");
 
     private final ProductRepository products;
     private final StockMovementRepository movements;
@@ -60,6 +66,7 @@ public class InventoryService {
                 form.getProductId() == null ||
                 form.getLocationId() == null ||
                 form.getType() == null ||
+                form.getBusinessDate() == null ||
                 form.getWeightKg() == null ||
                 form.getWeightKg().signum() <= 0 ||
                 form.getWeightKg().scale() > 3 ||
@@ -68,12 +75,20 @@ public class InventoryService {
                 form.getReason().trim().length() > 255) {
 
             throw new IllegalArgumentException(
-                    "Enter a valid product, location, movement, weight and reason");
+                    "Enter a valid product, location, business date, " +
+                    "movement, weight and reason");
+        }
+
+        LocalDate businessDate = form.getBusinessDate();
+
+        if (businessDate.isAfter(LocalDate.now(BUSINESS_ZONE))) {
+            throw new IllegalArgumentException(
+                    "Business date cannot be in the future");
         }
 
         BigDecimal weight = form.getWeightKg().setScale(3);
 
-        // Lock product first to serialize changes.
+        // Lock product first to serialize inventory changes.
         Product product = products
                 .findLockedById(form.getProductId())
                 .orElseThrow(() ->
@@ -126,7 +141,8 @@ public class InventoryService {
                     existingCost.signum() == 0) {
 
                 throw new IllegalStateException(
-                        "Set the existing inventory purchase cost before adding stock");
+                        "Set the existing inventory purchase cost " +
+                        "before adding stock");
             }
 
             if (balance == null) {
@@ -169,6 +185,10 @@ public class InventoryService {
             movement.assignLocation(location);
             movement.assignCategory(MovementCategory.PURCHASE);
 
+            // Record the actual business date separately
+            // from the timestamp when the user submitted it.
+            movement.assignBusinessDate(businessDate);
+
             movement.setPurchaseDetails(
                     incomingCost,
                     averageCost
@@ -186,7 +206,8 @@ public class InventoryService {
                     category != MovementCategory.MISSING_STOCK) {
 
                 throw new IllegalArgumentException(
-                        "Select spoilage, damage or missing stock for manual stock-out");
+                        "Select spoilage, damage or missing stock " +
+                        "for manual stock-out");
             }
 
             if (balance == null) {
@@ -210,7 +231,8 @@ public class InventoryService {
                     existingCost.signum() <= 0) {
 
                 throw new IllegalStateException(
-                        "Set a valid inventory purchase cost before recording stock loss");
+                        "Set a valid inventory purchase cost " +
+                        "before recording stock loss");
             }
 
             balance.changeStock(weight.negate());
@@ -227,6 +249,7 @@ public class InventoryService {
 
             movement.assignLocation(location);
             movement.assignCategory(category);
+            movement.assignBusinessDate(businessDate);
             movement.setInventoryLossValue(existingCost);
 
             movements.save(movement);

@@ -278,6 +278,11 @@ public class SecurityConfig {
 
                 .requestMatchers("/sales/**").denyAll()
 
+                // Independent stall deliveries and collections are company-managed.
+                // Cashiers cannot mutate these accounts or bypass remittance rules.
+                .requestMatchers("/independent-stalls", "/independent-stalls/**")
+                .hasAnyRole("ADMIN", "MANAGER")
+
                 // Customer and credit information
                 .requestMatchers(
                         HttpMethod.GET,

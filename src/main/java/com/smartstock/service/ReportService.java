@@ -1,3 +1,4 @@
+
 package com.smartstock.service;
 
 import com.smartstock.model.*;
@@ -95,7 +96,8 @@ public class ReportService {
         // Historical movements without a stored value:
         // estimate using the current product cost.
         // This is NOT a historical cost snapshot.
-        BigDecimal currentCost = movement.getProduct().getCostPerKg();
+        BigDecimal currentCost =
+                movement.getProduct().getCostPerKg();
 
         if (currentCost == null) {
             return BigDecimal.ZERO.setScale(2);
@@ -109,27 +111,39 @@ public class ReportService {
     @Transactional(readOnly = true)
     public Map<String, Object> daily(LocalDate date) {
 
+        if (date == null) {
+            throw new IllegalArgumentException(
+                    "Report date is required");
+        }
+
         var start = date.atStartOfDay();
         var end = date.plusDays(1).atStartOfDay();
 
-        var daySales =
-                sales.findBySoldAtGreaterThanEqualAndSoldAtLessThan(
-                        start, end);
+        // Business dates determine revenue/collection day; recorded timestamps
+        // remain unmodified for audit. Legacy rows without business_date use
+        // their original timestamp date.
+        List<Sale> daySales = new ArrayList<>(sales.findByBusinessDate(date));
+        daySales.addAll(sales.findByBusinessDateIsNullAndSoldAtGreaterThanEqualAndSoldAtLessThan(start, end));
 
-        var dayPayments =
-                payments.findByPaidAtGreaterThanEqualAndPaidAtLessThan(
-                        start, end);
+        List<CreditPayment> dayPayments = new ArrayList<>(payments.findByBusinessDate(date));
+        dayPayments.addAll(payments.findByBusinessDateIsNullAndPaidAtGreaterThanEqualAndPaidAtLessThan(start, end));
 
         var dayExpenses =
                 expenses.findByIncurredAtGreaterThanEqualAndIncurredAtLessThanOrderByIncurredAtDesc(
                         start, end);
 
+        // IMPORTANT:
+        // Inventory movements use their business date.
+        // Existing historical movements with a null business date
+        // fall back to recordedAt through getBusinessDate().
+        //
+        // This does not change the actual recordedAt timestamp.
         var dayMovements =
                 movements.findAllByOrderByRecordedAtDescIdDesc()
                         .stream()
-                        .filter(x ->
-                                !x.getRecordedAt().isBefore(start)
-                                && x.getRecordedAt().isBefore(end))
+                        .filter(movement ->
+                                date.equals(
+                                        movement.getBusinessDate()))
                         .toList();
 
         BigDecimal revenue = sum(
@@ -212,6 +226,9 @@ public class ReportService {
                 gross.subtract(expenseTotal)
                         .subtract(estimatedLossCost);
 
+        // NOTE:
+        // This is the CURRENT inventory value, not the
+        // historical closing inventory value for 'date'.
         BigDecimal stockCostValue = sum(
                 products.findAll()
                         .stream()
@@ -227,20 +244,25 @@ public class ReportService {
         YearMonth lastMonth = YearMonth.from(date);
         YearMonth firstMonth = lastMonth.minusMonths(5);
 
-        var trendSales =
-                sales.findBySoldAtGreaterThanEqualAndSoldAtLessThan(
-                        firstMonth.atDay(1).atStartOfDay(),
-                        lastMonth.plusMonths(1).atDay(1).atStartOfDay());
+        LocalDate trendStart = firstMonth.atDay(1);
+        LocalDate trendEnd = lastMonth.plusMonths(1).atDay(1);
+        List<Sale> trendSales = new ArrayList<>(
+                sales.findByBusinessDateGreaterThanEqualAndBusinessDateLessThan(trendStart, trendEnd));
+        trendSales.addAll(sales.findByBusinessDateIsNullAndSoldAtGreaterThanEqualAndSoldAtLessThan(
+                trendStart.atStartOfDay(), trendEnd.atStartOfDay()));
 
-        Map<YearMonth, BigDecimal> monthly = new LinkedHashMap<>();
+        Map<YearMonth, BigDecimal> monthly =
+                new LinkedHashMap<>();
 
         for (int i = 0; i < 6; i++) {
-            monthly.put(firstMonth.plusMonths(i), BigDecimal.ZERO);
+            monthly.put(
+                    firstMonth.plusMonths(i),
+                    BigDecimal.ZERO);
         }
 
         for (Sale s : trendSales) {
             monthly.merge(
-                    YearMonth.from(s.getSoldAt()),
+                    YearMonth.from(s.getBusinessDate()),
                     s.getTotal(),
                     BigDecimal::add);
         }
@@ -251,7 +273,8 @@ public class ReportService {
         monthly.forEach((month, total) -> {
             trendLabels.add(
                     month.getMonth().getDisplayName(
-                            TextStyle.SHORT, Locale.ENGLISH));
+                            TextStyle.SHORT,
+                            Locale.ENGLISH));
             trendValues.add(total);
         });
 
@@ -260,44 +283,61 @@ public class ReportService {
         // Last 7 days, ending on the selected date.
         // ========================================
 
-        var weekSales =
-                sales.findBySoldAtGreaterThanEqualAndSoldAtLessThan(
-                        date.minusDays(6).atStartOfDay(), end);
+        List<Sale> weekSales = new ArrayList<>(sales
+                .findByBusinessDateGreaterThanEqualAndBusinessDateLessThan(date.minusDays(6), date.plusDays(1)));
+        weekSales.addAll(sales.findByBusinessDateIsNullAndSoldAtGreaterThanEqualAndSoldAtLessThan(
+                date.minusDays(6).atStartOfDay(), end));
 
-        Map<String, BigDecimal> byCategory = new LinkedHashMap<>();
+        Map<String, BigDecimal> byCategory =
+                new LinkedHashMap<>();
 
         for (Sale s : weekSales) {
 
-            String category = s.getProduct().getCategory();
+            String category =
+                    s.getProduct().getCategory();
 
             if (category == null || category.isBlank()) {
                 category = "Other";
             }
 
-            byCategory.merge(category, s.getTotal(), BigDecimal::add);
+            byCategory.merge(
+                    category,
+                    s.getTotal(),
+                    BigDecimal::add);
         }
 
-        BigDecimal categoryTotal = sum(byCategory.values());
+        BigDecimal categoryTotal =
+                sum(byCategory.values());
 
         List<Map<String, Object>> categorySales =
                 byCategory.entrySet()
                         .stream()
-                        .sorted(Map.Entry
-                                .<String, BigDecimal>comparingByValue()
-                                .reversed())
+                        .sorted(
+                                Map.Entry
+                                        .<String, BigDecimal>comparingByValue()
+                                        .reversed())
                         .map(entry -> {
 
                             Map<String, Object> row =
                                     new LinkedHashMap<>();
 
-                            row.put("name", entry.getKey());
-                            row.put("total", entry.getValue());
-                            row.put("percent",
+                            row.put(
+                                    "name",
+                                    entry.getKey());
+
+                            row.put(
+                                    "total",
+                                    entry.getValue());
+
+                            row.put(
+                                    "percent",
                                     categoryTotal.signum() == 0
                                             ? BigDecimal.ZERO
                                             : entry.getValue()
-                                                    .multiply(BigDecimal.valueOf(100))
-                                                    .divide(categoryTotal,
+                                                    .multiply(
+                                                            BigDecimal.valueOf(100))
+                                                    .divide(
+                                                            categoryTotal,
                                                             1,
                                                             RoundingMode.HALF_UP));
 
@@ -305,7 +345,8 @@ public class ReportService {
                         })
                         .toList();
 
-        Map<String, Object> m = new LinkedHashMap<>();
+        Map<String, Object> m =
+                new LinkedHashMap<>();
 
         m.put("date", date);
 
@@ -317,10 +358,15 @@ public class ReportService {
         m.put("gcashSales", gcashSales);
         m.put("creditSales", creditSales);
 
-        m.put("cashCollected", cashSales.add(cashRepay));
-        m.put("gcashCollected", gcashSales.add(gcashRepay));
-        m.put("collected", collected);
+        m.put(
+                "cashCollected",
+                cashSales.add(cashRepay));
 
+        m.put(
+                "gcashCollected",
+                gcashSales.add(gcashRepay));
+
+        m.put("collected", collected);
         m.put("expenses", expenseTotal);
 
         m.put("lossKg", lossKg);

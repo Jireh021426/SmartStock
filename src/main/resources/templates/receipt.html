@@ -67,6 +67,14 @@
                 </span>
             </div>
 
+            <div class="receipt-row" th:if="${sale.independentDelivery}">
+                <span class="receipt-label">Delivery Date</span>
+                <span class="receipt-value" th:text="${sale.businessDate}"></span>
+            </div>
+            <div class="receipt-row" th:if="${sale.independentDelivery}">
+                <span class="receipt-label">Delivery Reference</span>
+                <span class="receipt-value" th:text="${sale.deliveryReference}"></span>
+            </div>
             <div class="receipt-row">
                 <span class="receipt-label">Product</span>
                 <span class="receipt-value"

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartStock | Independent Stalls</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/forms.css}">
+<link rel="stylesheet" th:href="@{/css/customers.css}">
+<link rel="stylesheet" th:href="@{/css/theme.css}">
+<script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="form-page">
+<div class="topbar"><div><a class="back-link" th:href="@{/independent-stalls}">← Independent Stalls</a><h2 class="page-title">Collect Independent-Stall Payment</h2><p class="page-sub">Reduce the outstanding balance without recording another sale.</p></div></div>
+<div class="panel"><p class="error-msg" th:if="${error}" th:text="${error}"></p>
+<form class="nova-form" th:object="${stallPaymentForm}" th:action="@{/independent-stalls/payments/save}" method="post">
+<input type="hidden" th:field="*{requestId}">
+<div class="form-grid">
+<label>Independent Stall<select th:field="*{customerId}" required><option value="">Choose independent stall</option><option th:each="s : ${stalls}" th:value="${s.id}" th:text="${s.name + ' — Outstanding ₱' + s.balance}"></option></select><small class="error-text" th:if="${#fields.hasErrors('customerId')}" th:errors="*{customerId}"></small></label>
+<label>Payment Business Date<input type="date" th:field="*{businessDate}" required><small class="error-text" th:if="${#fields.hasErrors('businessDate')}" th:errors="*{businessDate}"></small></label>
+<label>Amount Received (₱)<input type="number" th:field="*{amount}" step="0.01" min="0.01" required><small class="error-text" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></small></label>
+<label>Payment Method<select th:field="*{method}" required><option value="CASH">Cash</option><option value="GCASH">GCash</option></select><small class="error-text" th:if="${#fields.hasErrors('method')}" th:errors="*{method}"></small></label>
+</div>
+<div class="form-note"><p><strong>Payment rule:</strong> A partial payment is allowed but cannot exceed the current debt. A duplicate form submission with the same request ID is rejected. This collection is separate from cashier remittances.</p></div>
+<div class="form-actions"><button class="btn btn-primary" type="submit">Record Collection</button></div>
+</form></div></main></body></html>

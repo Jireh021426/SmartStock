@@ -62,6 +62,11 @@ public class SalesService {
     }
 
     @Transactional(readOnly = true)
+    public List<Customer> retailCustomers() {
+        return customers.findByCustomerTypeOrderByNameAsc(CustomerType.RETAIL);
+    }
+
+    @Transactional(readOnly = true)
     public List<CreditPayment> allPayments() {
         return payments.findAllByOrderByPaidAtDescIdDesc();
     }
@@ -192,6 +197,10 @@ public class SalesService {
                     .orElseThrow(() ->
                             new IllegalArgumentException(
                                     "Customer not found"));
+            if (customer.isIndependentStall()) {
+                throw new IllegalArgumentException(
+                        "Independent-stall deliveries must use the Independent Stalls module");
+            }
         }
 
         // Deduct inventory from stall and company totals.
@@ -374,6 +383,11 @@ public class SalesService {
                         new IllegalArgumentException(
                                 "Customer not found"));
 
+        if (customer.isIndependentStall()) {
+            throw new IllegalArgumentException(
+                    "Independent-stall collections must use the Independent Stalls module");
+        }
+
         customer.pay(form.getAmount());
 
         CreditPayment payment = new CreditPayment(
@@ -411,14 +425,13 @@ public class SalesService {
     @Transactional(readOnly = true)
     public BigDecimal todaySales() {
 
-        LocalDate date = LocalDate.now();
+        LocalDate date = LocalDate.now(java.time.ZoneId.of("Asia/Manila"));
 
-        return sales
-                .findBySoldAtGreaterThanEqualAndSoldAtLessThan(
-                        date.atStartOfDay(),
-                        date.plusDays(1).atStartOfDay()
+        return java.util.stream.Stream.concat(
+                sales.findByBusinessDate(date).stream(),
+                sales.findByBusinessDateIsNullAndSoldAtGreaterThanEqualAndSoldAtLessThan(
+                        date.atStartOfDay(), date.plusDays(1).atStartOfDay()).stream()
                 )
-                .stream()
                 .map(Sale::getTotal)
                 .reduce(
                         BigDecimal.ZERO,
@@ -433,15 +446,14 @@ public class SalesService {
     @Transactional(readOnly = true)
     public BigDecimal todayCollected() {
 
-        LocalDate date = LocalDate.now();
+        LocalDate date = LocalDate.now(java.time.ZoneId.of("Asia/Manila"));
 
         // Cash and GCash sales.
-        BigDecimal direct = sales
-                .findBySoldAtGreaterThanEqualAndSoldAtLessThan(
-                        date.atStartOfDay(),
-                        date.plusDays(1).atStartOfDay()
+        BigDecimal direct = java.util.stream.Stream.concat(
+                sales.findByBusinessDate(date).stream(),
+                sales.findByBusinessDateIsNullAndSoldAtGreaterThanEqualAndSoldAtLessThan(
+                        date.atStartOfDay(), date.plusDays(1).atStartOfDay()).stream()
                 )
-                .stream()
                 .filter(s ->
                         s.getPaymentMethod() != PaymentMethod.CREDIT)
                 .map(Sale::getTotal)
@@ -451,12 +463,11 @@ public class SalesService {
                 );
 
         // Cash and GCash utang repayments.
-        BigDecimal repayment = payments
-                .findByPaidAtGreaterThanEqualAndPaidAtLessThan(
-                        date.atStartOfDay(),
-                        date.plusDays(1).atStartOfDay()
+        BigDecimal repayment = java.util.stream.Stream.concat(
+                payments.findByBusinessDate(date).stream(),
+                payments.findByBusinessDateIsNullAndPaidAtGreaterThanEqualAndPaidAtLessThan(
+                        date.atStartOfDay(), date.plusDays(1).atStartOfDay()).stream()
                 )
-                .stream()
                 .map(CreditPayment::getAmount)
                 .reduce(
                         BigDecimal.ZERO,

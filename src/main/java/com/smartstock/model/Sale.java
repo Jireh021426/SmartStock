@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Entity
 public class Sale {
@@ -88,6 +90,14 @@ public class Sale {
 
     @Column(nullable = false)
     private LocalDateTime soldAt;
+
+    // An entry may be recorded after the actual delivery day.
+    @Column(name = "business_date")
+    private LocalDate businessDate;
+
+    // Only populated for independent-stall credit deliveries.
+    @Column(name = "delivery_reference", length = 80, unique = true)
+    private String deliveryReference;
 
     // Required by JPA
     protected Sale() {
@@ -210,6 +220,57 @@ public class Sale {
 
         this.paymentMethod = method;
         this.soldAt = LocalDateTime.now();
+        this.businessDate = LocalDate.now(ZoneId.of("Asia/Manila"));
+    }
+
+    // Independent stalls owe the full delivery value, including unsold stock.
+    // Each delivery is a credit sale, not a stock transfer or a cashier sale.
+    public static Sale independentDelivery(
+            Product product,
+            Customer customer,
+            StockLocation source,
+            BigDecimal weightKg,
+            BigDecimal agreedPricePerKg,
+            LocalDate date,
+            String deliveryReference) {
+
+        if (customer == null || !customer.isIndependentStall()) {
+            throw new IllegalArgumentException("Select a registered independent stall");
+        }
+        if (source == null || !source.isActive() ||
+                "LEGACY".equalsIgnoreCase(source.getCode()) ||
+                !("STORAGE".equalsIgnoreCase(source.getLocationType()) ||
+                  "STALL".equalsIgnoreCase(source.getLocationType()))) {
+            throw new IllegalArgumentException("Select an active company stock location");
+        }
+        if (agreedPricePerKg == null || agreedPricePerKg.signum() <= 0 ||
+                agreedPricePerKg.scale() > 2 ||
+                date == null || date.isAfter(LocalDate.now(ZoneId.of("Asia/Manila"))) ||
+                deliveryReference == null || deliveryReference.isBlank() ||
+                deliveryReference.trim().length() > 80) {
+            throw new IllegalArgumentException("Valid price, delivery date and reference are required");
+        }
+
+        Sale sale = new Sale(product, customer, source, weightKg, PaymentMethod.CREDIT);
+        sale.pricePerKg = agreedPricePerKg.setScale(2);
+        sale.total = sale.weightKg.multiply(sale.pricePerKg)
+                .setScale(2, RoundingMode.HALF_UP);
+        sale.grossProfit = sale.total.subtract(sale.costAtSale);
+        sale.businessDate = date;
+        sale.deliveryReference = deliveryReference.trim().toUpperCase(java.util.Locale.ROOT);
+        return sale;
+    }
+
+    public boolean isIndependentDelivery() {
+        return deliveryReference != null;
+    }
+
+    public LocalDate getBusinessDate() {
+        return businessDate != null ? businessDate : soldAt.toLocalDate();
+    }
+
+    public String getDeliveryReference() {
+        return deliveryReference;
     }
 
     // ========================================

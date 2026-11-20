@@ -5,10 +5,15 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 public class StockMovement {
+
+    private static final ZoneId BUSINESS_ZONE =
+            ZoneId.of("Asia/Manila");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,19 +39,24 @@ public class StockMovement {
     @Column(nullable = false)
     private String reason;
 
+    // Actual timestamp when the transaction was recorded.
+    // Never overwrite this for a backdated delivery.
     @Column(nullable = false)
     private LocalDateTime recordedAt;
+
+    // Actual business date of the stock movement.
+    // Nullable for compatibility with existing records.
+    @Column(name = "business_date")
+    private LocalDate businessDate;
 
     // ========================================
     // LOCATION TRACKING
     // ========================================
 
-    // Nullable to preserve historical movements.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
     private StockLocation location;
 
-    // Nullable for historical records.
     @Enumerated(EnumType.STRING)
     @Column(name = "movement_category", length = 40)
     private MovementCategory category;
@@ -71,7 +81,7 @@ public class StockMovement {
     @Column(precision = 16, scale = 2)
     private BigDecimal inventoryLossValue;
 
-    // Required by JPA
+    // Required by JPA.
     protected StockMovement() {
     }
 
@@ -99,7 +109,44 @@ public class StockMovement {
         this.type = type;
         this.weightKg = weightKg.setScale(3);
         this.reason = reason.trim();
+
         this.recordedAt = LocalDateTime.now();
+
+        // Default for existing transaction workflows.
+        // The inventory receiving workflow can override this
+        // with an explicitly selected delivery date.
+        this.businessDate = LocalDate.now(BUSINESS_ZONE);
+    }
+
+    // ========================================
+    // BUSINESS DATE
+    // ========================================
+
+    public void assignBusinessDate(LocalDate date) {
+
+        if (date == null) {
+            throw new IllegalArgumentException(
+                    "Business date is required");
+        }
+
+        if (date.isAfter(LocalDate.now(BUSINESS_ZONE))) {
+            throw new IllegalArgumentException(
+                    "Business date cannot be in the future");
+        }
+
+        this.businessDate = date;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+
+        if (recordedAt == null) {
+            recordedAt = LocalDateTime.now();
+        }
+
+        if (businessDate == null) {
+            businessDate = LocalDate.now(BUSINESS_ZONE);
+        }
     }
 
     // ========================================
@@ -261,6 +308,18 @@ public class StockMovement {
 
     public LocalDateTime getRecordedAt() {
         return recordedAt;
+    }
+
+    public LocalDate getBusinessDate() {
+
+        // Legacy records may have no business_date.
+        // Use their original recorded date for display
+        // without modifying historical database values.
+        if (businessDate == null && recordedAt != null) {
+            return recordedAt.toLocalDate();
+        }
+
+        return businessDate;
     }
 
     public StockLocation getLocation() {

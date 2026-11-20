@@ -2,7 +2,11 @@
 package com.smartstock.model;
 
 import jakarta.validation.constraints.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class MovementForm {
 
@@ -14,6 +18,11 @@ public class MovementForm {
 
     @NotNull(message = "Please select a movement type")
     private MovementType type = MovementType.STOCK_IN;
+
+    @NotNull(message = "Please select a business date")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate businessDate =
+            LocalDate.now(ZoneId.of("Asia/Manila"));
 
     @NotNull(message = "Please enter the weight")
     @DecimalMin(
@@ -63,6 +72,14 @@ public class MovementForm {
 
     public void setType(MovementType type) {
         this.type = type;
+    }
+
+    public LocalDate getBusinessDate() {
+        return businessDate;
+    }
+
+    public void setBusinessDate(LocalDate businessDate) {
+        this.businessDate = businessDate;
     }
 
     public BigDecimal getWeightKg() {

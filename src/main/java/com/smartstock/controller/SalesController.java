@@ -234,13 +234,13 @@ public class SalesController {
 
         model.addAttribute(
                 "customers",
-                sales.allCustomers());
+                sales.retailCustomers());
     }
 
     private void fillPaymentOptions(Model model) {
 
         model.addAttribute(
                 "customers",
-                sales.allCustomers());
+                sales.retailCustomers());
     }
 }

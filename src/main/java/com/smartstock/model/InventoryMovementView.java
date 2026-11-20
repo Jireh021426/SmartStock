@@ -3,6 +3,7 @@ package com.smartstock.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record InventoryMovementView(
         Long id,
@@ -14,6 +15,7 @@ public record InventoryMovementView(
         BigDecimal purchaseCostPerKg,
         BigDecimal totalPurchaseCost,
         BigDecimal averageCostAfter,
-        BigDecimal inventoryLossValue
+        BigDecimal inventoryLossValue,
+        LocalDate businessDate
 ) {
 }

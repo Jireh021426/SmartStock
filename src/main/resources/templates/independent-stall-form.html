@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartStock | Independent Stalls</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/forms.css}">
+<link rel="stylesheet" th:href="@{/css/customers.css}">
+<link rel="stylesheet" th:href="@{/css/theme.css}">
+<script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="form-page">
+<div class="topbar"><div><a class="back-link" th:href="@{/independent-stalls}">← Independent Stalls</a><h2 class="page-title">Register Independent Stall</h2></div></div>
+<div class="panel"><p class="error-msg" th:if="${error}" th:text="${error}"></p>
+<form class="nova-form" th:object="${stallForm}" th:action="@{/independent-stalls/save}" method="post">
+<div class="form-grid">
+<label>Stall Name<input th:field="*{name}" maxlength="255" required placeholder="e.g. Independent Stall A"><small class="error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small></label>
+<label>Phone / Unique Account Identifier<input th:field="*{phone}" maxlength="255" required placeholder="Phone or stall code"><small class="error-text" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small></label>
+</div>
+<p class="form-note">Independent stalls owe the full value of chickens delivered, even when the chickens remain unsold.</p>
+<div class="form-actions"><button class="btn btn-primary" type="submit">Register Stall</button></div>
+</form></div></main></body></html>

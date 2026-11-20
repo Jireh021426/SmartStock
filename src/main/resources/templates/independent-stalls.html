@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartStock | Independent Stalls</title>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<link rel="stylesheet" th:href="@{/css/forms.css}">
+<link rel="stylesheet" th:href="@{/css/customers.css}">
+<link rel="stylesheet" th:href="@{/css/theme.css}">
+<script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="customers-page">
+  <div class="topbar">
+    <div><h2 class="page-title">Independent Stalls</h2>
+      <p class="page-sub">Full-delivery credit accounts. Chickens leave company inventory when delivered; collections only reduce debt.</p></div>
+    <div class="topbar-actions">
+      <a class="btn btn-ghost" th:href="@{/independent-stalls/new}">+ Add Stall</a>
+      <a class="btn btn-primary" th:href="@{/independent-stalls/deliveries/new}">+ Credit Delivery</a>
+      <a class="btn btn-ghost" th:href="@{/independent-stalls/payments/new}">+ Collect Payment</a>
+    </div>
+  </div>
+  <p class="notice" th:if="${notice}" th:text="${notice}"></p>
+  <div class="panel"><h3>Outstanding independent-stall credit</h3><h2 th:text="'₱' + ${outstanding}">₱0</h2></div>
+  <div class="panel">
+    <div class="panel-head"><h3>Independent Stall Accounts</h3></div>
+    <div class="table-wrap"><table><thead><tr><th>Stall</th><th>Contact / ID</th><th>Unpaid Balance</th></tr></thead>
+    <tbody>
+      <tr th:each="s : ${stalls}"><td th:text="${s.name}"></td><td th:text="${s.phone}"></td><td th:text="'₱' + ${s.balance}"></td></tr>
+      <tr th:if="${#lists.isEmpty(stalls)}"><td colspan="3">Register an independent stall to begin.</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h3>Credit Deliveries</h3></div>
+    <div class="table-wrap"><table><thead><tr><th>Business Date</th><th>Entered At</th><th>DR / Reference</th><th>Independent Stall</th><th>Source</th><th>Product</th><th>Weight</th><th>Price/kg</th><th>Charge</th><th>Receipt</th></tr></thead>
+    <tbody>
+      <tr th:each="d : ${deliveries}">
+        <td th:text="${d.businessDate}"></td>
+        <td th:text="${#temporals.format(d.soldAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${d.deliveryReference}"></td>
+        <td th:text="${d.customer.name}"></td>
+        <td th:text="${d.location.name}"></td>
+        <td th:text="${d.productName}"></td>
+        <td th:text="${d.weightKg} + ' kg'"></td>
+        <td th:text="'₱' + ${d.pricePerKg}"></td>
+        <td th:text="'₱' + ${d.total}"></td>
+        <td><a th:href="@{/sales/{id}(id=${d.id})}">View</a></td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(deliveries)}"><td colspan="10">No independent-stall deliveries recorded.</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h3>Collections (not new sales)</h3></div>
+    <div class="table-wrap"><table><thead><tr><th>Business Date</th><th>Entered At</th><th>Stall</th><th>Method</th><th>Amount</th></tr></thead>
+    <tbody>
+      <tr th:each="c : ${collections}"><td th:text="${c.businessDate}"></td><td th:text="${#temporals.format(c.paidAt,'yyyy-MM-dd HH:mm')}"></td><td th:text="${c.customer.name}"></td><td th:text="${c.method}"></td><td th:text="'₱' + ${c.amount}"></td></tr>
+      <tr th:if="${#lists.isEmpty(collections)}"><td colspan="5">No collections recorded.</td></tr>
+    </tbody></table></div>
+  </div>
+</main></body></html>

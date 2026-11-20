@@ -161,7 +161,8 @@ public class InventoryController {
                         : null,
                 canSeeFinancials
                         ? movement.getInventoryLossValue()
-                        : null
+                        : null,
+                movement.getBusinessDate()
         );
     }
 

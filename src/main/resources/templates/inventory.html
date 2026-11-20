@@ -59,7 +59,8 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Date / Time</th>
+                        <th>Business Date</th>
+                        <th>Entered At</th>
                         <th>Product</th>
                         <th>Movement</th>
                         <th style="text-align: right;">Weight (kg)</th>
@@ -72,6 +73,7 @@
                 </thead>
                 <tbody>
                     <tr th:each="m : ${movements}">
+                        <td th:text="${m.businessDate}"></td>
                         <td th:text="${#temporals.format(m.recordedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                         <td class="product-name" th:text="${m.productName}"></td>
                         <td>
@@ -102,7 +104,7 @@
                     </tr>
                     <!-- EMPTY HISTORY -->
                     <tr th:if="${#lists.isEmpty(movements)}">
-                        <td th:colspan="${canSeeInventoryFinancials ? 9 : 5}" class="empty-state">
+                        <td th:colspan="${canSeeInventoryFinancials ? 10 : 6}" class="empty-state">
                             No stock movements recorded yet.
                         </td>
                     </tr>
