@@ -6,6 +6,8 @@ import com.smartstock.model.EmployeeRole;
 
 import jakarta.persistence.LockModeType;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -34,6 +36,11 @@ public interface EmployeeRepository
     );
 
     boolean existsByUsername(String username);
+
+    // Paginated employee view requires the assigned location outside the transaction.
+    @Override
+    @EntityGraph(attributePaths = {"assignedLocation"})
+    Page<Employee> findAll(Pageable pageable);
 
     List<Employee> findByActiveTrueOrderByFullNameAsc();
 

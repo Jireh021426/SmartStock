@@ -95,7 +95,7 @@
             </div>
 
             <p class="form-hint">
-                * Sender and Receiver accounts require an assigned location.
+                * Sender, Receiver and Cashier accounts require an assigned location.
             </p>
 
             <div class="form-actions">
@@ -156,11 +156,14 @@
                             <form th:if="${employee.active}"
                                   th:action="@{/employees/deactivate}"
                                   method="post"
+                                  class="employee-status-form"
                                   style="display:inline;">
 
                                 <input type="hidden"
                                        name="employeeId"
                                        th:value="${employee.id}">
+                                <input type="hidden" name="page" th:value="${currentPage}">
+                                <input type="hidden" name="size" th:value="${pageSize}">
 
                                 <button type="submit"
                                         class="btn-action btn-deactivate">
@@ -171,11 +174,14 @@
                             <form th:unless="${employee.active}"
                                   th:action="@{/employees/activate}"
                                   method="post"
+                                  class="employee-status-form"
                                   style="display:inline;">
 
                                 <input type="hidden"
                                        name="employeeId"
                                        th:value="${employee.id}">
+                                <input type="hidden" name="page" th:value="${currentPage}">
+                                <input type="hidden" name="size" th:value="${pageSize}">
 
                                 <button type="submit"
                                         class="btn-action btn-activate">
@@ -193,6 +199,39 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Server-side employee pagination. The controller fetches one page only. -->
+        <nav class="employees-pagination" aria-label="Employee pages" th:if="${totalPages > 0}">
+            <div class="pagination-info">
+                Showing <strong th:text="${showingStart}">1</strong>
+                to <strong th:text="${showingEnd}">10</strong>
+                of <strong th:text="${totalEmployees}">10</strong> employees
+            </div>
+            <div class="pagination-controls">
+                <form method="get" th:action="@{/employees}" class="pagination-size-form">
+                    <label for="employee-page-size">Rows per page</label>
+                    <select id="employee-page-size" name="size" onchange="this.form.submit()" class="select">
+                        <option th:each="option : ${pageSizes}"
+                                th:value="${option}" th:text="${option}"
+                                th:selected="${option == pageSize}">10</option>
+                    </select>
+                </form>
+
+                <a th:if="${currentPage > 0}" th:href="@{/employees(page=0,size=${pageSize})}" class="page-button">First</a>
+                <a th:if="${currentPage > 0}" th:href="@{/employees(page=${currentPage - 1},size=${pageSize})}" class="page-button">Previous</a>
+                <span th:unless="${currentPage > 0}" class="page-button disabled">Previous</span>
+
+                <a th:each="pageNumber : ${pageNumbers}"
+                   th:href="@{/employees(page=${pageNumber},size=${pageSize})}"
+                   th:text="${pageNumber + 1}"
+                   th:classappend="${pageNumber == currentPage} ? ' active' : ''"
+                   class="page-button">1</a>
+
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/employees(page=${currentPage + 1},size=${pageSize})}" class="page-button">Next</a>
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/employees(page=${totalPages - 1},size=${pageSize})}" class="page-button">Last</a>
+                <span th:unless="${currentPage < totalPages - 1}" class="page-button disabled">Next</span>
+            </div>
+        </nav>
     </div>
 
 </main>

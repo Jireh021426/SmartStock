@@ -1,10 +1,15 @@
 
 package com.smartstock.controller;
 
+import com.smartstock.model.Employee;
 import com.smartstock.model.EmployeeRole;
 import com.smartstock.repository.StockLocationRepository;
 import com.smartstock.service.EmployeeService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -14,6 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/employees")
@@ -31,23 +39,55 @@ public class EmployeeController {
         this.locationRepository = locationRepository;
     }
 
+    private static final List<Integer> PAGE_SIZES = List.of(5, 10, 20, 50);
+
+    private static int allowedPageSize(int requestedSize) {
+        return PAGE_SIZES.contains(requestedSize) ? requestedSize : 10;
+    }
+
     @GetMapping
-    public String employees(Model model) {
+    public String employees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
 
-        model.addAttribute(
-                "employees",
-                employeeService.allEmployees()
-        );
+        int pageSize = allowedPageSize(size);
+        int safePage = Math.max(0, page);
 
-        model.addAttribute(
-                "locations",
-                locationRepository.findByActiveTrueOrderByNameAsc()
-        );
+        Sort sort = Sort.by(Sort.Order.asc("fullName"), Sort.Order.asc("id"));
+        Pageable pageable = PageRequest.of(safePage, pageSize, sort);
+        Page<Employee> employeePage = employeeService.pagedEmployees(pageable);
 
-        model.addAttribute(
-                "roles",
-                EmployeeRole.values()
-        );
+        // Invalid large page numbers return the last existing page.
+        if (employeePage.getTotalPages() > 0
+                && safePage >= employeePage.getTotalPages()) {
+            safePage = employeePage.getTotalPages() - 1;
+            employeePage = employeeService.pagedEmployees(
+                    PageRequest.of(safePage, pageSize, sort));
+        }
+
+        int totalPages = employeePage.getTotalPages();
+        long totalEmployees = employeePage.getTotalElements();
+        int windowStart = Math.max(0,
+                Math.min(safePage - 3, totalPages - 7));
+        int windowEnd = Math.min(totalPages, windowStart + 7);
+
+        model.addAttribute("employees", employeePage.getContent());
+        model.addAttribute("currentPage", safePage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalEmployees", totalEmployees);
+        model.addAttribute("pageSize", pageSize);
+        model.addAttribute("pageSizes", PAGE_SIZES);
+        model.addAttribute("pageNumbers",
+                IntStream.range(windowStart, windowEnd).boxed().toList());
+        model.addAttribute("showingStart",
+                totalEmployees == 0 ? 0 : (long) safePage * pageSize + 1);
+        model.addAttribute("showingEnd",
+                Math.min(((long) safePage + 1) * pageSize, totalEmployees));
+
+        model.addAttribute("locations",
+                locationRepository.findByActiveTrueOrderByNameAsc());
+        model.addAttribute("roles", EmployeeRole.values());
 
         return "employees";
     }
@@ -88,6 +128,8 @@ public class EmployeeController {
     @PostMapping("/deactivate")
     public String deactivate(
             @RequestParam Long employeeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             Authentication authentication,
             RedirectAttributes redirect) {
 
@@ -115,12 +157,15 @@ public class EmployeeController {
             );
         }
 
-        return "redirect:/employees";
+        return "redirect:/employees?page=" + Math.max(0, page)
+                + "&size=" + allowedPageSize(size);
     }
 
     @PostMapping("/activate")
     public String activate(
             @RequestParam Long employeeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             RedirectAttributes redirect) {
 
         try {
@@ -138,6 +183,7 @@ public class EmployeeController {
             );
         }
 
-        return "redirect:/employees";
+        return "redirect:/employees?page=" + Math.max(0, page)
+                + "&size=" + allowedPageSize(size);
     }
 }

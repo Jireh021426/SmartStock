@@ -435,3 +435,108 @@ main.employees-page {
         width: 100%;
     }
 }
+
+/* Employee pagination — scoped to avoid leaking into other screens */
+.employees-page .employees-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 18px 24px;
+    border-top: 1px solid var(--line);
+}
+
+.employees-page .pagination-info {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.employees-page .pagination-info strong {
+    color: var(--ink);
+}
+
+.employees-page .pagination-controls,
+.employees-page .pagination-size-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.employees-page .pagination-size-form {
+    margin-right: 8px;
+}
+
+.employees-page .pagination-size-form label {
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.employees-page .pagination-size-form select {
+    width: auto;
+    min-width: 65px;
+    height: 35px;
+    padding: 6px 9px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    font-family: inherit;
+}
+
+.employees-page .page-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    min-height: 35px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.employees-page a.page-button:hover {
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+}
+
+.employees-page .page-button.active {
+    border-color: var(--teal);
+    background: var(--teal);
+    color: #fff;
+}
+
+.employees-page .page-button.disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+:root[data-theme="dark"] .employees-page .pagination-info strong {
+    color: #f8fafc;
+}
+
+:root[data-theme="dark"] .employees-page .pagination-size-form select,
+:root[data-theme="dark"] .employees-page .page-button:not(.active) {
+    background: #202c42;
+    color: #f8fafc;
+    border-color: #334155;
+}
+
+:root[data-theme="dark"] .employees-page .pagination-size-form select option {
+    background: #202c42;
+    color: #f8fafc;
+}
+
+@media (max-width: 650px) {
+    .employees-page .employees-pagination {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

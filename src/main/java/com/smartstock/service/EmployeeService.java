@@ -8,6 +8,8 @@ import com.smartstock.model.StockLocation;
 import com.smartstock.repository.EmployeeRepository;
 import com.smartstock.repository.StockLocationRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,11 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public List<Employee> allEmployees() {
         return employeeRepository.findAllWithAssignedLocation();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Employee> pagedEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
