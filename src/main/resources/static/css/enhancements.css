@@ -251,3 +251,91 @@ button.ss-busy::after {
         transition-duration: .01ms !important;
     }
 }
+
+/* ---------- Pagination: compact override (beats global button/label styles) ---------- */
+nav.ss-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 12px 2px 0;
+    font-size: 12.5px;
+    line-height: 1.2;
+}
+nav.ss-pager .ss-pager-info { opacity: .7; white-space: nowrap; }
+nav.ss-pager .ss-pager-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+nav.ss-pager label.ss-pager-size {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    margin: 0;
+    font-size: 12.5px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+nav.ss-pager label.ss-pager-size select {
+    width: auto;
+    min-width: 0;
+    height: 30px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 22px 0 8px;
+    border: 1px solid var(--ss-line);
+    border-radius: 7px;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 12.5px;
+}
+nav.ss-pager .ss-pager-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+}
+nav.ss-pager button.ss-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-width: 30px;
+    height: 30px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 8px;
+    border: 1px solid var(--ss-line);
+    border-radius: 7px;
+    background: transparent;
+    color: inherit;
+    box-shadow: none;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+}
+nav.ss-pager button.ss-page:hover:not(:disabled):not(.is-active) {
+    background: color-mix(in srgb, var(--ss-accent) 14%, transparent);
+    border-color: var(--ss-accent);
+}
+nav.ss-pager button.ss-page.is-active {
+    background: var(--ss-accent);
+    border-color: var(--ss-accent);
+    color: #fff;
+    cursor: default;
+}
+nav.ss-pager button.ss-page:disabled { opacity: .35; cursor: not-allowed; }
+nav.ss-pager .ss-gap { padding: 0 1px; opacity: .5; }
+@media (max-width: 640px) {
+    nav.ss-pager { flex-direction: column; align-items: flex-start; }
+    nav.ss-pager .ss-pager-buttons { flex-wrap: wrap; }
+    nav.ss-pager button.ss-page { min-width: 36px; height: 36px; }
+}
