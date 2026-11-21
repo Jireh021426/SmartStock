@@ -1,0 +1,168 @@
+/*
+ * SmartStock pagination design system
+ * Unifies server-side (Employees, Stock History), location balances,
+ * legacy remittance/table pagers and shared enhancements pagers.
+ * No inventory, sales, security or pagination data logic is changed.
+ */
+:root {
+    --ss-pg-accent: #12aa9b;
+    --ss-pg-surface: #ffffff;
+    --ss-pg-text: #0e1d37;
+    --ss-pg-border: #d7dfe7;
+    --ss-pg-muted: #798393;
+    --ss-pg-hover: #effaf8;
+}
+:root[data-theme="dark"] {
+    --ss-pg-surface: #202c42;
+    --ss-pg-text: #f3f7fc;
+    --ss-pg-border: #3c4960;
+    --ss-pg-muted: #aab5c7;
+    --ss-pg-hover: #263e47;
+}
+
+/* Consistent dividers and positioning, including existing count / size tools. */
+:is(.inventory-pagination, .employees-pagination, .balance-pagination, .pager, .ss-pager) {
+    border-top: 1px solid var(--ss-pg-border);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+:is(.inventory-pagination, .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.pagination-controls, .balance-pagination-controls, .pager-nav, .ss-pager-controls, .ss-pager-buttons, .balance-page-numbers, .ss-unified-numbers) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.ss-unified-numbers { display: inline-flex; }
+
+/* Single button design for all 5 SmartStock paginator families. */
+:is(.inventory-pagination, .employees-page .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.page-button, .balance-page-btn, .pager-btn, .ss-page) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    height: 52px;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid var(--ss-pg-border);
+    border-radius: 11px;
+    background: var(--ss-pg-surface);
+    color: var(--ss-pg-text);
+    font-size: 16px;
+    line-height: 1;
+    font-family: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: none;
+    cursor: pointer;
+    opacity: 1;
+    transition: background-color .16s ease, border-color .16s ease;
+}
+
+:is(.inventory-pagination, .employees-page .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.page-button, .balance-page-btn, .pager-btn, .ss-page):is(:hover, :focus-visible):not(.active):not(.is-active):not(:disabled):not(.disabled) {
+    background: var(--ss-pg-hover);
+    border-color: var(--ss-pg-accent);
+    color: var(--ss-pg-text);
+}
+
+:is(.inventory-pagination, .employees-page .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.page-button.active, .balance-page-btn.active, .pager-btn.active, .ss-page.is-active) {
+    background: var(--ss-pg-accent);
+    border-color: var(--ss-pg-accent);
+    color: #ffffff;
+    opacity: 1;
+    cursor: default;
+}
+
+:is(.inventory-pagination, .employees-page .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.page-button.disabled, .balance-page-btn:disabled, .pager-btn:disabled, .ss-page:disabled) {
+    color: var(--ss-pg-muted);
+    opacity: .52;
+    background: var(--ss-pg-surface);
+    cursor: not-allowed;
+}
+
+/* Previous / Next are wider, as in the reference screenshot. */
+:is(.inventory-pagination, .employees-pagination) .page-button[data-ss-nav],
+.balance-pagination :is(#balance-prev, #balance-next),
+.pager .pager-btn[aria-label="Previous page"],
+.pager .pager-btn[aria-label="Next page"],
+.ss-pager .ss-page[aria-label="Previous page"],
+.ss-pager .ss-page[aria-label="Next page"] {
+    min-width: 104px;
+    padding: 0 16px;
+}
+
+/* Keep legacy arrow-based client pagers' actions; render text visually. */
+.pager .pager-btn[aria-label="Previous page"],
+.pager .pager-btn[aria-label="Next page"],
+.ss-pager .ss-page[aria-label="Previous page"],
+.ss-pager .ss-page[aria-label="Next page"] { font-size: 0; }
+.pager .pager-btn[aria-label="Previous page"]::after,
+.ss-pager .ss-page[aria-label="Previous page"]::after { content: "Previous"; font-size: 16px; }
+.pager .pager-btn[aria-label="Next page"]::after,
+.ss-pager .ss-page[aria-label="Next page"]::after { content: "Next"; font-size: 16px; }
+
+/* The first and final numbered buttons already navigate to the endpoints. */
+.ss-pager .ss-page[aria-label="First page"],
+.ss-pager .ss-page[aria-label="Last page"],
+:is(.inventory-pagination, .employees-pagination) .page-button.ss-unified-hide { display: none !important; }
+
+/* Ellipses separate non-adjacent page numbers without a click target. */
+:is(.inventory-pagination, .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.ss-unified-ellipsis, .balance-page-dots, .pager-gap, .ss-gap) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    color: var(--ss-pg-muted);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Preserve full access to size selectors and page counts. */
+:is(.inventory-pagination, .employees-pagination, .balance-pagination, .pager, .ss-pager)
+:is(.pagination-info, .balance-page-info, .pager-info, .ss-pager-info) {
+    color: var(--ss-pg-muted);
+    font-size: 13px;
+}
+:is(.inventory-pagination, .employees-pagination, .pager, .ss-pager)
+:is(.pagination-size-form select, .pager-size select, .ss-pager-size select) {
+    min-height: 40px;
+    border-radius: 9px;
+    border: 1px solid var(--ss-pg-border);
+    background: var(--ss-pg-surface);
+    color: var(--ss-pg-text);
+}
+@media (max-width: 720px) {
+    :is(.inventory-pagination, .employees-pagination, .balance-pagination, .pager, .ss-pager) {
+        padding: 14px;
+        justify-content: center;
+    }
+    :is(.inventory-pagination, .employees-page .employees-pagination, .balance-pagination, .pager, .ss-pager)
+    :is(.page-button, .balance-page-btn, .pager-btn, .ss-page) {
+        min-width: 42px;
+        min-height: 42px;
+        height: 42px;
+        padding: 0 9px;
+        font-size: 14px;
+    }
+    :is(.inventory-pagination, .employees-pagination) .page-button[data-ss-nav],
+    .balance-pagination :is(#balance-prev, #balance-next),
+    .pager .pager-btn[aria-label="Previous page"], .pager .pager-btn[aria-label="Next page"],
+    .ss-pager .ss-page[aria-label="Previous page"], .ss-pager .ss-page[aria-label="Next page"] {
+        min-width: 84px;
+    }
+    .pager .pager-btn[aria-label="Previous page"]::after,
+    .pager .pager-btn[aria-label="Next page"]::after,
+    .ss-pager .ss-page[aria-label="Previous page"]::after,
+    .ss-pager .ss-page[aria-label="Next page"]::after { font-size: 14px; }
+}
