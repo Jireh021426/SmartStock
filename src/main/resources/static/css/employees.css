@@ -541,42 +541,425 @@ main.employees-page {
     }
 }
 
-/* ==================================================
-   COMPACT ADD EMPLOYEE FORM
-   Scoped to this form so employee tables, pagination,
-   navigation, and forms elsewhere remain unchanged.
-   ================================================== */
+/* ===============================================================
+   EMPLOYEE FORM — REFERENCE DESIGN (image-inspired, responsive)
+   The rules are scoped to Employees, not the shared navigation.
+   =============================================================== */
+
+.employees-page {
+    --employee-teal: #079e96;
+    --employee-teal-deep: #087f78;
+    --employee-outline: #dfe5ee;
+    --employee-ink: #10283a;
+}
+
+.employees-page .employee-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 88px;
+    padding: 12px 20px;
+    align-items: center;
+    border-radius: 18px;
+    background:
+        linear-gradient(124deg, transparent 0 77%, rgba(15, 191, 181, .085) 77% 88%, transparent 88%),
+        linear-gradient(142deg, transparent 0 85%, rgba(13, 193, 182, .09) 85%),
+        transparent;
+}
+
+.employees-page .employee-hero-heading {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.employees-page .employee-hero-icon {
+    display: block;
+    width: 43px;
+    height: 43px;
+    flex: none;
+    color: var(--employee-teal);
+}
+
+.employees-page .employee-hero .page-title {
+    color: var(--ink, #10283a);
+    font-size: clamp(27px, 2.25vw, 35px);
+    line-height: 1.1;
+    letter-spacing: -.9px;
+    font-weight: 800;
+}
+
+.employees-page .employee-account-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 6px 15px 6px 7px;
+    border-radius: 100px;
+    background: var(--card, #fff);
+    box-shadow: 0 2px 14px rgba(20, 46, 79, .075);
+    color: var(--ink, #10283a);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.employees-page .employee-account-avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 50%;
+    background: #e3e9f2;
+    color: #263e5e;
+}
+
+.employees-page .employee-account-avatar svg {
+    width: 23px;
+    height: 23px;
+}
+
+.employees-page .employee-create-panel {
+    position: relative;
+    isolation: isolate;
+    padding: 22px 26px 10px;
+    border: 1px solid rgba(206, 220, 229, .65);
+    border-radius: 28px;
+    background: var(--card, #fff);
+    box-shadow: 0 12px 38px rgba(37, 62, 90, .09), 0 2px 5px rgba(37, 62, 90, .04);
+}
+
+/* Decorative arcs like the reference; these are CSS shapes, never interactive. */
+.employees-page .employee-create-panel::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    left: -35px;
+    bottom: -10px;
+    width: min(340px, 38%);
+    height: 145px;
+    border-radius: 58% 75% 0 0;
+    background: linear-gradient(20deg, rgba(56, 215, 201, .2), rgba(56, 215, 201, 0));
+    transform: rotate(12deg);
+}
+
+.employees-page .employee-create-panel::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    right: -60px;
+    top: -85px;
+    width: 300px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(32, 203, 194, .06), transparent 75%);
+}
+
+.employees-page .employee-create-panel .employee-create-heading {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 72px;
+    padding: 8px 15px 8px 6px;
+    overflow: hidden;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(100deg, #edfafd 0%, #f6fdff 55%, #b5ebe9 100%);
+}
+
+.employees-page .employee-create-panel .employee-create-heading::after {
+    content: "";
+    position: absolute;
+    right: 2%;
+    top: 0;
+    width: 90px;
+    height: 100%;
+    transform: skewX(-30deg);
+    background: rgba(14, 177, 174, .16);
+    pointer-events: none;
+}
+
+.employees-page .employee-add-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    flex: none;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--employee-teal);
+}
+
+.employees-page .employee-add-icon svg {
+    width: 29px;
+    height: 29px;
+}
+
+.employees-page .employee-create-panel .employee-create-heading h3 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: #10283a;
+    font-size: clamp(18px, 2vw, 25px);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -.35px;
+    text-transform: none;
+}
+
 .employees-page .employee-create-form {
-    padding: 16px 20px;
+    position: relative;
+    z-index: 1;
+    padding: 30px 5px 26px;
 }
 
-.employees-page .employee-create-form .compact-grid {
-    gap: 12px 16px;
+.employees-page .employee-create-form .employee-reference-grid {
+    gap: 28px 30px;
 }
 
-.employees-page .employee-create-form .compact-grid label {
-    gap: 6px;
+.employees-page .employee-create-form .employee-reference-grid label {
+    display: flex;
+    gap: 9px;
+    flex-direction: column;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink, #10283a);
+    margin: 0;
 }
 
-.employees-page .employee-create-form .compact-grid input,
-.employees-page .employee-create-form .compact-grid select {
-    height: 38px;
-    padding: 0 12px;
-    font-size: 13px;
+.employees-page .employee-password-field {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
 }
+
+.employees-page .employee-field-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    line-height: 1.4;
+}
+
+.employees-page .employee-field-label svg {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    color: var(--employee-teal);
+}
+
+.employees-page .employee-create-form .employee-reference-grid input,
+.employees-page .employee-create-form .employee-reference-grid select {
+    width: 100%;
+    height: 54px;
+    padding: 0 19px;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1.5px solid var(--employee-outline);
+    border-radius: 13px;
+    background: var(--card, #fff);
+    color: var(--ink, #10283a);
+    box-shadow: 0 1px 3px rgba(27, 47, 68, .025);
+}
+
+.employees-page .employee-create-form .employee-reference-grid input::placeholder {
+    color: #788ba9;
+    opacity: 1;
+}
+
+.employees-page .employee-create-form .employee-reference-grid input:focus-visible,
+.employees-page .employee-create-form .employee-reference-grid select:focus-visible {
+    border-color: var(--employee-teal);
+    outline: 3px solid rgba(7, 158, 150, .13);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 3px rgba(7, 158, 150, .08);
+}
+
+.employees-page .employee-create-form .employee-reference-grid select {
+    padding-right: 44px;
+    cursor: pointer;
+}
+
+.employees-page .employee-password-wrap {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.employees-page .employee-create-form .employee-password-wrap input {
+    padding-right: 58px;
+}
+
+.employees-page .employee-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: #526683;
+    cursor: pointer;
+}
+
+.employees-page .employee-password-toggle:hover {
+    background: rgba(20, 156, 149, .08);
+    color: var(--employee-teal);
+}
+
+.employees-page .employee-password-toggle svg {
+    width: 23px;
+    height: 23px;
+}
+
+.employees-page .employee-password-toggle .eye-show { display: none; }
+.employees-page .employee-password-toggle[aria-pressed="true"] .eye-show { display: block; }
+.employees-page .employee-password-toggle[aria-pressed="true"] .eye-hide { display: none; }
 
 .employees-page .employee-create-form .form-hint {
-    margin: 10px 0 0;
-    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 21px 0 0;
+    color: #60758d;
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
 }
 
-.employees-page .employee-create-form .form-actions {
-    margin-top: 16px;
+.employees-page .employee-create-form .form-hint svg {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: #6383a3;
+}
+
+.employees-page .employee-create-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 26px;
     padding-top: 0;
 }
 
+.employees-page .employee-create-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    min-width: 155px;
+    min-height: 52px;
+    padding: 12px 21px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 750;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.employees-page .employee-create-actions .btn svg {
+    width: 22px;
+    height: 22px;
+    flex: none;
+}
+
+.employees-page .employee-create-actions .employee-cancel-button {
+    border: 1.5px solid #d6deeb;
+    background: #f2f5fa;
+    color: #344862;
+}
+
+.employees-page .employee-create-actions .employee-cancel-button:hover {
+    background: #e8eef7;
+}
+
+.employees-page .employee-create-actions .employee-submit-button {
+    border-color: transparent;
+    background: #079e96;
+    color: #fff;
+    box-shadow: 0 3px 0 rgba(0, 104, 94, .14);
+}
+
+.employees-page .employee-create-actions .employee-submit-button:hover {
+    background: #087f78;
+    color: #fff;
+}
+
+/* Dark theme: keep the screenshot's hierarchy, use actual dark surfaces. */
+:root[data-theme="dark"] .employees-page .employee-hero .page-title,
+:root[data-theme="dark"] .employees-page .employee-account-pill,
+:root[data-theme="dark"] .employees-page .employee-create-form .employee-reference-grid label {
+    color: #f1f6fb;
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-panel {
+    border-color: #304159;
+    background: #172033;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .18);
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-panel .employee-create-heading {
+    background: linear-gradient(100deg, #163b48 0%, #1b3945 62%, #276f70 100%);
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-panel .employee-create-heading h3 {
+    color: #f2f9fb;
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-form .employee-reference-grid input,
+:root[data-theme="dark"] .employees-page .employee-create-form .employee-reference-grid select {
+    border-color: #3b4d66;
+    background: #202c42;
+    color: #f2f7fc;
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-form .employee-reference-grid input::placeholder,
+:root[data-theme="dark"] .employees-page .employee-create-form .form-hint {
+    color: #a5b6cc;
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-actions .employee-cancel-button {
+    border-color: #495b72;
+    background: #2b3950;
+    color: #ebf2fa;
+}
+
+:root[data-theme="dark"] .employees-page .employee-create-actions .employee-cancel-button:hover {
+    background: #3b4c66;
+}
+
 @media (max-width: 760px) {
-    .employees-page .employee-create-form {
-        padding: 16px;
-    }
+    .employees-page .employee-hero { min-height: 66px; padding: 10px 4px; }
+    .employees-page .employee-hero-icon { width: 34px; height: 34px; }
+    .employees-page .employee-account-pill { min-height: 38px; font-size: 12px; }
+    .employees-page .employee-account-avatar { width: 30px; height: 30px; }
+    .employees-page .employee-create-panel { border-radius: 18px; padding: 14px 14px 4px; }
+    .employees-page .employee-create-panel .employee-create-heading { min-height: 64px; gap: 11px; }
+    .employees-page .employee-add-icon { width: 47px; height: 47px; }
+    .employees-page .employee-create-form { padding: 22px 2px 23px; }
+    .employees-page .employee-create-form .employee-reference-grid { gap: 20px; }
+    .employees-page .employee-create-actions .btn { min-width: 0; flex: 1; }
+}
+
+@media (max-width: 430px) {
+    .employees-page .employee-hero { gap: 12px; }
+    .employees-page .employee-account-pill { padding-right: 10px; }
+    .employees-page .employee-create-actions { gap: 9px; }
+    .employees-page .employee-create-actions .btn { font-size: 14px; min-height: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .employees-page .employee-create-form *,
+    .employees-page .employee-create-form *::before,
+    .employees-page .employee-create-form *::after { transition-duration: .01ms !important; }
 }
