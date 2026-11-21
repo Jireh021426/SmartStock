@@ -9,149 +9,17 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/forms.css}">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/movement-form.css}">
 
     <script th:src="@{/js/theme.js}"></script>
 
-    <style>
-        .form-page .panel { padding: 22px 26px; }
-        .form-page .form-grid { gap: 14px 22px; }
-        .form-page .form-grid label { gap: 4px; }
-        .form-page .form-grid select,
-        .form-page .form-grid input { padding-top: 9px; padding-bottom: 9px; }
-        .form-page .movement-dependent-fields { display: contents; }
-        .form-page .movement-dependent-fields > div { min-width: 0; }
-
-        .hint-text { font-size: 0.8rem; opacity: 0.75; font-weight: 400; }
-        .js-error { display: block; color: #b42318; font-size: 0.8rem; font-weight: 600; min-height: 0; }
-        .has-error select,
-        .has-error input { border-color: #b42318 !important; }
-
-        .total-box {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            background: rgba(16, 150, 120, 0.10);
-            border: 1px solid rgba(16, 150, 120, 0.30);
-        }
-        .total-box .total-label { font-weight: 600; }
-        .total-box .total-detail { font-size: 0.8rem; opacity: 0.75; display: block; font-weight: 400; }
-        .total-box .total-value { font-size: 1.35rem; font-weight: 700; white-space: nowrap; }
-
-        details.form-note { margin-top: 16px; }
-        details.form-note summary { cursor: pointer; font-weight: 600; }
-        details.form-note p { margin: 8px 0 0; }
-
-        @media (max-width: 700px) {
-            .form-page .panel { padding: 16px; }
-            .total-box { flex-direction: column; align-items: flex-start; }
-        }
-
-        /* ---- Design polish ---- */
-        .form-page .form-grid { align-items: start; row-gap: 16px !important; column-gap: 20px !important; }
-        .form-page .form-grid label { font-weight: 600; font-size: 0.9rem; }
-        .form-page .form-grid small.hint-text { color: inherit !important; opacity: 0.65; font-weight: 400; }
-        .form-page .form-grid label[data-field="reason"] { grid-column: 1 / -1; }
-        .form-page .form-grid label[data-field="movementType"] { display: none; }
-        .form-page .form-grid select,
-        .form-page .form-grid input {
-            border-radius: 10px;
-            transition: border-color .15s, box-shadow .15s;
-        }
-        .form-page .form-grid select:focus,
-        .form-page .form-grid input:focus {
-            outline: none;
-            border-color: #0f9b7a !important;
-            box-shadow: 0 0 0 3px rgba(15, 155, 122, 0.18);
-        }
-
-        .seg {
-            grid-column: 1 / -1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            padding: 5px;
-            border-radius: 14px;
-            background: rgba(0, 0, 0, 0.06);
-        }
-        .seg-btn {
-            border: 0;
-            border-radius: 10px;
-            padding: 11px 12px;
-            font: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            background: transparent;
-            color: inherit;
-            opacity: 0.7;
-            transition: background .15s, opacity .15s, color .15s;
-        }
-        .seg-btn small { display: block; font-weight: 400; font-size: 0.75rem; opacity: 0.85; }
-        .seg-btn.active { opacity: 1; background: #fff; color: #0b7a60; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
-        .seg-btn.active[data-value="STOCK_OUT"] { color: #b42318; }
-        .seg-btn:focus-visible { outline: 2px solid #0f9b7a; outline-offset: 2px; }
-
-        .total-box .total-value { color: #0b7a60; }
-        .form-page .form-actions {
-            margin-top: 18px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-            display: flex;
-            justify-content: flex-end;
-        }
-        .form-page .form-actions .btn { padding: 12px 28px; border-radius: 12px; font-weight: 700; }
-        @media (max-width: 700px) {
-            .form-page .form-actions .btn { width: 100%; }
-        }
-
-        /* ---- Fit on one screen (landscape layout) ---- */
-        .form-page { padding-top: 8px !important; }
-        .form-page .topbar { margin-bottom: 8px !important; }
-        .form-page .page-title { font-size: 1.5rem !important; margin: 4px 0 !important; }
-        .form-page .page-sub { display: none !important; }
-        .form-page .panel { padding: 16px 20px !important; }
-
-        .form-page .form-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-            row-gap: 10px !important;
-            column-gap: 16px !important;
-        }
-        .form-page .form-grid label[data-field="productId"],
-        .form-page .form-grid label[data-field="locationId"] { grid-column: span 2; }
-        .form-page .form-grid label[data-field="reason"] { grid-column: auto; }
-        .form-page .form-grid small.hint-text { display: none; }
-
-        .seg { padding: 4px; }
-        .seg-btn { padding: 8px 10px; }
-        .seg-btn small { display: none; }
-
-        .total-box { padding: 8px 14px; }
-        .total-box .total-value { font-size: 1.15rem; }
-        details.form-note { margin-top: 10px; }
-        .form-page .form-actions { margin-top: 10px !important; padding-top: 10px !important; }
-        .form-page .form-actions .btn { padding: 10px 26px !important; }
-
-        @media (max-width: 1000px) {
-            .form-page .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-        }
-        @media (max-width: 600px) {
-            .form-page .form-grid { grid-template-columns: 1fr !important; }
-            .form-page .form-grid label[data-field="productId"],
-            .form-page .form-grid label[data-field="locationId"] { grid-column: auto; }
-            .form-page .page-sub { display: block !important; }
-            .seg-btn small { display: block; }
-        }
-    </style>
 </head>
 
 <body>
 
 <header th:replace="~{fragments/navigation :: siteHeader}"></header>
 
-<main class="form-page">
+<main class="form-page movement-page">
 
     <div class="topbar">
         <div>
@@ -181,7 +49,7 @@
               method="post"
               novalidate>
 
-            <div class="form-grid">
+            <div class="mf-grid">
 
                 <!-- MOVEMENT TYPE TOGGLE (syncs with the select below) -->
                 <div class="seg" role="radiogroup" aria-label="Movement type">
@@ -248,7 +116,7 @@
                 </label>
 
                 <!-- MOVEMENT TYPE -->
-                <label data-field="movementType">
+                <label data-field="movementType" class="hidden-label">
                     Movement Type
 
                     <select th:field="*{type}"
