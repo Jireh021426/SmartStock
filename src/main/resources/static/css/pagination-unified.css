@@ -166,3 +166,40 @@
     .ss-pager .ss-page[aria-label="Previous page"]::after,
     .ss-pager .ss-page[aria-label="Next page"]::after { font-size: 14px; }
 }
+
+/* ---------- Compact size override (loads last, higher specificity) ---------- */
+main nav.ss-pager button.ss-page[aria-label],
+main .pager button.pager-btn[aria-label] {
+    height: 28px !important;
+    min-height: 0 !important;
+    min-width: 28px !important;
+    padding: 0 10px !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+}
+main nav.ss-pager button.ss-page[aria-label="Previous page"],
+main nav.ss-pager button.ss-page[aria-label="Next page"],
+main .pager button.pager-btn[aria-label="Previous page"],
+main .pager button.pager-btn[aria-label="Next page"] {
+    min-width: 0 !important;
+    padding: 0 12px !important;
+}
+main nav.ss-pager button.ss-page[aria-label="Previous page"]::after,
+main nav.ss-pager button.ss-page[aria-label="Next page"]::after,
+main .pager button.pager-btn[aria-label="Previous page"]::after,
+main .pager button.pager-btn[aria-label="Next page"]::after {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+main nav.ss-pager button.ss-page:not([aria-label="Previous page"]):not([aria-label="Next page"]),
+main .pager button.pager-btn:not([aria-label="Previous page"]):not([aria-label="Next page"]) {
+    font-size: 12px !important;
+}
+main nav.ss-pager label, main nav.ss-pager select,
+main .pager label, main .pager select {
+    font-size: 12px !important;
+}
+main nav.ss-pager select, main .pager select {
+    height: 28px !important;
+    min-height: 0 !important;
+}
