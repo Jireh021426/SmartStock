@@ -48,7 +48,7 @@ public class EmployeeController {
     @GetMapping
     public String employees(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "10") int size,
             Model model) {
 
         int pageSize = allowedPageSize(size);
@@ -129,7 +129,7 @@ public class EmployeeController {
     public String deactivate(
             @RequestParam Long employeeId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "10") int size,
             Authentication authentication,
             RedirectAttributes redirect) {
 
@@ -165,7 +165,7 @@ public class EmployeeController {
     public String activate(
             @RequestParam Long employeeId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "10") int size,
             RedirectAttributes redirect) {
 
         try {

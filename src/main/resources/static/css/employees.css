@@ -540,3 +540,43 @@ main.employees-page {
         align-items: flex-start;
     }
 }
+
+/* ==================================================
+   COMPACT ADD EMPLOYEE FORM
+   Scoped to this form so employee tables, pagination,
+   navigation, and forms elsewhere remain unchanged.
+   ================================================== */
+.employees-page .employee-create-form {
+    padding: 16px 20px;
+}
+
+.employees-page .employee-create-form .compact-grid {
+    gap: 12px 16px;
+}
+
+.employees-page .employee-create-form .compact-grid label {
+    gap: 6px;
+}
+
+.employees-page .employee-create-form .compact-grid input,
+.employees-page .employee-create-form .compact-grid select {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.employees-page .employee-create-form .form-hint {
+    margin: 10px 0 0;
+    font-size: 11px;
+}
+
+.employees-page .employee-create-form .form-actions {
+    margin-top: 16px;
+    padding-top: 0;
+}
+
+@media (max-width: 760px) {
+    .employees-page .employee-create-form {
+        padding: 16px;
+    }
+}

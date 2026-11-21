@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -21,8 +20,7 @@
 
     <div class="topbar">
         <div>
-            <h2 class="page-title">Employee Management</h2>
-            <p class="page-sub">Create staff accounts, assign locations, and manage employee access.</p>
+            <h2 class="page-title">Employees</h2>
         </div>
     </div>
 
@@ -30,78 +28,51 @@
     <p class="error-msg" th:if="${error}" th:text="${error}"></p>
     <p class="notice-msg" th:if="${notice}" th:text="${notice}"></p>
 
-    <!-- Create Employee Form -->
-    <div class="panel">
+    <!-- Compact create employee form; existing endpoint and field names preserved. -->
+    <div class="panel employee-create-panel">
         <div class="panel-head">
-            <h3>Create Employee Account</h3>
+            <h3>Add Employee</h3>
         </div>
 
-        <form class="nova-form" th:action="@{/employees/create}" method="post">
-            <div class="form-grid">
-
+        <form class="nova-form employee-create-form" th:action="@{/employees/create}" method="post">
+            <div class="form-grid compact-grid">
                 <label>
-                    Full Name
-                    <input type="text"
-                           name="fullName"
-                           maxlength="100"
-                           placeholder="e.g. Juan Dela Cruz"
-                           required>
+                    Name
+                    <input type="text" name="fullName" maxlength="100" placeholder="e.g. Juan Dela Cruz" required>
                 </label>
 
                 <label>
                     Username
-                    <input type="text"
-                           name="username"
-                           minlength="3"
-                           maxlength="50"
-                           pattern="[A-Za-z0-9._-]+"
-                           autocomplete="off"
-                           placeholder="e.g. juan.dela"
-                           required>
+                    <input type="text" name="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" autocomplete="off" placeholder="e.g. juan.dela" required>
                 </label>
 
                 <label>
                     Password
-                    <input type="password"
-                           name="password"
-                           minlength="12"
-                           maxlength="72"
-                           autocomplete="new-password"
-                           placeholder="Minimum 12 characters"
-                           required>
+                    <input type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" placeholder="Min 12 chars" required>
                 </label>
 
                 <label>
-                    Employee Role
+                    Role
                     <select name="role" required>
                         <option value="">Select Role</option>
-                        <option th:each="role : ${roles}"
-                                th:value="${role}"
-                                th:text="${role}"></option>
+                        <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
                     </select>
                 </label>
 
                 <label class="full-width">
-                    Assigned Stall / Storage
+                    Location
                     <select name="locationId">
-                        <option value="">No Assigned Location</option>
+                        <option value="">None</option>
                         <option th:each="location : ${locations}"
                                 th:value="${location.id}"
-                                th:text="${location.name + ' (' + location.code + ')'}">
-                        </option>
+                                th:text="${location.name + ' (' + location.code + ')'}"></option>
                     </select>
                 </label>
-
             </div>
 
-            <p class="form-hint">
-                * Sender, Receiver and Cashier accounts require an assigned location.
-            </p>
-
+            <p class="form-hint">* Assigned location is required for Sender, Receiver, and Cashier roles.</p>
             <div class="form-actions">
-                <button class="btn btn-primary" type="submit">
-                    Create Employee
-                </button>
+                <button class="btn btn-primary" type="submit">Create</button>
             </div>
         </form>
     </div>
