@@ -52,6 +52,65 @@
             .form-page .panel { padding: 16px; }
             .total-box { flex-direction: column; align-items: flex-start; }
         }
+
+        /* ---- Design polish ---- */
+        .form-page .form-grid { align-items: start; row-gap: 16px !important; column-gap: 20px !important; }
+        .form-page .form-grid label { font-weight: 600; font-size: 0.9rem; }
+        .form-page .form-grid small.hint-text { color: inherit !important; opacity: 0.65; font-weight: 400; }
+        .form-page .form-grid label[data-field="reason"] { grid-column: 1 / -1; }
+        .form-page .form-grid label[data-field="movementType"] { display: none; }
+        .form-page .form-grid select,
+        .form-page .form-grid input {
+            border-radius: 10px;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .form-page .form-grid select:focus,
+        .form-page .form-grid input:focus {
+            outline: none;
+            border-color: #0f9b7a !important;
+            box-shadow: 0 0 0 3px rgba(15, 155, 122, 0.18);
+        }
+
+        /* Stock In / Stock Out toggle */
+        .seg {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding: 5px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .seg-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 12px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: inherit;
+            opacity: 0.7;
+            transition: background .15s, opacity .15s, color .15s;
+        }
+        .seg-btn small { display: block; font-weight: 400; font-size: 0.75rem; opacity: 0.85; }
+        .seg-btn.active { opacity: 1; background: #fff; color: #0b7a60; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+        .seg-btn.active[data-value="STOCK_OUT"] { color: #b42318; }
+        .seg-btn:focus-visible { outline: 2px solid #0f9b7a; outline-offset: 2px; }
+
+        /* Total + actions */
+        .total-box .total-value { color: #0b7a60; }
+        .form-page .form-actions {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: flex-end;
+        }
+        .form-page .form-actions .btn { padding: 12px 28px; border-radius: 12px; font-weight: 700; }
+        @media (max-width: 700px) {
+            .form-page .form-actions .btn { width: 100%; }
+        }
     </style>
 </head>
 
@@ -90,6 +149,20 @@
               novalidate>
 
             <div class="form-grid">
+
+                <!-- MOVEMENT TYPE TOGGLE (syncs with the select below) -->
+                <div class="seg" role="radiogroup" aria-label="Movement type">
+                    <button type="button" class="seg-btn" data-value="STOCK_IN"
+                            role="radio" aria-checked="true">
+                        Stock In
+                        <small>Supplier delivery</small>
+                    </button>
+                    <button type="button" class="seg-btn" data-value="STOCK_OUT"
+                            role="radio" aria-checked="false">
+                        Stock Out
+                        <small>Spoilage, damage or missing</small>
+                    </button>
+                </div>
 
                 <!-- PRODUCT -->
                 <label data-field="productId">
@@ -533,6 +606,24 @@
         /* ---------- Wire up ---------- */
         document.addEventListener("DOMContentLoaded", function () {
             movementType.addEventListener("change", updateMovementFields);
+
+            var segBtns = document.querySelectorAll(".seg-btn");
+            function syncSegment() {
+                segBtns.forEach(function (b) {
+                    var on = b.getAttribute("data-value") === movementType.value;
+                    b.classList.toggle("active", on);
+                    b.setAttribute("aria-checked", on ? "true" : "false");
+                });
+            }
+            segBtns.forEach(function (b) {
+                b.addEventListener("click", function () {
+                    movementType.value = b.getAttribute("data-value");
+                    movementType.dispatchEvent(new Event("change"));
+                });
+            });
+            movementType.addEventListener("change", syncSegment);
+            syncSegment();
+
             purchaseInput.addEventListener("input", updateTotal);
             weightInput.addEventListener("input", updateTotal);
 
