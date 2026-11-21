@@ -8,8 +8,8 @@
 (function () {
     'use strict';
 
-    var SIZES = [10, 25, 50, 100];
-    var MIN_ROWS = 11; // show pager/filter only when more than 10 rows
+    var SIZES = [5, 10, 25, 50];
+    var MIN_ROWS = 6; // show pager/filter only when more than 5 rows
 
     function ready(fn) {
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
@@ -160,7 +160,7 @@
 
         rows.forEach(function (r) { r._t = r.textContent.toLowerCase(); });
 
-        var saved = parseInt(store('ss.pageSize'), 10);
+        var saved = parseInt(store('ss.pageSize.v2'), 10);
         var state = { size: SIZES.indexOf(saved) > -1 ? saved : 10, page: 0, q: '' };
 
         /* filter box */
@@ -261,7 +261,7 @@
         sizeSel.addEventListener('change', function () {
             state.size = parseInt(sizeSel.value, 10);
             state.page = 0;
-            store('ss.pageSize', String(state.size));
+            store('ss.pageSize.v2', String(state.size));
             render(false);
         });
 
