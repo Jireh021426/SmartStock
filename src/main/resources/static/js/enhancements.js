@@ -1,3 +1,30 @@
+/* Sort tables whose first column is "SKU" by the number at the end (…-01, …-02)
+   before pagination runs, so WC-MC-01 always comes first. */
+(function () {
+    function run() {
+        document.querySelectorAll('main table').forEach(function (t) {
+            var h = t.tHead && t.tHead.rows[0];
+            if (!h || !h.cells[0] || h.cells[0].textContent.trim().toUpperCase() !== 'SKU') return;
+            var tb = t.tBodies[0];
+            if (!tb) return;
+            var rows = Array.prototype.filter.call(tb.rows, function (r) {
+                return !(r.cells.length === 1 && r.cells[0].colSpan > 1);
+            });
+            function num(r) {
+                var m = r.cells[0].textContent.trim().match(/(\d+)\D*$/);
+                return m ? parseInt(m[1], 10) : Infinity;
+            }
+            rows.sort(function (a, b) {
+                return num(a) - num(b) ||
+                    a.cells[0].textContent.localeCompare(b.cells[0].textContent);
+            });
+            rows.forEach(function (r) { tb.appendChild(r); });
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+})();
+
 /* SmartStock — shared front-end enhancements
    - Pagination + quick filter for every data table
    - Peso formatting (₱1234.5 -> ₱1,234.50) and numeric column alignment
