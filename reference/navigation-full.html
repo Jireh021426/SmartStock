@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<header th:fragment="siteHeader">
+
+    <!-- Shared icon sprite -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></symbol>
+        <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+        <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 4v14M3 14l4 4 4-4M17 20V6M13 10l4-4 4 4"/></symbol>
+        <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2z"/><path d="M9 7h6M9 11h6"/></symbol>
+        <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M1 2h4l2.7 13.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L22 7H6"/></symbol>
+        <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+        <symbol id="i-truck" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+        <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></symbol>
+        <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h16v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7"/><path d="M16 14h2"/></symbol>
+        <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol>
+        <symbol id="i-peso" viewBox="0 0 24 24"><path d="M7 4v16M7 4h5a4 4 0 0 1 0 8H7M4 8h12M4 11h12"/></symbol>
+        <symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+        <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1"/></symbol>
+        <symbol id="i-card" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></symbol>
+        <symbol id="i-percent" viewBox="0 0 24 24"><path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+        <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+        <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    </svg>
+
+    <!-- SmartStock top navigation -->
+    <div class="smart-topbar no-print">
+        <div class="topbar-left">
+            <details class="topbar-quick-add">
+                <summary aria-label="Quick add" title="Quick add">
+                    <span aria-hidden="true">+</span>
+                </summary>
+                <div class="topbar-dropdown">
+                    <strong>Quick Add</strong>
+                    <a th:if="${nav.admin}" th:href="@{/products/new}">
+                        New Product
+                    </a>
+                    <a th:if="${nav.admin}" th:href="@{/inventory/new}">
+                        Stock In / Out
+                    </a>
+                    <a th:if="${nav.cashier}" th:href="@{/sales/new}">
+                        New Sale
+                    </a>
+                    <a th:if="${nav.admin or nav.manager}" th:href="@{/independent-stalls/deliveries/new}">
+                        Independent Delivery
+                    </a>
+                </div>
+            </details>
+
+            <a class="topbar-icon-link"
+               th:if="${nav.admin or nav.manager or nav.auditor or nav.sender or nav.receiver}"
+               th:href="@{/inventory}"
+               title="Stock activity"
+               aria-label="Stock activity">
+                <svg class="ico"><use href="#i-clock"/></svg>
+            </a>
+        </div>
+
+        <div class="topbar-search">
+            <svg class="ico" aria-hidden="true">
+                <use href="#i-search"/>
+            </svg>
+            <input id="smartstock-nav-search"
+                   type="search"
+                   placeholder="Search pages..."
+                   aria-label="Search SmartStock pages"
+                   autocomplete="off"/>
+            <div id="smartstock-search-results"
+                 class="topbar-search-results"
+                 hidden></div>
+        </div>
+
+        <div class="topbar-right">
+            <details class="topbar-notifications"
+                     th:if="${nav.admin or nav.manager}">
+                <summary aria-label="Notifications"
+                         title="Notifications">
+                    <svg class="ico" aria-hidden="true">
+                        <use href="#i-bell"/>
+                    </svg>
+                    <span class="topbar-notification-count"
+                          th:if="${pendingAuditCount > 0}"
+                          th:text="${pendingAuditCount}">0</span>
+                </summary>
+                <div class="topbar-notification-menu">
+                    <strong>Notifications</strong>
+                    <a th:if="${pendingAuditCount > 0}"
+                       th:href="@{/audits}">
+                        <span>Pending stock audits</span>
+                        <b th:text="${pendingAuditCount}">0</b>
+                    </a>
+                    <p th:if="${pendingAuditCount == 0}">
+                        No pending stock audits.
+                    </p>
+                </div>
+            </details>
+
+            <!-- Light / Dark Mode toggle -->
+            <button type="button"
+                    class="topbar-icon-link theme-toggle"
+                    data-theme-toggle
+                    aria-label="Switch to dark mode"
+                    aria-pressed="false"
+                    title="Dark mode">
+                <svg class="ico theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+                </svg>
+                <svg class="ico theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/>
+                </svg>
+            </button>
+
+            <details class="topbar-profile">
+                <summary aria-label="Account menu">
+                    <span class="topbar-avatar" aria-hidden="true">
+                        <svg class="ico"><use href="#i-users"/></svg>
+                    </span>
+                    <span class="topbar-profile-label"
+                          th:text="${currentUsername}">Account</span>
+                    <span aria-hidden="true">⌄</span>
+                </summary>
+
+                <div class="topbar-profile-menu">
+                    <strong th:text="${currentUsername}">Account</strong>
+                    <span class="topbar-profile-role"
+                          th:text="${nav.admin ? 'Administrator' :
+                                   nav.manager ? 'Manager' :
+                                   nav.cashier ? 'Cashier' :
+                                   nav.sender ? 'Sender' :
+                                   nav.receiver ? 'Receiver' :
+                                   nav.auditor ? 'Auditor' : 'User'}">
+                        User
+                    </span>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Log out</button>
+                    </form>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <div class="brand">
+        <span class="brand-mark">
+            <svg class="ico"><use href="#i-box"/></svg>
+        </span>
+        <div class="brand-text">
+            <h1>SmartStock</h1>
+            <span>Chicken Stall &amp; Storage Management</span>
+        </div>
+    </div>
+
+    <nav>
+
+        <a th:if="${nav.admin or nav.manager}"
+           th:href="@{/dashboard}">
+            <svg class="ico"><use href="#i-grid"/></svg>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="nav-label">Inventory</div>
+
+        <a th:href="@{/products}">
+            <svg class="ico"><use href="#i-box"/></svg>
+            <span>Products</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.auditor or nav.sender or nav.receiver}"
+           th:href="@{/inventory}">
+            <svg class="ico"><use href="#i-clock"/></svg>
+            <span>Stock History</span>
+        </a>
+
+        <a th:if="${nav.admin}"
+           th:href="@{/inventory/new}">
+            <svg class="ico"><use href="#i-swap"/></svg>
+            <span>Stock In/Out</span>
+        </a>
+
+        <a th:if="${nav.canViewLocations}"
+           th:href="@{/locations}">
+            <svg class="ico"><use href="#i-pin"/></svg>
+            <span>Locations</span>
+        </a>
+
+        <a th:if="${nav.canViewTransfers}"
+           th:href="@{/transfers}">
+            <svg class="ico"><use href="#i-truck"/></svg>
+            <span>Transfers</span>
+        </a>
+
+        <a th:if="${nav.canViewAudits}"
+           th:href="@{/audits}">
+            <svg class="ico"><use href="#i-clipboard"/></svg>
+            <span>Audits</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.auditor}"
+           th:href="@{/daily-closing}">
+            <svg class="ico"><use href="#i-clipboard"/></svg>
+            <span>Daily Closing</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.auditor}"
+           th:href="@{/historical-reconciliation}">
+            <svg class="ico"><use href="#i-clipboard"/></svg>
+            <span>Historical Reconciliation</span>
+        </a>
+
+        <div class="nav-label"
+             th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor or nav.canViewRemittances}">
+            Sales
+        </div>
+
+        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
+           th:href="@{/sales}">
+            <svg class="ico"><use href="#i-receipt"/></svg>
+            <span>Sales</span>
+        </a>
+
+        <a th:if="${nav.cashier}"
+           th:href="@{/sales/new}">
+            <svg class="ico"><use href="#i-cart"/></svg>
+            <span>New Sale</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor}"
+           th:href="@{/customers}">
+            <svg class="ico"><use href="#i-users"/></svg>
+            <span>Customers / Utang</span>
+        </a>
+
+        <a th:if="${nav.admin or nav.manager}"
+           th:href="@{/independent-stalls}">
+            <svg class="ico"><use href="#i-truck"/></svg>
+            <span>Independent Stalls</span>
+        </a>
+
+        <a th:if="${nav.canViewRemittances}"
+           th:href="@{/remittances}">
+            <svg class="ico"><use href="#i-wallet"/></svg>
+            <span>Remittances</span>
+        </a>
+
+        <div class="nav-label" th:if="${nav.admin}">
+            Admin
+        </div>
+
+        <a th:if="${nav.admin}"
+           th:href="@{/suppliers}">
+            <svg class="ico"><use href="#i-truck"/></svg>
+            <span>Suppliers</span>
+        </a>
+
+        <a th:if="${nav.admin}"
+           th:href="@{/employees}">
+            <svg class="ico"><use href="#i-briefcase"/></svg>
+            <span>Employees</span>
+        </a>
+
+    </nav>
+
+    <script th:src="@{/js/navigation-search.js}" defer></script>
+
+    <!-- Shared enhancements: pagination, filters, formatting, form safety.
+         Loaded here so every page gets them; the stylesheet comes after theme.css. -->
+    <link rel="stylesheet" th:href="@{/css/enhancements.css}">
+    <script th:src="@{/js/enhancements.js}" defer></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll("header nav a");
+
+            let activeLink = null;
+
+            links.forEach(function (link) {
+                const linkPath = new URL(link.href).pathname;
+
+                if (currentPath === linkPath) {
+                    activeLink = link;
+                } else if (
+                    currentPath.startsWith(linkPath + "/") &&
+                    (!activeLink || linkPath.length > new URL(activeLink.href).pathname.length)
+                ) {
+                    activeLink = link;
+                }
+            });
+
+            if (activeLink) {
+                activeLink.classList.add("active");
+                activeLink.setAttribute("aria-current", "page");
+            }
+        });
+    </script>
+
+</header>
+
+</body>
+</html>
