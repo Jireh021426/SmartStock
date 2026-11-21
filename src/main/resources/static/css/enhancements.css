@@ -1,0 +1,253 @@
+/* ==========================================================
+   SmartStock — shared front-end enhancements
+   Loaded after theme.css (via the navigation fragment), so it
+   layers on top of your existing styles without replacing them.
+   Uses your existing variables (--accent, --good, --warn, --bad)
+   with fallbacks, and color-mix(currentColor) so it adapts to
+   both light and dark themes.
+   ========================================================== */
+
+:root {
+    --ss-accent: var(--accent, #38bde5);
+    --ss-line: color-mix(in srgb, currentColor 16%, transparent);
+    --ss-soft: color-mix(in srgb, currentColor 6%, transparent);
+    --ss-radius: 10px;
+}
+
+/* Native controls (date pickers, selects, scrollbars) follow the theme */
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+/* ---------- Accessibility ---------- */
+.ss-skip {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 1000;
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: var(--ss-accent);
+    color: #071b2d;
+    font-weight: 700;
+    text-decoration: none;
+    transition: top .15s ease;
+}
+.ss-skip:focus { top: 12px; }
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--ss-accent);
+    outline-offset: 2px;
+}
+
+/* ---------- Layout polish ---------- */
+.topbar { flex-wrap: wrap; gap: 14px 20px; }
+.topbar-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.table-wrap,
+.dc-table-wrap,
+.supplier-table-wrap,
+.inventory-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+tr[hidden] { display: none !important; }
+
+/* ---------- Tables ---------- */
+main table tbody tr { transition: background-color .12s ease; }
+main table tbody tr:hover { background: var(--ss-soft); }
+main table td { font-variant-numeric: tabular-nums; }
+
+main table th.ss-num,
+main table td.ss-num { text-align: right; white-space: nowrap; }
+
+.empty-state,
+.dc-empty,
+.supplier-empty,
+.empty-row {
+    text-align: center;
+    color: var(--muted, inherit);
+    padding: 28px 12px;
+}
+
+/* ---------- Table tools (filter box) ---------- */
+.ss-table-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+    margin: 0 0 12px;
+}
+.ss-table-tools input[type="search"] {
+    flex: 1 1 240px;
+    max-width: 360px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--ss-line);
+    border-radius: var(--ss-radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+}
+.ss-table-tools input[type="search"]:focus {
+    border-color: var(--ss-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ss-accent) 22%, transparent);
+    outline: none;
+}
+.ss-nomatch {
+    margin: 0;
+    font-size: 13px;
+    opacity: .75;
+}
+
+/* ---------- Pagination ---------- */
+.ss-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+    padding: 14px 2px 2px;
+    font-size: 13px;
+}
+.ss-pager-info { opacity: .75; }
+.ss-pager-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 18px;
+}
+.ss-pager-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.ss-pager-size select {
+    min-height: 34px;
+    padding: 4px 28px 4px 10px;
+    border: 1px solid var(--ss-line);
+    border-radius: 8px;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+}
+.ss-pager-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+.ss-page {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid var(--ss-line);
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .12s ease, border-color .12s ease;
+}
+.ss-page:hover:not(:disabled):not(.is-active) {
+    background: color-mix(in srgb, var(--ss-accent) 16%, transparent);
+    border-color: var(--ss-accent);
+}
+.ss-page.is-active {
+    background: var(--ss-accent);
+    border-color: var(--ss-accent);
+    color: #071b2d;
+    cursor: default;
+}
+.ss-page:disabled { opacity: .4; cursor: not-allowed; }
+.ss-gap { padding: 0 2px; opacity: .5; }
+
+@media (max-width: 640px) {
+    .ss-pager { flex-direction: column; align-items: flex-start; }
+    .ss-page { min-width: 40px; height: 40px; }
+}
+
+/* ---------- Notices and errors ---------- */
+.notice-msg,
+.notice {
+    position: relative;
+    padding-right: 44px;
+    transition: opacity .25s ease, transform .25s ease;
+}
+.notice-msg.ss-leaving,
+.notice.ss-leaving { opacity: 0; transform: translateY(-4px); }
+
+.ss-close {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: .7;
+}
+.ss-close:hover { opacity: 1; background: var(--ss-soft); }
+
+/* ---------- Forms ---------- */
+.nova-form input,
+.nova-form select,
+.nova-form textarea { transition: border-color .15s ease, box-shadow .15s ease; }
+
+.nova-form input:focus,
+.nova-form select:focus,
+.nova-form textarea:focus {
+    border-color: var(--ss-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ss-accent) 22%, transparent);
+}
+
+/* Only flag a field after the person has interacted with it */
+.nova-form input:user-invalid,
+.nova-form select:user-invalid,
+.nova-form textarea:user-invalid {
+    border-color: var(--bad, #fb7185);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad, #fb7185) 20%, transparent);
+}
+
+/* ---------- Buttons ---------- */
+.btn, .button, .btn-action, .supplier-action-btn { transition: transform .08s ease, background-color .15s ease, opacity .15s ease; }
+.btn:active, .button:active, .btn-action:active { transform: translateY(1px); }
+button:disabled, .btn:disabled, .button:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Submit buttons show progress after click (prevents double submits) */
+button.ss-busy { position: relative; pointer-events: none; }
+button.ss-busy::after {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 10px;
+    vertical-align: -2px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: ss-spin .7s linear infinite;
+}
+@keyframes ss-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Print: hide interactive chrome ---------- */
+@media print {
+    .ss-table-tools, .ss-pager, .ss-skip, .ss-close { display: none !important; }
+    tr[hidden] { display: table-row !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
