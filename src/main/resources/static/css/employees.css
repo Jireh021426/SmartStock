@@ -963,3 +963,193 @@ main.employees-page {
     .employees-page .employee-create-form *::before,
     .employees-page .employee-create-form *::after { transition-duration: .01ms !important; }
 }
+
+
+/* ===============================================================
+   REGISTERED EMPLOYEES — TEAL MANAGEMENT TABLE
+   Scoped to Employees; preserves shared navbar and pagination.
+   =============================================================== */
+.employees-page .employee-list-panel {
+    border-radius: 22px;
+    box-shadow: 0 10px 34px rgba(34, 56, 79, .075);
+    overflow: hidden;
+}
+.employees-page .employee-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 23px 28px 13px;
+}
+.employees-page .employee-list-heading h3 {
+    margin: 0 0 5px;
+    color: var(--ink);
+    font-size: 19px;
+    line-height: 1.3;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: -.2px;
+}
+.employees-page .employee-list-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+.employees-page .emp-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 16px 28px 21px;
+}
+.employees-page .emp-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(100%, 500px);
+    min-height: 46px;
+    padding: 4px 7px 4px 16px;
+    border: 1px solid var(--line);
+    border-radius: 50px;
+    background: var(--card);
+    box-sizing: border-box;
+}
+.employees-page .emp-search:focus-within {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13,148,136,.12);
+}
+.employees-page .emp-search > svg { width: 18px; height: 18px; flex: none; color: #0d9488; }
+.employees-page .emp-sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.employees-page .emp-search input[type="search"] {
+    min-width: 90px;
+    width: 100%;
+    height: 35px;
+    padding: 0 3px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+    color: var(--ink);
+    font-size: 13px;
+    font-family: inherit;
+}
+.employees-page .emp-search input[type="search"]:focus { box-shadow: none; outline: none; }
+.employees-page .emp-search input::placeholder { color: var(--muted); opacity: .85; }
+.employees-page .emp-search-submit {
+    height: 32px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 18px;
+    background: #0d9488;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 750;
+}
+.employees-page .emp-search-submit:hover { background: #0f766e; }
+.employees-page .emp-search-clear {
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--teal-soft); color: var(--ink); text-decoration: none;
+    font-size: 21px; line-height: 1;
+}
+.employees-page .emp-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.employees-page .btn-export,
+.employees-page .btn-add-emp {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 42px; padding: 9px 16px; border-radius: 10px;
+    font-size: 12px; font-weight: 750; font-family: inherit;
+    text-decoration: none; white-space: nowrap; transition: background .15s;
+}
+.employees-page .btn-export { background: var(--card); color: #0d9488; border: 1px solid #0d9488; }
+.employees-page .btn-export:hover { background: var(--teal-soft); }
+.employees-page .btn-add-emp { background: #0d9488; color: white; border: 1px solid #0d9488; }
+.employees-page .btn-add-emp:hover { background: #0f766e; }
+.employees-page .btn-export svg,
+.employees-page .btn-add-emp svg { width: 17px; height: 17px; flex: none; }
+.employees-page .employee-table-wrap { width: 100%; }
+.employees-page .employee-table-wrap .emp-table {
+    width: 100%; min-width: 970px; border-collapse: collapse;
+    table-layout: auto; background: var(--card);
+}
+.employees-page .employee-table-wrap .emp-table thead th {
+    padding: 16px 17px; color: #fff; background: #0d9488;
+    border-bottom: 0; text-align: left; white-space: nowrap;
+    font-size: 11px; font-weight: 750; letter-spacing: .6px;
+}
+.employees-page .employee-table-wrap .emp-table thead th:first-child { padding-left: 26px; }
+.employees-page .employee-table-wrap .emp-table tbody td {
+    padding: 15px 17px; border-bottom: 1px solid var(--line);
+    vertical-align: middle; color: var(--ink); font-size: 12.5px;
+}
+.employees-page .employee-table-wrap .emp-table tbody td:first-child { padding-left: 26px; }
+.employees-page .employee-table-wrap .emp-table tbody tr:hover td { background: var(--teal-soft); }
+.employees-page .emp-sort-hint { opacity: .78; margin-left: 3px; font-size: 14px; }
+.employees-page .emp-id { color: var(--muted) !important; font-variant-numeric: tabular-nums; }
+.employees-page .emp-name-cell { display: inline-flex; align-items: center; gap: 11px; min-width: 160px; }
+.employees-page .emp-avatar {
+    display: grid; place-items: center; width: 40px; height: 40px; flex: none;
+    color: #6584a0; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--teal-soft);
+}
+.employees-page .emp-avatar svg { width: 20px; height: 20px; }
+.employees-page .emp-name-cell strong { font-size: 13px; font-weight: 750; line-height: 1.35; color: var(--ink); }
+.employees-page .emp-username { color: var(--muted) !important; }
+.employees-page .emp-role {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px;
+    border-radius: 50px; font-size: 10px; line-height: 1.4; font-weight: 800;
+    white-space: nowrap; letter-spacing: .25px;
+}
+.employees-page .emp-role svg { width: 14px; height: 14px; flex: none; }
+.employees-page .emp-role.role-admin { background: #ccfbf1; color: #115e59; }
+.employees-page .emp-role.role-manager { background: #ede9fe; color: #5b21b6; }
+.employees-page .emp-role.role-cashier { background: #e0f2fe; color: #075985; }
+.employees-page .emp-role.role-sender,
+.employees-page .emp-role.role-receiver { background: #f3e8ff; color: #6b21a8; }
+.employees-page .emp-role.role-auditor { background: #fef3c7; color: #92400e; }
+.employees-page .emp-location { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-weight: 600; }
+.employees-page .emp-location svg { width: 15px; height: 15px; flex: none; color: #0d9488; }
+.employees-page .emp-not-assigned { color: var(--muted); font-weight: 500; }
+.employees-page .emp-status {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px;
+    border-radius: 50px; font-size: 10px; line-height: 1.4; font-weight: 800; white-space: nowrap;
+}
+.employees-page .emp-status-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: currentColor; }
+.employees-page .emp-is-active { background: #dcfce7; color: #166534; }
+.employees-page .emp-is-inactive { background: #fee2e2; color: #991b1b; }
+.employees-page .emp-action-heading { text-align: center !important; }
+.employees-page .emp-row-actions { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.employees-page .employee-status-form { margin: 0; }
+.employees-page .emp-icon-button {
+    display: grid; place-items: center; width: 36px; height: 36px;
+    padding: 0; border-radius: 9px; cursor: pointer;
+}
+.employees-page .emp-icon-button svg { width: 17px; height: 17px; }
+.employees-page .emp-deactivate { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+.employees-page .emp-deactivate:hover { background: #ffe4e6; }
+.employees-page .emp-activate { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.employees-page .emp-activate:hover { background: #d1fae5; }
+.employees-page .emp-empty { padding: 35px 16px !important; text-align: center; color: var(--muted) !important; }
+.employees-page .emp-zero-count { color: var(--muted); font-size: 13px; padding: 12px 28px 24px; }
+.employees-page .employee-list-panel .employees-pagination { padding: 20px 28px; }
+:root[data-theme="dark"] .employees-page .emp-role.role-admin { background: #123e38; color: #99f6e4; }
+:root[data-theme="dark"] .employees-page .emp-role.role-manager { background: #35235b; color: #ddd6fe; }
+:root[data-theme="dark"] .employees-page .emp-role.role-cashier { background: #133950; color: #bae6fd; }
+:root[data-theme="dark"] .employees-page .emp-role.role-sender,
+:root[data-theme="dark"] .employees-page .emp-role.role-receiver { background: #39254b; color: #e9d5ff; }
+:root[data-theme="dark"] .employees-page .emp-role.role-auditor { background: #513719; color: #fde68a; }
+:root[data-theme="dark"] .employees-page .emp-is-active { background: #123d32; color: #6ee7b7; }
+:root[data-theme="dark"] .employees-page .emp-is-inactive { background: #4c1d2a; color: #fda4af; }
+:root[data-theme="dark"] .employees-page .emp-search { background: #202c42; border-color: #334155; }
+:root[data-theme="dark"] .employees-page .btn-export { background: #202c42; color: #5eead4; }
+:root[data-theme="dark"] .employees-page .emp-avatar { color: #9cc9c2; background: #203c46; }
+@media (max-width: 1100px) {
+    .employees-page .emp-search { width: min(100%, 100%); flex: 1 1 360px; }
+}
+@media (max-width: 760px) {
+    .employees-page .employee-list-heading { padding: 20px 18px 8px; }
+    .employees-page .emp-toolbar { padding: 12px 18px 20px; }
+    .employees-page .emp-search { flex: 1 1 100%; }
+    .employees-page .emp-actions { width: 100%; }
+    .employees-page .emp-actions a { flex: 1; }
+    .employees-page .employee-list-panel .employees-pagination { padding: 16px 18px; }
+}

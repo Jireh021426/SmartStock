@@ -127,101 +127,115 @@
         </form>
     </section>
 
-    <!-- Employee List -->
-    <div class="panel">
-        <div class="panel-head">
-            <h3>Registered Employees</h3>
+    <!-- Employee table: searches across all employees on the server, not only the visible page. -->
+    <section class="panel employee-list-panel" id="employee-list" aria-labelledby="employees-list-title">
+        <div class="employee-list-heading">
+            <div>
+                <h3 id="employees-list-title">Registered Employees</h3>
+                <p>Manage staff accounts, roles, locations, and account access.</p>
+            </div>
         </div>
 
-        <div class="table-wrap">
-            <table>
+        <div class="emp-toolbar">
+            <form class="emp-search" method="get" th:action="@{/employees}" role="search" id="employee-search-form">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <label for="employee-search-field" class="emp-sr-only">Search employees by name, username, or role</label>
+                <input id="employee-search-field" name="q" type="search" maxlength="100" th:value="${searchQuery}"
+                       placeholder="Search name, username, or role..." autocomplete="off">
+                <input type="hidden" name="size" th:value="${pageSize}">
+                <button type="submit" class="emp-search-submit">Search</button>
+                <a th:if="${searchQuery != null and !#strings.isEmpty(searchQuery)}" th:href="@{/employees(size=${pageSize})}" class="emp-search-clear" aria-label="Clear search" title="Clear search">&times;</a>
+            </form>
+            <div class="emp-actions">
+                <a class="btn-export" th:href="@{/employees/export(q=${searchQuery})}" title="Download all matching employees as CSV (no passwords)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></svg>
+                    Export CSV
+                </a>
+                <a class="btn-add-emp" href="#employee-create-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                    Add Employee
+                </a>
+            </div>
+        </div>
+
+        <div class="table-wrap employee-table-wrap">
+            <table class="emp-table" data-no-paginate>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Username</th>
-                        <th>Role</th>
-                        <th>Assigned Location</th>
-                        <th>Status</th>
-                        <th style="text-align: right;">Action</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Full Name <span class="emp-sort-hint" title="Sorted by full name ascending" aria-label="Sorted ascending">&uarr;</span></th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Assigned Location</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="emp-action-heading">Action</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     <tr th:each="employee : ${employees}">
-                        <td class="text-muted" th:text="${employee.id}"></td>
-
-                        <td class="product-name"
-                            th:text="${employee.fullName}"></td>
-
-                        <td class="text-muted"
-                            th:text="${employee.username}"></td>
-
+                        <td class="emp-id" th:text="${employee.id}">1</td>
                         <td>
-                            <span class="role-badge"
-                                  th:text="${employee.role}"></span>
+                            <div class="emp-name-cell">
+                                <span class="emp-avatar" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1.5c0-3.7 3.3-6.5 8-6.5s8 2.8 8 6.5V21"/></svg>
+                                </span>
+                                <strong th:text="${employee.fullName}">Employee Name</strong>
+                            </div>
                         </td>
-
-                        <td th:text="${employee.assignedLocation != null ? employee.assignedLocation.name : 'Not Assigned'}"
-                            th:classappend="${employee.assignedLocation == null} ? 'text-muted' : ''">
-                        </td>
-
+                        <td class="emp-username" th:text="${employee.username}">staff</td>
                         <td>
-                            <span class="status-badge"
-                                  th:classappend="${employee.active} ? 'status-active' : 'status-inactive'"
-                                  th:text="${employee.active ? 'ACTIVE' : 'INACTIVE'}">
+                            <span class="emp-role" th:classappend="${'role-' + #strings.toLowerCase(employee.role.name())}">
+                                <svg th:if="${employee.role.name() == 'ADMIN'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
+                                <svg th:if="${employee.role.name() == 'MANAGER'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                <svg th:if="${employee.role.name() == 'CASHIER'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                                <svg th:if="${employee.role.name() == 'SENDER' or employee.role.name() == 'RECEIVER'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+                                <svg th:if="${employee.role.name() == 'AUDITOR'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 2h6v4H9zM9 12l2 2 4-4"/></svg>
+                                <span th:text="${employee.role}">ADMIN</span>
                             </span>
                         </td>
-
-                        <td style="text-align: right;">
-                            <form th:if="${employee.active}"
-                                  th:action="@{/employees/deactivate}"
-                                  method="post"
-                                  class="employee-status-form"
-                                  style="display:inline;">
-
-                                <input type="hidden"
-                                       name="employeeId"
-                                       th:value="${employee.id}">
-                                <input type="hidden" name="page" th:value="${currentPage}">
-                                <input type="hidden" name="size" th:value="${pageSize}">
-
-                                <button type="submit"
-                                        class="btn-action btn-deactivate">
-                                    Deactivate
-                                </button>
-                            </form>
-
-                            <form th:unless="${employee.active}"
-                                  th:action="@{/employees/activate}"
-                                  method="post"
-                                  class="employee-status-form"
-                                  style="display:inline;">
-
-                                <input type="hidden"
-                                       name="employeeId"
-                                       th:value="${employee.id}">
-                                <input type="hidden" name="page" th:value="${currentPage}">
-                                <input type="hidden" name="size" th:value="${pageSize}">
-
-                                <button type="submit"
-                                        class="btn-action btn-activate">
-                                    Activate
-                                </button>
-                            </form>
+                        <td>
+                            <span class="emp-location" th:classappend="${employee.assignedLocation == null} ? ' emp-not-assigned' : ''">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span th:text="${employee.assignedLocation != null ? employee.assignedLocation.name : 'Not Assigned'}">Not Assigned</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="emp-status" th:classappend="${employee.active} ? ' emp-is-active' : ' emp-is-inactive'">
+                                <span class="emp-status-dot" aria-hidden="true"></span>
+                                <span th:text="${employee.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="emp-row-actions">
+                                <form th:if="${employee.active}" th:action="@{/employees/deactivate}" method="post" class="employee-status-form">
+                                    <input type="hidden" name="employeeId" th:value="${employee.id}">
+                                    <input type="hidden" name="page" th:value="${currentPage}">
+                                    <input type="hidden" name="size" th:value="${pageSize}">
+                                    <input type="hidden" name="q" th:value="${searchQuery}">
+                                    <button type="submit" class="emp-icon-button emp-deactivate" th:aria-label="${'Deactivate ' + employee.fullName}" th:title="${'Deactivate ' + employee.fullName}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18.4 6.6a9 9 0 1 1-12.8 0M12 2v10"/></svg>
+                                    </button>
+                                </form>
+                                <form th:unless="${employee.active}" th:action="@{/employees/activate}" method="post" class="employee-status-form">
+                                    <input type="hidden" name="employeeId" th:value="${employee.id}">
+                                    <input type="hidden" name="page" th:value="${currentPage}">
+                                    <input type="hidden" name="size" th:value="${pageSize}">
+                                    <input type="hidden" name="q" th:value="${searchQuery}">
+                                    <button type="submit" class="emp-icon-button emp-activate" th:aria-label="${'Activate ' + employee.fullName}" th:title="${'Activate ' + employee.fullName}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3"/></svg>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
-
                     <tr th:if="${#lists.isEmpty(employees)}">
-                        <td colspan="7" class="empty-state">
-                            No employee accounts found.
-                        </td>
+                        <td colspan="7" class="emp-empty">No employees match your search.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Server-side employee pagination. The controller fetches one page only. -->
+        <!-- Real Spring Data pagination; the shared unified-pager script handles number-window styling. -->
         <nav class="employees-pagination" aria-label="Employee pages" th:if="${totalPages > 0}">
             <div class="pagination-info">
                 Showing <strong th:text="${showingStart}">1</strong>
@@ -230,30 +244,28 @@
             </div>
             <div class="pagination-controls">
                 <form method="get" th:action="@{/employees}" class="pagination-size-form">
+                    <input type="hidden" name="q" th:value="${searchQuery}">
                     <label for="employee-page-size">Rows per page</label>
                     <select id="employee-page-size" name="size" onchange="this.form.submit()" class="select">
-                        <option th:each="option : ${pageSizes}"
-                                th:value="${option}" th:text="${option}"
-                                th:selected="${option == pageSize}">10</option>
+                        <option th:each="option : ${pageSizes}" th:value="${option}" th:text="${option}" th:selected="${option == pageSize}">10</option>
                     </select>
                 </form>
-
-                <a th:if="${currentPage > 0}" th:href="@{/employees(page=0,size=${pageSize})}" class="page-button">First</a>
-                <a th:if="${currentPage > 0}" th:href="@{/employees(page=${currentPage - 1},size=${pageSize})}" class="page-button">Previous</a>
+                <a th:if="${currentPage > 0}" th:href="@{/employees(page=0,size=${pageSize},q=${searchQuery})}" class="page-button">First</a>
+                <a th:if="${currentPage > 0}" th:href="@{/employees(page=${currentPage - 1},size=${pageSize},q=${searchQuery})}" class="page-button">Previous</a>
                 <span th:unless="${currentPage > 0}" class="page-button disabled">Previous</span>
-
                 <a th:each="pageNumber : ${pageNumbers}"
-                   th:href="@{/employees(page=${pageNumber},size=${pageSize})}"
+                   th:href="@{/employees(page=${pageNumber},size=${pageSize},q=${searchQuery})}"
                    th:text="${pageNumber + 1}"
+                   th:aria-current="${pageNumber == currentPage} ? 'page' : null"
                    th:classappend="${pageNumber == currentPage} ? ' active' : ''"
                    class="page-button">1</a>
-
-                <a th:if="${currentPage < totalPages - 1}" th:href="@{/employees(page=${currentPage + 1},size=${pageSize})}" class="page-button">Next</a>
-                <a th:if="${currentPage < totalPages - 1}" th:href="@{/employees(page=${totalPages - 1},size=${pageSize})}" class="page-button">Last</a>
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/employees(page=${currentPage + 1},size=${pageSize},q=${searchQuery})}" class="page-button">Next</a>
+                <a th:if="${currentPage < totalPages - 1}" th:href="@{/employees(page=${totalPages - 1},size=${pageSize},q=${searchQuery})}" class="page-button">Last</a>
                 <span th:unless="${currentPage < totalPages - 1}" class="page-button disabled">Next</span>
             </div>
         </nav>
-    </div>
+        <div th:if="${totalPages == 0}" class="emp-zero-count" th:text="${'0 employees found'}">0 employees found</div>
+    </section>
 
 </main>
 

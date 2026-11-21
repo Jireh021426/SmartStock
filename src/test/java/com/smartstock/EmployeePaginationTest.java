@@ -21,6 +21,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
@@ -108,6 +110,66 @@ class EmployeePaginationTest {
     @Test
     void nonAdminCannotListEmployees() throws Exception {
         mvc.perform(get("/employees").with(user("cashier").roles("CASHIER")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void searchFindsEmployeesOnOtherPages() throws Exception {
+        String token = "Filter" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        Employee employee = employeeRepository.saveAndFlush(new Employee(
+                token + " Tester", "search_" + token.toLowerCase(),
+                "UnusedHash", EmployeeRole.MANAGER, null));
+        var found = mvc.perform(get("/employees")
+                .with(user("admin").roles("ADMIN"))
+                .param("q", token.toLowerCase()).param("size", "5"))
+                .andExpect(status().isOk()).andReturn();
+        @SuppressWarnings("unchecked")
+        List<Employee> matches = (List<Employee>) attr(found, "employees");
+        assertTrue(matches.stream().anyMatch(e -> e.getId().equals(employee.getId())));
+        assertEquals(1L, ((Number) attr(found, "totalEmployees")).longValue());
+        assertEquals(5, attr(found, "pageSize"));
+    }
+
+    @Test
+    void partialRoleSearchIsServerSide() throws Exception {
+        String tag = "Role" + UUID.randomUUID().toString().substring(0, 8);
+        Employee cashier = employeeRepository.saveAndFlush(new Employee(
+                tag + " Employee", "role_" + tag.toLowerCase(),
+                "UnusedHash", EmployeeRole.CASHIER, null));
+        var result = mvc.perform(get("/employees")
+                .with(user("admin").roles("ADMIN"))
+                .param("q", "cash")).andExpect(status().isOk()).andReturn();
+        @SuppressWarnings("unchecked")
+        List<Employee> found = (List<Employee>) attr(result, "employees");
+        assertTrue(found.stream().anyMatch(e -> e.getId().equals(cashier.getId())));
+        assertTrue(found.stream().allMatch(e ->
+                e.getRole() == EmployeeRole.CASHIER
+                || e.getFullName().toLowerCase().contains("cash")
+                || e.getUsername().toLowerCase().contains("cash")));
+    }
+
+    @Test
+    void csvExportIsAdminOnlyAndHasNoPasswords() throws Exception {
+        String secret = "SecretHash" + UUID.randomUUID();
+        String name = "Csv" + UUID.randomUUID().toString().substring(0, 8);
+        employeeRepository.saveAndFlush(new Employee(name, "csv_" + name.toLowerCase(),
+                secret, EmployeeRole.AUDITOR, null));
+        var response = mvc.perform(get("/employees/export")
+                .with(user("admin").roles("ADMIN")).param("q", name))
+                .andExpect(status().isOk()).andReturn().getResponse();
+        String csv = response.getContentAsString();
+        assertTrue(csv.contains(name));
+        assertTrue(csv.contains("Full Name"));
+        assertFalse(csv.contains(secret));
+        assertFalse(csv.contains("Password"));
+        mvc.perform(get("/employees/export").with(user("cashier").roles("CASHIER")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void cannotDeactivateWithoutCsrf() throws Exception {
+        mvc.perform(post("/employees/deactivate")
+                .with(user("admin").roles("ADMIN")).param("employeeId", "1"))
                 .andExpect(status().isForbidden());
     }
 }

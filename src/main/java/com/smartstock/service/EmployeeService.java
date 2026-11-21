@@ -45,6 +45,21 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Employee> searchEmployees(String query, Pageable pageable) {
+        String term = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+        if (term.isEmpty()) {
+            return pagedEmployees(pageable);
+        }
+        List<EmployeeRole> matchingRoles = java.util.Arrays.stream(EmployeeRole.values())
+                .filter(role -> role.name().toLowerCase(Locale.ROOT).contains(term))
+                .toList();
+        if (matchingRoles.isEmpty()) {
+            return employeeRepository.searchByNameOrUsername(term, pageable);
+        }
+        return employeeRepository.searchByNameUsernameOrRole(term, matchingRoles, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Employee findById(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() ->

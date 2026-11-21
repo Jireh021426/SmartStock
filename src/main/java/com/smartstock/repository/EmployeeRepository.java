@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,28 @@ public interface EmployeeRepository
     @Override
     @EntityGraph(attributePaths = {"assignedLocation"})
     Page<Employee> findAll(Pageable pageable);
+
+    // Case-insensitive name/username search. To-one location is fetched with each page.
+    @EntityGraph(attributePaths = {"assignedLocation"})
+    @Query("""
+            SELECT e FROM Employee e
+            WHERE LOWER(e.fullName) LIKE CONCAT('%', :term, '%')
+               OR LOWER(e.username) LIKE CONCAT('%', :term, '%')
+            """)
+    Page<Employee> searchByNameOrUsername(@Param("term") String term, Pageable pageable);
+
+    // Include enum roles when the term matches any role label, e.g., "cash" => CASHIER.
+    @EntityGraph(attributePaths = {"assignedLocation"})
+    @Query("""
+            SELECT e FROM Employee e
+            WHERE LOWER(e.fullName) LIKE CONCAT('%', :term, '%')
+               OR LOWER(e.username) LIKE CONCAT('%', :term, '%')
+               OR e.role IN :roles
+            """)
+    Page<Employee> searchByNameUsernameOrRole(
+            @Param("term") String term,
+            @Param("roles") Collection<EmployeeRole> roles,
+            Pageable pageable);
 
     List<Employee> findByActiveTrueOrderByFullNameAsc();
 
