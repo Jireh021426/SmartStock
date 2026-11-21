@@ -204,6 +204,12 @@
             <span>Audits</span>
         </a>
 
+        <a th:if="${nav.admin or nav.manager or nav.auditor}"
+           th:href="@{/daily-closing}">
+            <svg class="ico"><use href="#i-clipboard"/></svg>
+            <span>Daily Closing</span>
+        </a>
+
         <div class="nav-label"
              th:if="${nav.admin or nav.manager or nav.cashier or nav.auditor or nav.canViewRemittances}">
             Sales

@@ -243,6 +243,15 @@ public class SecurityConfig {
 
                 .requestMatchers("/audits/**").denyAll()
 
+                // Daily closing counts, history and independent review
+                .requestMatchers(HttpMethod.GET, "/daily-closing", "/daily-closing/")
+                .hasAnyRole("ADMIN", "MANAGER", "AUDITOR")
+                .requestMatchers(HttpMethod.POST, "/daily-closing/count")
+                .hasAnyRole("ADMIN", "MANAGER", "AUDITOR")
+                .requestMatchers(HttpMethod.POST, "/daily-closing/review")
+                .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/daily-closing/**").denyAll()
+
                 // Sales: read-only access for auditors
                 .requestMatchers(
                         HttpMethod.GET,

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 public interface StockMovementRepository
         extends JpaRepository<StockMovement, Long> {
@@ -20,6 +21,9 @@ public interface StockMovementRepository
             Pageable pageable);
 
     long countByType(MovementType type);
+
+    boolean existsByProductIdAndLocationIdAndRecordedAtAfter(
+            Long productId, Long locationId, LocalDateTime recordedAt);
 
     boolean existsByProductId(Long productId);
 }
