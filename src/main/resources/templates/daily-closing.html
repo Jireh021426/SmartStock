@@ -1,3 +1,6 @@
+Update your file with this. I removed the inline styles and made sure every section uses the exact classes the CSS will target.
+
+html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -17,13 +20,13 @@
 <main class="daily-closing-page">
 
     <!-- TOPBAR -->
-    <div class="topbar">
-        <div>
+    <div class="dc-topbar">
+        <div class="dc-title-group">
             <h2 class="page-title">Daily Closing Stock</h2>
             <p class="page-sub">Physical leftovers, recorded sales and discrepancies for company-operated stalls.</p>
         </div>
 
-        <form th:action="@{/daily-closing}" method="get" class="date-picker-form">
+        <form th:action="@{/daily-closing}" method="get" class="dc-date-form">
             <label for="reportDate">Report date</label>
             <input id="reportDate" type="date" name="date" th:value="${report.date}" th:max="${today}" required>
             <button class="btn btn-primary" type="submit">View</button>
@@ -34,65 +37,63 @@
     <p class="error-msg" th:if="${error}" th:text="${error}"></p>
 
     <!-- RECORDED SALES SUMMARY -->
-    <div class="panel" style="margin-bottom: 24px;">
-        <div class="panel-head">
-            <h3>Recorded company-stall sales on <span th:text="${report.date}" style="color: var(--accent);">date</span></h3>
+    <div class="dc-panel">
+        <div class="dc-panel-head">
+            <h3>Recorded company-stall sales on <span th:text="${report.date}" class="dc-date-accent">date</span></h3>
         </div>
 
-        <div class="panel-body">
-            <div class="stats">
-                <div class="rem-kpi" style="--c: var(--good); --cb: rgba(52,211,153,.1)">
+        <div class="dc-panel-body">
+            <!-- Stats Grid -->
+            <div class="dc-stats-grid">
+                <div class="dc-kpi">
                     <small>Cashier-recorded sold weight</small>
                     <h2 th:text="${report.recordedKg} + ' kg'">0 kg</h2>
                 </div>
-
-                <div class="rem-kpi" style="--c: var(--accent); --cb: rgba(76,201,240,.1)">
+                <div class="dc-kpi">
                     <small>Recorded sales revenue</small>
                     <h2 th:text="'₱' + ${report.recordedRevenue}">₱0</h2>
                 </div>
-
-                <div class="rem-kpi" style="--c: var(--warn); --cb: rgba(251,191,36,.1)">
+                <div class="dc-kpi">
                     <small>Possible unrecorded / shortages</small>
                     <h2 th:text="${report.potentialUnrecordedKg} + ' kg'">0 kg</h2>
                 </div>
-
-                <div class="rem-kpi" style="--c: var(--bad); --cb: rgba(251,113,133,.1)">
+                <div class="dc-kpi">
                     <small>Possible additional sales value</small>
                     <h2 th:text="'₱' + ${report.potentialRevenue}">₱0</h2>
                 </div>
             </div>
 
-            <div class="payment-breakdown">
-                <span class="status-badge status-in" th:text="'Cash: ₱' + ${report.cashSales}"></span>
-                <span class="status-badge status-accent" th:text="'GCash: ₱' + ${report.gcashSales}"></span>
-                <span class="status-badge status-warn" th:text="'Credit: ₱' + ${report.creditSales}"></span>
+            <!-- Payment Pills -->
+            <div class="dc-payment-pills">
+                <span class="dc-badge dc-badge-in" th:text="'Cash: ₱' + ${report.cashSales}"></span>
+                <span class="dc-badge dc-badge-accent" th:text="'GCash: ₱' + ${report.gcashSales}"></span>
+                <span class="dc-badge dc-badge-warn" th:text="'Credit: ₱' + ${report.creditSales}"></span>
             </div>
 
-            <div class="form-note" style="margin-top: 20px;">
-                <p><strong>Do not count shortages as sales automatically.</strong> Differences between physical and book stock may come from missing transactions, spoilage, weighing mistakes or theft. Potential revenue from unexplained quantities is not recognized revenue or cash collected.</p>
-                <p>Payment collections and cashier remittances must be checked in their own modules. Independent-stall deliveries are excluded; they are recorded separately as credit sales.</p>
+            <!-- Info Notes -->
+            <div class="dc-note">
+                <p><strong>Do not count shortages as sales automatically.</strong> Differences between physical and book stock may come from missing transactions, spoilage, weighing mistakes or theft. Potential revenue from unexplained quantities is not recognized revenue or cash collected. Payment collections and cashier remittances must be checked in their own modules. Independent-stall deliveries are excluded; they are recorded separately as credit sales.</p>
             </div>
 
-            <div class="form-note" th:if="${report.date != today}" style="margin-top: 12px; border-color: rgba(251,191,36,.3); color: var(--warn);">
+            <div class="dc-note dc-note-warning" th:if="${report.date != today}">
                 <p><strong>Historical report:</strong> Showing cashier-recorded sales on that date. Historical closing counts cannot be certified from today's stock balance; the app does not yet reconstruct dated inventory balances and transfers.</p>
             </div>
         </div>
     </div>
 
     <!-- ENTER CLOSING COUNT -->
-    <div class="panel" th:if="${canCount}" style="margin-bottom: 24px;">
-        <div class="panel-head">
+    <div class="dc-panel" th:if="${canCount}">
+        <div class="dc-panel-head">
             <h3>Enter Physical Remaining Stock — Today</h3>
-            <span class="text-muted" style="font-size: 12px;">After the day's sales and transfers are recorded, count remaining stock in each company stall.</span>
         </div>
 
-        <form class="nova-form" th:object="${closingForm}" th:action="@{/daily-closing/count}" method="post">
-            <div class="form-grid">
+        <form class="dc-form" th:object="${closingForm}" th:action="@{/daily-closing/count}" method="post">
+            <div class="dc-form-grid">
                 <label>
                     Business date
                     <input type="date" th:field="*{businessDate}" th:min="${today}" th:max="${today}" required>
-                    <span class="hint-plain">Today's closing only. Historical backdating needs dated transfer and inventory snapshots.</span>
-                    <small class="error-text" th:if="${#fields.hasErrors('businessDate')}" th:errors="*{businessDate}"></small>
+                    <span class="dc-hint">Today's closing only. Historical backdating needs dated transfer and inventory snapshots.</span>
+                    <small class="dc-error" th:if="${#fields.hasErrors('businessDate')}" th:errors="*{businessDate}"></small>
                 </label>
 
                 <label>
@@ -101,7 +102,7 @@
                         <option value="">Choose a stall</option>
                         <option th:each="l : ${locations}" th:value="${l.id}" th:text="${l.name + ' (' + l.code + ')'}"></option>
                     </select>
-                    <small class="error-text" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></small>
+                    <small class="dc-error" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></small>
                 </label>
 
                 <label>
@@ -110,70 +111,70 @@
                         <option value="">Choose a product</option>
                         <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option>
                     </select>
-                    <small class="error-text" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></small>
+                    <small class="dc-error" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></small>
                 </label>
 
                 <label>
                     Actual remaining (kg)
                     <input type="number" min="0" step="0.001" th:field="*{countedKg}" placeholder="0.000" required>
-                    <small class="error-text" th:if="${#fields.hasErrors('countedKg')}" th:errors="*{countedKg}"></small>
+                    <small class="dc-error" th:if="${#fields.hasErrors('countedKg')}" th:errors="*{countedKg}"></small>
                 </label>
 
                 <label class="full-width">
                     Count notes / evidence
                     <textarea th:field="*{note}" rows="2" maxlength="1000" placeholder="Physical count, witness, weighing reference" required></textarea>
-                    <small class="error-text" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></small>
+                    <small class="dc-error" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></small>
                 </label>
             </div>
 
-            <div class="form-actions">
+            <div class="dc-form-actions">
                 <button class="btn btn-primary" type="submit">Submit Closing Count</button>
             </div>
         </form>
     </div>
 
     <!-- CLOSING RECORDS TABLE -->
-    <div class="panel" style="margin-bottom: 24px;">
-        <div class="panel-head">
+    <div class="dc-panel">
+        <div class="dc-panel-head">
             <h3>Company Stall Closing Records</h3>
         </div>
 
-        <div class="table-wrap">
-            <table>
+        <div class="dc-table-wrap">
+            <table class="dc-table">
                 <thead>
                     <tr>
                         <th>Stall / Product</th>
-                        <th style="text-align: right;">Counted</th>
-                        <th style="text-align: right;">Book snapshot</th>
-                        <th style="text-align: right;">Recorded sold kg</th>
-                        <th style="text-align: right;">Recorded sales ₱</th>
-                        <th style="text-align: right;">Book − counted</th>
-                        <th style="text-align: right;">Potential unrecorded ₱</th>
+                        <th class="dc-num">Counted</th>
+                        <th class="dc-num">Book snapshot</th>
+                        <th class="dc-num">Recorded sold kg</th>
+                        <th class="dc-num">Recorded sales ₱</th>
+                        <th class="dc-num">Book − counted</th>
+                        <th class="dc-num">Potential unrecorded ₱</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="c : ${report.closings}">
                         <td>
-                            <div class="product-name" th:text="${c.location.name}"></div>
-                            <div style="font-size: 13px; color: var(--muted);" th:text="${c.product.name}"></div>
-                            <div style="font-size: 11px; color: #5c6b88; margin-top: 4px;" th:text="${'Counted ' + c.countedAt + ' by ' + c.countedBy}"></div>
+                            <div class="dc-product-name" th:text="${c.location.name}"></div>
+                            <div class="dc-product-meta" th:text="${c.product.name}"></div>
+                            <div class="dc-product-caption" th:text="${'Counted ' + c.countedAt + ' by ' + c.countedBy}"></div>
                         </td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="${c.countedKg} + ' kg'"></td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="${c.bookKg} + ' kg'"></td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="${c.recordedSalesKg} + ' kg'"></td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="'₱' + ${c.recordedRevenue}"></td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700;" th:classappend="${c.varianceKg.signum() != 0 ? 'text-danger' : ''}" th:text="${c.varianceKg} + ' kg'"></td>
-                        <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--warn);" th:text="'₱' + ${c.potentialUnrecordedRevenue}"></td>
+                        <td class="dc-num" th:text="${c.countedKg} + ' kg'"></td>
+                        <td class="dc-num" th:text="${c.bookKg} + ' kg'"></td>
+                        <td class="dc-num" th:text="${c.recordedSalesKg} + ' kg'"></td>
+                        <td class="dc-num" th:text="'₱' + ${c.recordedRevenue}"></td>
+                        <td class="dc-num dc-variance" th:classappend="${c.varianceKg.signum() != 0 ? 'dc-text-danger' : ''}" th:text="${c.varianceKg} + ' kg'"></td>
+                        <td class="dc-num dc-potential" th:text="'₱' + ${c.potentialUnrecordedRevenue}"></td>
                         <td>
-                            <span class="status-badge"
-                                  th:classappend="${c.status.name() == 'PENDING' ? 'status-warn' : (c.status.name() == 'APPROVED' ? 'status-in' : 'status-out')}"
+                            <span class="dc-badge"
+                                  th:classappend="${c.status.name() == 'PENDING' ? 'dc-badge-warn' : (c.status.name() == 'APPROVED' ? 'dc-badge-in' : 'dc-badge-out')}"
                                   th:text="${c.status}">
                             </span>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(report.closings)}">
-                        <td colspan="8" class="empty-state">No closing counts for this date yet.</td>
+                        <td colspan="8" class="dc-empty">No closing counts for this date yet.</td>
                     </tr>
                 </tbody>
             </table>
@@ -181,30 +182,29 @@
     </div>
 
     <!-- MANAGER VERIFICATION -->
-    <div class="panel" th:if="${canReview}">
-        <div class="panel-head">
+    <div class="dc-panel" th:if="${canReview}">
+        <div class="dc-panel-head">
             <h3>Manager Verification</h3>
-            <span class="text-muted" style="font-size: 12px;">Approve only if the physical count exactly matches the unchanged book balance.</span>
         </div>
 
-        <div class="panel-body">
-            <div th:each="c : ${report.closings}" th:if="${c.status.name() == 'PENDING'}" class="review-card">
+        <div class="dc-panel-body">
+            <div th:each="c : ${report.closings}" th:if="${c.status.name() == 'PENDING'}" class="dc-review-card">
 
-                <div class="rc-header">
+                <div class="dc-rc-header">
                     <h4 th:text="${c.location.name + ' — ' + c.product.name}"></h4>
-                    <span class="status-badge status-warn" th:if="${c.varianceKg.signum() != 0}">DISCREPANCY</span>
-                    <span class="status-badge status-in" th:if="${c.varianceKg.signum() == 0}">BALANCED</span>
+                    <span class="dc-badge dc-badge-warn" th:if="${c.varianceKg.signum() != 0}">DISCREPANCY</span>
+                    <span class="dc-badge dc-badge-in" th:if="${c.varianceKg.signum() == 0}">BALANCED</span>
                 </div>
 
-                <div class="rc-details">
+                <div class="dc-rc-details">
                     <p><span>Counted:</span> <strong th:text="${c.countedKg} + ' kg'"></strong></p>
                     <p><span>Book:</span> <strong th:text="${c.bookKg} + ' kg'"></strong></p>
-                    <p><span>Variance:</span> <strong th:classappend="${c.varianceKg.signum() != 0 ? 'text-danger' : 'text-good'}" th:text="${c.varianceKg} + ' kg'"></strong></p>
+                    <p><span>Variance:</span> <strong th:classappend="${c.varianceKg.signum() != 0 ? 'dc-text-danger' : 'dc-text-good'}" th:text="${c.varianceKg} + ' kg'"></strong></p>
                     <p><span>Counted By:</span> <strong th:text="${c.countedBy}"></strong></p>
                     <p class="full-width"><span>Count Note:</span> <span th:text="${c.countNote}"></span></p>
                 </div>
 
-                <form class="nova-form rc-form" th:action="@{/daily-closing/review}" method="post">
+                <form class="dc-form dc-review-form" th:action="@{/daily-closing/review}" method="post">
                     <input type="hidden" name="id" th:value="${c.id}">
 
                     <label>
@@ -212,29 +212,28 @@
                         <textarea name="note" rows="2" maxlength="1000" placeholder="Explain the reasoning for approval or rejection..." required></textarea>
                     </label>
 
-                    <div class="form-actions rc-actions">
-                        <button type="submit" class="btn btn-reject" name="decision" value="REJECT">Reject / Request Recount</button>
-                        <button type="submit" class="btn btn-approve" name="decision" value="APPROVE"
+                    <div class="dc-form-actions dc-review-actions">
+                        <button type="submit" class="btn dc-btn-reject" name="decision" value="REJECT">Reject / Request Recount</button>
+                        <button type="submit" class="btn dc-btn-approve" name="decision" value="APPROVE"
                                 th:disabled="${c.varianceKg.signum() != 0 or c.countedBy == currentUsername}">
                             Approve Balanced Count
                         </button>
                     </div>
 
-                    <small class="hint-plain text-danger" th:if="${c.countedBy == currentUsername}">
+                    <small class="dc-hint dc-text-danger dc-review-hint" th:if="${c.countedBy == currentUsername}">
                         * An independent user must verify the count.
                     </small>
                 </form>
             </div>
 
-            <p class="text-muted" th:if="${#lists.isEmpty(report.closings.?[status.name() == 'PENDING'])}" style="font-size: 13px;">
+            <p class="dc-muted" th:if="${#lists.isEmpty(report.closings.?[status.name() == 'PENDING'])}">
                 No pending closing counts on this date.
             </p>
         </div>
     </div>
 
-    <div class="form-note">
-        <p>An approved closing is a snapshot, not a permanent transaction freeze. If sales or stock movements occur afterward on the same day, recount.</p>
-        <p>No sale or new stock-in is generated by closing; the remaining book balance carries forward.</p>
+    <div class="dc-note">
+        <p>An approved closing is a snapshot, not a permanent transaction freeze. If sales or stock movements occur afterward on the same day, recount. No sale or new stock-in is generated by closing; the remaining book balance carries forward.</p>
     </div>
 
 </main>
