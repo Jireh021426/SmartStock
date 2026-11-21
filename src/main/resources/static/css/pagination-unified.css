@@ -203,3 +203,51 @@ main nav.ss-pager select, main .pager select {
     height: 28px !important;
     min-height: 0 !important;
 }
+
+/* ---------- Compact size: server-side pagers (Stock History, Employees) ---------- */
+main :is(.inventory-pagination, .employees-pagination) {
+    font-size: 12px !important;
+    gap: 8px 14px !important;
+    padding-top: 12px !important;
+}
+main :is(.inventory-pagination, .employees-pagination) .pagination-controls {
+    gap: 6px !important;
+    align-items: center !important;
+}
+main :is(.inventory-pagination, .employees-pagination) .page-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border-radius: 7px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+main :is(.inventory-pagination, .employees-pagination) .pagination-size-form {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 6px 0 0 !important;
+}
+main :is(.inventory-pagination, .employees-pagination) .pagination-size-form label {
+    margin: 0 !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+}
+main :is(.inventory-pagination, .employees-pagination) select {
+    width: auto !important;
+    height: 28px !important;
+    min-height: 0 !important;
+    padding: 0 22px 0 8px !important;
+    font-size: 12px !important;
+}
+main :is(.inventory-pagination, .employees-pagination) .pagination-info {
+    font-size: 12px !important;
+}

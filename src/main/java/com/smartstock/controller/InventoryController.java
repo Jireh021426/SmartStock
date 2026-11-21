@@ -46,7 +46,7 @@ public class InventoryController {
     @GetMapping
     public String history(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             Model model,
             Authentication authentication) {
 
@@ -58,8 +58,8 @@ public class InventoryController {
                 admin || manager || auditor;
 
         // Only allow supported page sizes.
-        int pageSize = List.of(10, 25, 50).contains(size)
-                ? size : 10;
+        int pageSize = List.of(5, 10, 25, 50).contains(size)
+                ? size : 5;
 
         int safePage = Math.max(0, page);
 
@@ -91,7 +91,7 @@ public class InventoryController {
         model.addAttribute("currentPage", safePage);
         model.addAttribute("totalPages", movementPage.getTotalPages());
         model.addAttribute("pageSize", pageSize);
-        model.addAttribute("pageSizes", List.of(10, 25, 50));
+        model.addAttribute("pageSizes", List.of(5, 10, 25, 50));
         model.addAttribute("totalMovements", totalRecords);
 
         // Show a maximum of seven numbered pages.
