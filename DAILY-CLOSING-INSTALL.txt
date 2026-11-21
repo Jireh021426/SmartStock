@@ -1,0 +1,55 @@
+SMARTSTOCK DAILY CLOSING & SALES RECONCILIATION
+===============================================
+
+WHAT THIS RELEASE DOES
+- Adds a Daily Closing navigation link, available to ADMIN, MANAGER and AUDITOR.
+- Allows the physical remaining kg to be counted at an active COMPANY stall for TODAY.
+- Captures book kg at count time, and cashier-recorded sales kg and revenue for the business date.
+- Shows a POTENTIAL unrecorded quantity and value if physical count is less than book.
+- Supports independent manager/admin review, and rejects approval of unmatched/stale counts.
+- Keeps existing stock and sales untouched by the closing operation. Tomorrow's book opening
+  remains today's recorded book ending, WITHOUT a duplicate Stock In.
+- Independent-stall credit deliveries are excluded from COMPANY-stall sales totals.
+- Shows historical cashier sale reports, but does NOT falsely claim to reconstruct historical stock.
+
+IMPORTANT BUSINESS LIMITATIONS
+- Missing kg are NOT automatically booked as revenue. They could be losses, not sales.
+- If cashiers did not record sales, the difference is only an estimate, not confirmed revenue.
+- Daily closings require today's date; Nov 16 or other past-day closing counts cannot be
+  certified using the current book balance. Historical as-of inventory and dated transfers
+  are not yet implemented.
+- Approved counts represent a point-in-time record, not a freeze preventing subsequent
+  same-day transactions. Recount if stock changed after approval.
+- Reconciliation of physical cash/GCash to remittances still happens in the Remittances module.
+
+FILES
+Full replacement source files and one additive PostgreSQL migration are included.
+Extract at the root of the existing SmartStock project (branch frontend-professor-demo).
+
+LOCALLY FIRST (Git Bash)
+1. Stop the local Spring Boot server if running.
+2. Extract the provided archive at the project root.
+3. Apply `database/migrations/2026-11-21_daily_stock_closing.sql` to LOCAL PostgreSQL.
+4. Run: mvn -Dtest=DailyStockClosingTest test
+5. Run full suite: mvn test
+6. Start LOCAL app with the cloud profile and local restore DB to test the page.
+
+BEFORE RAILWAY DEPLOYMENT
+- Verify local tests and UI. Back up Railway PostgreSQL and verify pg_restore -l.
+- Apply the additive SQL migration to Railway BEFORE pushing the new Java entity, because
+  the cloud profile uses Hibernate ddl-auto=validate.
+- Commit only modified files, migration and test. Never commit logs or DB credentials.
+- Rotate the previously exposed Railway PostgreSQL password and verify app references.
+
+FILES INCLUDED:
+  database/migrations/2026-11-21_daily_stock_closing.sql
+  src/main/java/com/smartstock/model/DailyClosingForm.java
+  src/main/java/com/smartstock/model/DailyStockClosing.java
+  src/main/java/com/smartstock/repository/DailyStockClosingRepository.java
+  src/main/java/com/smartstock/repository/StockMovementRepository.java
+  src/main/java/com/smartstock/service/DailyStockClosingService.java
+  src/main/java/com/smartstock/controller/DailyStockClosingController.java
+  src/main/java/com/smartstock/config/SecurityConfig.java
+  src/main/resources/templates/fragments/navigation.html
+  src/main/resources/templates/daily-closing.html
+  src/test/java/com/smartstock/DailyStockClosingTest.java
