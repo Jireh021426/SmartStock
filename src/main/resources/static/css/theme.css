@@ -292,3 +292,26 @@ body > header .topbar-quick-add summary .ico {
 :root[data-theme="dark"] .topbar-profile-menu .topbar-profile-role {
     color: #5b6b7f !important;
 }
+/* ---- Compact pagination ---- */
+[class*="pagination"],
+[class*="pager"] {
+    gap: 6px !important;
+    align-items: center !important;
+}
+[class*="pagination"] a,
+[class*="pagination"] button,
+[class*="pagination"] span,
+[class*="pager"] a,
+[class*="pager"] button,
+[class*="pager"] span {
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
