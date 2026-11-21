@@ -9,6 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/gentelella-dark.css(v=2)}">
 </head>
 
 <body>
@@ -19,8 +20,9 @@
 
     <div class="heading">
         <div>
-            <h2>Business Dashboard</h2>
-            <p>Daily sales, collections, gross profit, costs and estimated losses.</p>
+            <span class="dashboard-eyebrow">OVERVIEW</span>
+            <h2>Dashboard</h2>
+            <p>Sales, collections, costs and stock at a glance.</p>
         </div>
 
         <div class="heading-actions no-print">
@@ -42,44 +44,32 @@
 
     <p class="notice" th:if="${notice}" th:text="${notice}" role="status"></p>
 
-    <!-- Overview band -->
-    <section class="overview">
-        <div class="overview-main">
-            <h3 class="overview-title">Sales activity</h3>
-            <div class="tiles">
-                <div class="tile">
-                    <p class="tile-value" th:text="'₱' + ${revenue}">₱0</p>
-                    <p class="tile-label">Total sales (including utang)</p>
-                </div>
-                <div class="tile">
-                    <p class="tile-value" th:text="'₱' + ${collected}">₱0</p>
-                    <p class="tile-label">Money collected</p>
-                </div>
-                <div class="tile">
-                    <p class="tile-value" th:text="'₱' + ${gross}">₱0</p>
-                    <p class="tile-label">Gross profit on sales</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="overview-side">
-            <h3 class="overview-title">Costs and result</h3>
-            <div class="sumrows">
-                <div class="sumrow">
-                    <span class="sumrow-label">Cost of goods sold</span>
-                    <span class="sumrow-value" th:text="'₱' + ${cost}">₱0</span>
-                </div>
-                <div class="sumrow">
-                    <span class="sumrow-label">Operating expenses</span>
-                    <span class="sumrow-value" th:text="'₱' + ${expenses}">₱0</span>
-                </div>
-                <div class="sumrow sumrow--result"
-                     th:classappend="${estimatedResult != null and estimatedResult.toString().startsWith('-')} ? 'sumrow--negative'">
-                    <span class="sumrow-label">Estimated result</span>
-                    <span class="sumrow-value" th:text="'₱' + ${estimatedResult}">₱0</span>
-                </div>
-            </div>
-        </div>
+    <!-- Six real financial KPIs; no invented comparison data. -->
+    <section class="metrics-grid" aria-label="Business performance">
+        <article class="metric-card">
+            <div class="metric-symbol metric-symbol--teal"><svg class="ico" aria-hidden="true"><use href="#i-peso"/></svg></div>
+            <div class="metric-copy"><p class="metric-label">Total sales</p><p class="metric-value" th:text="'₱' + ${revenue}">₱0</p><p class="metric-note">Including utang</p></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-symbol metric-symbol--blue"><svg class="ico" aria-hidden="true"><use href="#i-wallet"/></svg></div>
+            <div class="metric-copy"><p class="metric-label">Money collected</p><p class="metric-value" th:text="'₱' + ${collected}">₱0</p><p class="metric-note">Payments received</p></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-symbol metric-symbol--violet"><svg class="ico" aria-hidden="true"><use href="#i-trend"/></svg></div>
+            <div class="metric-copy"><p class="metric-label">Gross profit</p><p class="metric-value" th:text="'₱' + ${gross}">₱0</p><p class="metric-note">Before operating costs</p></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-symbol metric-symbol--amber"><svg class="ico" aria-hidden="true"><use href="#i-box"/></svg></div>
+            <div class="metric-copy"><p class="metric-label">Cost of goods sold</p><p class="metric-value" th:text="'₱' + ${cost}">₱0</p><p class="metric-note">Cost of sold stock</p></div>
+        </article>
+        <article class="metric-card">
+            <div class="metric-symbol metric-symbol--red"><svg class="ico" aria-hidden="true"><use href="#i-receipt"/></svg></div>
+            <div class="metric-copy"><p class="metric-label">Operating expenses</p><p class="metric-value" th:text="'₱' + ${expenses}">₱0</p><p class="metric-note">Recorded for this date</p></div>
+        </article>
+        <article class="metric-card" th:classappend="${estimatedResult != null and estimatedResult.toString().startsWith('-')} ? 'metric--negative'">
+            <div class="metric-symbol metric-symbol--green"><svg class="ico" aria-hidden="true"><use href="#i-card"/></svg></div>
+            <div class="metric-copy"><p class="metric-label">Estimated result</p><p class="metric-value" th:text="'₱' + ${estimatedResult}">₱0</p><p class="metric-note">Gross profit minus expenses</p></div>
+        </article>
     </section>
 
     <!-- Charts -->

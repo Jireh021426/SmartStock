@@ -1,630 +1,126 @@
-/*
- * SmartStock Dashboard (Nova design, theme-aware)
- * Everything is scoped to .dashboard-page so shared styles in style.css
- * and the navigation in theme.css are not touched.
- *
- * Colours come from the --d-* tokens below. Light values are the default;
- * the dark block swaps them when <html data-theme="dark"> is set by theme.js.
- *
- *   accent = money in / profit     cash / gcash / credit = payment mix
- *   bad    = a negative result     good = success notice
- */
-
-/* ---------- Tokens ---------- */
+/* ==================================================
+   SMARTSTOCK — DASHBOARD (LIGHT/DARK THEME COMPATIBLE)
+   ================================================== */
 
 .dashboard-page {
-    --d-ink: #172b4d;
-    --d-muted: #5b6b7f;
-    --d-line: #e4eaf0;
-    --d-surface: #ffffff;
-    --d-overview: #f1f7fa;
-    --d-side: transparent;
-    --d-tile: #ffffff;
-    --d-track: #eef2f6;
-    --d-dot: #ffffff;
-    --d-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
-
-    --d-accent: #0f766e;
-    --d-accent-2: #2563eb;
-    --d-cash: #0f766e;
-    --d-gcash: #2563eb;
-    --d-credit: #d97706;
-    --d-good: #0f766e;
-    --d-good-soft: #e3f5f1;
-    --d-bad: #b42318;
-    --d-bad-soft: #fee4e2;
-
-    --d-result-bg: #0f766e;
-    --d-result-ink: #ffffff;
-    --d-result-neg-bg: #b42318;
-    --d-result-neg-ink: #ffffff;
-
-    --d-radius: 16px;
-    --d-gap: 20px;
-}
-
-:root[data-theme="dark"] .dashboard-page {
-    --d-ink: #e9eefb;
-    --d-muted: #8496b8;
-    --d-line: rgba(255, 255, 255, 0.075);
-    --d-surface: rgba(19, 26, 44, 0.62);
-    --d-overview: rgba(19, 26, 44, 0.62);
-    --d-side: rgba(0, 0, 0, 0.15);
-    --d-tile: rgba(255, 255, 255, 0.025);
-    --d-track: rgba(255, 255, 255, 0.06);
-    --d-dot: #172033;
-    --d-shadow: none;
-
-    --d-accent: #4cc9f0;
-    --d-accent-2: #a855f7;
-    --d-cash: #34d399;
-    --d-gcash: #4cc9f0;
-    --d-credit: #fbbf24;
-    --d-good: #34d399;
-    --d-good-soft: rgba(52, 211, 153, 0.1);
-    --d-bad: #fb7185;
-    --d-bad-soft: rgba(251, 113, 133, 0.1);
-
-    --d-result-bg: linear-gradient(135deg, #4cc9f0, #a855f7);
-    --d-result-ink: #05080f;
-    --d-result-neg-bg: linear-gradient(135deg, #fb7185, #e11d48);
-    --d-result-neg-ink: #ffffff;
-}
-
-.dashboard-page :focus-visible {
-    outline: 2px solid var(--d-accent);
-    outline-offset: 2px;
-}
-
-/* ---------- Heading and date picker ---------- */
-
-.dashboard-page .heading {
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.dashboard-page .heading-actions,
-.dashboard-page .heading-actions form {
-    display: flex;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.dashboard-page .heading-actions label {
+    padding: 32px 40px;
+    height: 100vh;
+    overflow-y: auto;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    color: var(--d-ink);
-    font-size: 13px;
-    font-weight: 600;
+    gap: 24px;
+
+    /* Map old dashboard variables to new global theme variables */
+    --d-ink: var(--ink);
+    --d-muted: var(--muted);
+    --d-line: var(--line);
+    --d-surface: var(--card);
+    --d-band: var(--bg);
+    --d-teal: var(--teal);
+    --d-teal-soft: var(--teal-soft);
+    --d-blue: var(--teal);
+    --d-amber: var(--orange);
+    --d-red: #ef4444;
 }
 
-/* ---------- Messages ---------- */
-
-.dashboard-page .error,
-.dashboard-page .notice {
-    margin: 0 0 16px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-}
-
-.dashboard-page .error  { background: var(--d-bad-soft);  color: var(--d-bad); }
-.dashboard-page .notice { background: var(--d-good-soft); color: var(--d-good); }
-
-/* ---------- Ghost buttons ----------
- * style.css gives .button.ghost a white background; theme.css keeps its
- * text dark for the other pages. On the dashboard in dark mode the ghost
- * button is transparent, so it needs light text. The repeated .button
- * class is only there to out-rank the theme.css rules.
- */
-
-:root[data-theme="dark"] body > main.dashboard-page .button.ghost.button {
-    background: transparent;
-    border-color: var(--d-line);
-    color: var(--d-ink);
-}
-
-:root[data-theme="dark"] body > main.dashboard-page .button.ghost.button:hover {
-    background: rgba(255, 255, 255, 0.06);
-}
+/* ---------- Heading ---------- */
+.dashboard-page .heading { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+.dashboard-page .heading h2 { font-size: 24px; font-weight: 750; letter-spacing: -0.5px; margin: 0; color: var(--ink); }
+.dashboard-page .heading p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.dashboard-page .heading-actions { display: flex; align-items: flex-end; gap: 12px; }
+.dashboard-page .heading-actions label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.dashboard-page .heading-actions input[type="date"] { height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); padding: 0 12px; outline: none; }
 
 /* ---------- Panels ---------- */
+.dashboard-page .panel { padding: 24px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+.dashboard-page .panel-head, .dashboard-page .chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.dashboard-page .panel-head h3, .dashboard-page .chart-head h3 { margin: 0; color: var(--ink); font-size: 14px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
 
-.dashboard-page .panel {
-    padding: 24px;
-    border: 1px solid var(--d-line);
-    border-radius: var(--d-radius);
-    background: var(--d-surface);
-    box-shadow: var(--d-shadow);
-    backdrop-filter: blur(14px);
-}
+/* ---------- Overview Band ---------- */
+.dashboard-page .overview { display: grid; grid-template-columns: 2fr 1fr; border: 1px solid var(--line); border-radius: 16px; background: var(--card); overflow: hidden; }
+.dashboard-page .overview-main, .dashboard-page .overview-side { padding: 28px; }
+.dashboard-page .overview-side { border-left: 1px solid var(--line); background: var(--bg); }
+.dashboard-page .overview-title { margin: 0 0 20px; color: var(--ink); font-size: 18px; font-weight: 650; }
 
-.dashboard-page .stats.triple,
-.dashboard-page .charts,
-.dashboard-page .overview,
-.dashboard-page > .panel {
-    margin-bottom: var(--d-gap);
-}
+/* ---------- Tiles (Stats) ---------- */
+.dashboard-page .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.dashboard-page .tile { padding: 22px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); text-align: center; transition: 0.2s; }
+.dashboard-page .tile:hover { transform: translateY(-2px); border-color: var(--teal); }
+.dashboard-page .tile-value { margin: 0; color: var(--teal); font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+.dashboard-page .tile-label { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 12px 0 0; color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.dashboard-page .tile-label svg { width: 16px; height: 16px; }
 
-.dashboard-page .panel-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--d-line);
-}
+/* ---------- Sumrows ---------- */
+.dashboard-page .sumrows { display: flex; flex-direction: column; gap: 12px; }
+.dashboard-page .sumrow { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.dashboard-page .sumrow-label { color: var(--muted); font-size: 13px; font-weight: 600; }
+.dashboard-page .sumrow-value { color: var(--ink); font-size: 18px; font-weight: 700; }
+.dashboard-page .sumrow--result { border-color: transparent; background: var(--teal); color: #fff; }
+.dashboard-page .sumrow--result .sumrow-label { color: rgba(255,255,255,0.9); }
+.dashboard-page .sumrow--result .sumrow-value { color: #fff; }
+.dashboard-page .sumrow--result.sumrow--negative { background: var(--d-red); }
 
-.dashboard-page .panel-head h3 {
-    margin: 0;
-    color: var(--d-ink);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
+/* ---------- Charts Grid ---------- */
+.dashboard-page .charts { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+.dashboard-page .trend-chart { width: 100%; height: 300px; } /* Force height for the chart */
+.dashboard-page .trend-chart svg { display: block; width: 100%; height: 100%; }
+.dashboard-page .trend-chart .grid { stroke: var(--line); }
+.dashboard-page .trend-chart text { fill: var(--muted); font-size: 12px; }
+.dashboard-page .trend-chart .line { fill: none; stroke: var(--teal); stroke-width: 3; stroke-linecap: round; }
+.dashboard-page .trend-chart .dot { fill: var(--card); stroke: var(--teal); stroke-width: 2.5; }
 
-.dashboard-page .panel-meta {
-    color: var(--d-muted);
-    font-size: 12px;
-    white-space: nowrap;
-}
+/* ---------- Sales by Category ---------- */
+.dashboard-page .cat-list { display: flex; flex-direction: column; gap: 16px; }
+.dashboard-page .cat-meta { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13.5px; }
+.dashboard-page .cat-name { color: var(--ink); font-weight: 600; }
+.dashboard-page .cat-value { color: var(--muted); }
+.dashboard-page .cat-track { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.dashboard-page .cat-bar { height: 100%; border-radius: 99px; background: var(--teal); }
 
-/* ---------- Overview band ---------- */
-
-.dashboard-page .overview {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    border: 1px solid var(--d-line);
-    border-radius: var(--d-radius);
-    background: var(--d-overview);
-    backdrop-filter: blur(14px);
-    overflow: hidden;
-}
-
-.dashboard-page .overview-main,
-.dashboard-page .overview-side {
-    min-width: 0;
-    padding: 28px;
-}
-
-.dashboard-page .overview-side {
-    border-left: 1px solid var(--d-line);
-    background: var(--d-side);
-}
-
-.dashboard-page .overview-title {
-    margin: 0 0 20px;
-    color: var(--d-ink);
-    font-size: 18px;
-    font-weight: 650;
-}
-
-.dashboard-page .tiles {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.dashboard-page .tile {
-    min-width: 0;
-    padding: 22px 16px;
-    border: 1px solid var(--d-line);
-    border-radius: 12px;
-    background: var(--d-tile);
-    box-shadow: var(--d-shadow);
-    text-align: center;
-    transition: transform 0.2s;
-}
-
-.dashboard-page .tile:hover {
-    transform: translateY(-2px);
-}
-
-.dashboard-page .tile-value {
-    margin: 0;
-    color: var(--d-accent);
-    font-size: clamp(24px, 2.4vw, 30px);
-    font-weight: 750;
-    letter-spacing: -0.5px;
-    overflow-wrap: anywhere;
-    font-variant-numeric: tabular-nums;
-}
-
-.dashboard-page .tile-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin: 12px 0 0;
-    color: var(--d-muted);
-    font-size: 12.5px;
-    font-weight: 600;
-}
-
-.dashboard-page .tile-label svg {
-    flex: none;
-    width: 16px;
-    height: 16px;
-}
-
-/* Costs and result rows */
-.dashboard-page .sumrows {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.dashboard-page .sumrow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px;
-    border: 1px solid var(--d-line);
-    border-radius: 12px;
-    background: var(--d-tile);
-    box-shadow: var(--d-shadow);
-}
-
-.dashboard-page .sumrow-label {
-    color: var(--d-muted);
-    font-size: 13px;
-    font-weight: 550;
-}
-
-.dashboard-page .sumrow-value {
-    flex: none;
-    color: var(--d-ink);
-    font-size: 18px;
-    font-weight: 750;
-    font-variant-numeric: tabular-nums;
-}
-
-.dashboard-page .sumrow--result {
-    border-color: transparent;
-    background: var(--d-result-bg);
-}
-
-.dashboard-page .sumrow--result .sumrow-label,
-.dashboard-page .sumrow--result .sumrow-value {
-    color: var(--d-result-ink);
-}
-
-.dashboard-page .sumrow--result .sumrow-label {
-    font-weight: 700;
-}
-
-.dashboard-page .sumrow--result.sumrow--negative {
-    background: var(--d-result-neg-bg);
-}
-
-.dashboard-page .sumrow--result.sumrow--negative .sumrow-label,
-.dashboard-page .sumrow--result.sumrow--negative .sumrow-value {
-    color: var(--d-result-neg-ink);
-}
-
-/* ---------- Charts ---------- */
-
-.dashboard-page .charts {
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-    gap: var(--d-gap);
-}
-
-.dashboard-page .trend-chart svg {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.dashboard-page .trend-chart .grid { stroke: var(--d-line); stroke-width: 1; }
-.dashboard-page .trend-chart text  { fill: var(--d-muted); font-size: 12px; }
-
-.dashboard-page .trend-chart .line {
-    fill: none;
-    stroke: var(--d-accent);
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.dashboard-page .trend-chart .dot {
-    fill: var(--d-dot);
-    stroke: var(--d-accent);
-    stroke-width: 2.5;
-}
-
-.dashboard-page .cat-list {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-}
-
-.dashboard-page .cat-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
-    font-size: 13.5px;
-}
-
-.dashboard-page .cat-name  { color: var(--d-ink); font-weight: 600; }
-.dashboard-page .cat-value { color: var(--d-muted); font-variant-numeric: tabular-nums; }
-
-.dashboard-page .cat-track {
-    height: 8px;
-    border-radius: 999px;
-    background: var(--d-track);
-    overflow: hidden;
-}
-
-.dashboard-page .cat-bar {
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--d-accent), var(--d-accent-2));
-}
-
-/* ---------- Empty states ---------- */
-
-.dashboard-page .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    min-height: 200px;
-    padding: 16px;
-    text-align: center;
-}
-
-.dashboard-page .empty-state p {
-    margin: 0;
-    max-width: 32ch;
-    color: var(--d-muted);
-}
-
-/* ---------- Sales mix donut ---------- */
-
-.dashboard-page .mix {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.dashboard-page .mix .figures { flex: 1 1 160px; }
-
-.dashboard-page .donut {
-    position: relative;
-    flex: none;
-    width: 130px;
-    height: 130px;
-}
-
-.dashboard-page .donut svg { display: block; width: 100%; height: 100%; }
+/* ---------- Triple Stats ---------- */
+.dashboard-page .stats.triple { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.dashboard-page .mix { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.dashboard-page .donut { position: relative; width: 130px; height: 130px; flex: none; }
+.dashboard-page .donut svg { width: 100%; height: 100%; }
 .dashboard-page .donut circle { fill: none; stroke-width: 5; }
-.dashboard-page .donut-ring { stroke: var(--d-track); }
+.dashboard-page .donut-ring { stroke: var(--bg); }
+.dashboard-page .donut-seg--cash { stroke: var(--teal); }
+.dashboard-page .donut-seg--gcash { stroke: #3b82f6; }
+.dashboard-page .donut-seg--credit { stroke: var(--orange); }
+.dashboard-page .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.dashboard-page .donut-center strong { font-size: 22px; color: var(--ink); }
+.dashboard-page .donut-center span { font-size: 11px; color: var(--muted); }
 
-.dashboard-page .donut-seg--cash   { stroke: var(--d-cash); }
-.dashboard-page .donut-seg--gcash  { stroke: var(--d-gcash); }
-.dashboard-page .donut-seg--credit { stroke: var(--d-credit); }
+.dashboard-page .figures { margin: 0; width: 100%; }
+.dashboard-page .figures > div { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--line); }
+.dashboard-page .figures > div:first-child { border-top: none; }
+.dashboard-page .figures dt { font-size: 13px; color: var(--muted); display: flex; align-items: center; }
+.dashboard-page .figures dd { font-size: 14px; font-weight: 700; color: var(--ink); }
+.dashboard-page .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; }
+.dashboard-page .swatch--cash { background: var(--teal); }
+.dashboard-page .swatch--gcash { background: #3b82f6; }
+.dashboard-page .swatch--credit { background: var(--orange); }
 
-.dashboard-page .donut-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.2;
-    text-align: center;
-}
-
-.dashboard-page .donut-center strong { color: var(--d-ink); font-size: 22px; font-weight: 700; }
-.dashboard-page .donut-center span   { color: var(--d-muted); font-size: 11px; }
-
-.dashboard-page .swatch {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin-right: 8px;
-    border-radius: 3px;
-}
-
-.dashboard-page .swatch--cash   { background: var(--d-cash); }
-.dashboard-page .swatch--gcash  { background: var(--d-gcash); }
-.dashboard-page .swatch--credit { background: var(--d-credit); }
-
-/* ---------- Breakdown rows ---------- */
-
-.dashboard-page .figures { margin: 0; }
-
-.dashboard-page .figures > div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 10px 0;
-    border-top: 1px solid var(--d-line);
-}
-
-.dashboard-page .figures > div:first-child { border-top: 0; padding-top: 0; }
-
-.dashboard-page .figures dt {
-    display: flex;
-    align-items: center;
-    color: var(--d-muted);
-    font-size: 13px;
-}
-
-.dashboard-page .figures dd {
-    margin: 0;
-    color: var(--d-ink);
-    font-size: 14px;
-    font-weight: 700;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-}
-
-.dashboard-page .panel-note {
-    margin: 14px 0 0;
-    color: var(--d-muted);
-    font-size: 12px;
-}
-
-/* ---------- Expense form ---------- */
-
-.dashboard-page .expense-form {
-    display: grid;
-    grid-template-columns: 180px 160px minmax(0, 1fr) auto;
-    gap: 16px;
-    align-items: end;
-}
-
-.dashboard-page .expense-form label {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    color: var(--d-muted);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.dashboard-page .expense-form input,
-.dashboard-page .expense-form select {
-    width: 100%;
-    height: 42px;
-    margin: 0;
-    box-sizing: border-box;
-}
-
-/* ---------- Expense table ---------- */
-
+/* ---------- Forms & Tables ---------- */
+.dashboard-page .expense-form { display: grid; grid-template-columns: 180px 160px 1fr auto; gap: 16px; align-items: end; }
 .dashboard-page .table-wrap { overflow-x: auto; }
-
 .dashboard-page .table-wrap table { width: 100%; border-collapse: collapse; }
-
-.dashboard-page .table-wrap th,
-.dashboard-page .table-wrap td {
-    padding: 14px;
-    border-bottom: 1px solid var(--d-line);
-    text-align: left;
-}
-
-.dashboard-page .table-wrap th {
-    background: transparent;
-    color: var(--d-muted);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-.dashboard-page .table-wrap td { color: var(--d-ink); font-size: 13.5px; }
-.dashboard-page .table-wrap .num { text-align: right; font-variant-numeric: tabular-nums; }
-.dashboard-page .table-wrap .empty-row { padding: 30px; color: var(--d-muted); text-align: center; }
-
-/* ---------- How figures are calculated ---------- */
-
-.dashboard-page .accounting-note {
-    margin: 0 0 var(--d-gap);
-    padding: 16px;
-    border: 1px solid var(--d-line);
-    border-radius: 12px;
-    background: var(--d-surface);
-    color: var(--d-muted);
-}
-
-.dashboard-page .accounting-note summary {
-    color: var(--d-ink);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.dashboard-page .accounting-note ul {
-    margin: 12px 0 0;
-    padding-left: 20px;
-    font-size: 13px;
-    line-height: 1.6;
-}
+.dashboard-page .table-wrap th, .dashboard-page .table-wrap td { padding: 14px; border-bottom: 1px solid var(--line); text-align: left; font-size: 13.5px; }
+.dashboard-page .table-wrap th { color: var(--muted); font-size: 11px; text-transform: uppercase; }
+.dashboard-page .table-wrap .num { text-align: right; }
 
 /* ---------- Responsive ---------- */
-
 @media (max-width: 1100px) {
     .dashboard-page .overview { grid-template-columns: 1fr; }
-    .dashboard-page .overview-side { border-left: 0; border-top: 1px solid var(--d-line); }
-    .dashboard-page .stats.triple { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .dashboard-page .expense-form { grid-template-columns: 1fr 1fr; }
+    .dashboard-page .overview-side { border-left: none; border-top: 1px solid var(--line); }
+    .dashboard-page .stats.triple { grid-template-columns: 1fr 1fr; }
 }
-
 @media (max-width: 900px) {
     .dashboard-page .charts { grid-template-columns: 1fr; }
-    .dashboard-page .tiles { grid-template-columns: 1fr; }
 }
-
 @media (max-width: 650px) {
-    .dashboard-page .stats.triple { grid-template-columns: 1fr; }
-    .dashboard-page .panel { padding: 20px; }
-    .dashboard-page .overview-main,
-    .dashboard-page .overview-side { padding: 20px; }
-    .dashboard-page .heading-actions,
-    .dashboard-page .heading-actions form { width: 100%; }
-    .dashboard-page .heading-actions label { flex: 1; }
+    .dashboard-page .stats.triple, .dashboard-page .tiles { grid-template-columns: 1fr; }
+    .dashboard-page { padding: 20px; }
     .dashboard-page .expense-form { grid-template-columns: 1fr; }
-}
-
-/* ---------- Print / Export ----------
- * Always print with the light palette, even if the screen is in dark mode,
- * so the exported page is dark text on white paper.
- */
-
-@media print {
-    body > header,
-    .no-print {
-        display: none !important;
-    }
-
-    :root[data-theme="dark"] .dashboard-page {
-        --d-ink: #172b4d;
-        --d-muted: #5b6b7f;
-        --d-line: #e4eaf0;
-        --d-surface: #ffffff;
-        --d-overview: #f1f7fa;
-        --d-side: transparent;
-        --d-tile: #ffffff;
-        --d-track: #eef2f6;
-        --d-dot: #ffffff;
-        --d-accent: #0f766e;
-        --d-accent-2: #2563eb;
-        --d-cash: #0f766e;
-        --d-gcash: #2563eb;
-        --d-credit: #d97706;
-        --d-result-bg: #0f766e;
-        --d-result-ink: #ffffff;
-        --d-result-neg-bg: #b42318;
-        --d-result-neg-ink: #ffffff;
-    }
-
-    :root[data-theme="dark"] body > main.dashboard-page :is(h1, h2, h3, label, strong) {
-        color: var(--d-ink);
-    }
-
-    .dashboard-page .panel,
-    .dashboard-page .tile,
-    .dashboard-page .sumrow {
-        box-shadow: none;
-        break-inside: avoid;
-    }
-
-    .dashboard-page .sumrow--result,
-    .dashboard-page .donut-seg,
-    .dashboard-page .cat-bar {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
 }

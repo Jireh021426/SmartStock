@@ -315,3 +315,242 @@ body > header .topbar-quick-add summary .ico {
     align-items: center !important;
     justify-content: center !important;
 }
+
+/* =============================================================
+   SMARTSTOCK THEME REPAIR — LOGIN / SIDEBAR / DASHBOARD
+   Keep existing layout rules and change colors, not structure.
+   Dark selectors are intentionally last to override legacy
+   hard-coded light colors and earlier theme exceptions.
+   ============================================================= */
+
+:root[data-theme="dark"] {
+    --bg: #0d1524;
+    --card: #182538;
+    --ink: #edf4fb;
+    --muted: #a5b4c7;
+    --line: #34445a;
+    --teal: #20b9a3;
+    --teal-dark: #61e1ce;
+    --teal-soft: #163a3b;
+    --orange: #fbbf24;
+    --orange-soft: #40321d;
+    --shadow: 0 2px 10px rgba(0,0,0,.20),0 12px 28px rgba(0,0,0,.12);
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] body > header,
+:root[data-theme="dark"] body > main {
+    background-color: var(--bg);
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body > header {
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > header .brand-text h1,
+:root[data-theme="dark"] body > header .topbar-app-name {
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body > header .brand-text span,
+:root[data-theme="dark"] body > header nav .nav-label,
+:root[data-theme="dark"] body > header nav a {
+    color: var(--muted);
+}
+
+:root[data-theme="dark"] body > header nav a:hover,
+:root[data-theme="dark"] body > header nav a:focus-visible {
+    background: #25364b;
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body > header nav a.active,
+:root[data-theme="dark"] body > header nav a.active:hover,
+:root[data-theme="dark"] body > header nav a.active span {
+    background: #25364b;
+    color: var(--ink);
+    border-left-color: transparent;
+}
+
+:root[data-theme="dark"] body > header nav a.active .ico {
+    color: var(--teal-dark);
+}
+
+:root[data-theme="dark"] body > header .smart-topbar {
+    background: #152132;
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > header .smart-topbar .topbar-search,
+:root[data-theme="dark"] body > header .smart-topbar .topbar-search input {
+    background: #1d2c41;
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] .topbar-search input::placeholder,
+:root[data-theme="dark"] .topbar-profile-label {
+    color: var(--muted);
+}
+
+:root[data-theme="dark"] .topbar-notifications summary,
+:root[data-theme="dark"] .topbar-profile summary,
+:root[data-theme="dark"] .theme-toggle {
+    color: var(--muted);
+}
+
+:root[data-theme="dark"] .topbar-notification-menu,
+:root[data-theme="dark"] .topbar-dropdown,
+:root[data-theme="dark"] .topbar-profile-menu {
+    background: #1c2b40;
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] .topbar-notification-menu strong,
+:root[data-theme="dark"] .topbar-dropdown strong,
+:root[data-theme="dark"] .topbar-profile-menu strong,
+:root[data-theme="dark"] .topbar-dropdown a {
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] .topbar-profile-menu .topbar-profile-role,
+:root[data-theme="dark"] .topbar-notification-menu p {
+    color: var(--muted) !important;
+}
+
+:root[data-theme="dark"] .topbar-dropdown a:hover {
+    background: #273a50;
+}
+
+:root[data-theme="dark"] .topbar-notification-menu a {
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+}
+
+/* Shared white surfaces become actual dark surfaces in dark mode. */
+:root[data-theme="dark"] body > main .panel,
+:root[data-theme="dark"] body > main .card,
+:root[data-theme="dark"] body > main .light-card,
+:root[data-theme="dark"] body > main .dashboard-card,
+:root[data-theme="dark"] body > main .dashboard-panel {
+    background: var(--card);
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > main .panel h1,
+:root[data-theme="dark"] body > main .panel h2,
+:root[data-theme="dark"] body > main .panel h3,
+:root[data-theme="dark"] body > main .panel label,
+:root[data-theme="dark"] body > main .panel strong,
+:root[data-theme="dark"] body > main .card h1,
+:root[data-theme="dark"] body > main .card h2,
+:root[data-theme="dark"] body > main .card h3,
+:root[data-theme="dark"] body > main .card strong,
+:root[data-theme="dark"] body > main .dashboard-card h3,
+:root[data-theme="dark"] body > main .dashboard-card label {
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body > main .button.ghost.button,
+:root[data-theme="dark"] body > main a.button.ghost.button,
+:root[data-theme="dark"] body > main .chip {
+    background: #25364a;
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > main .button.ghost:hover {
+    background: #334b63;
+}
+
+:root[data-theme="dark"] body > main input,
+:root[data-theme="dark"] body > main select,
+:root[data-theme="dark"] body > main textarea {
+    background: #1c2b40;
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > main th,
+:root[data-theme="dark"] body > main td {
+    border-bottom-color: var(--line);
+}
+
+/* Dashboard styles already consume theme variables, but keep
+   main overview, chart, and summary surfaces consistent. */
+:root[data-theme="dark"] body > main.dashboard-page .overview,
+:root[data-theme="dark"] body > main.dashboard-page .tile,
+:root[data-theme="dark"] body > main.dashboard-page .sumrow {
+    background: var(--card);
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > main.dashboard-page .overview-side {
+    background: #122032;
+    border-color: var(--line);
+}
+
+:root[data-theme="dark"] body > main.dashboard-page .sumrow--result {
+    background: var(--teal);
+    border-color: transparent;
+}
+
+:root[data-theme="dark"] body > main.dashboard-page .sumrow--result .sumrow-label,
+:root[data-theme="dark"] body > main.dashboard-page .sumrow--result .sumrow-value {
+    color: #062a29;
+}
+
+:root[data-theme="dark"] body > main.dashboard-page .sumrow--negative {
+    background: #ef4444;
+}
+
+:root[data-theme="dark"] body > main.dashboard-page .sumrow--negative .sumrow-label,
+:root[data-theme="dark"] body > main.dashboard-page .sumrow--negative .sumrow-value {
+    color: #fff;
+}
+
+/* Login: retain centering and sizing while switching the full palette. */
+:root[data-theme="dark"] body.login-body .login-card {
+    background: #172338;
+    border-color: var(--line);
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body.login-body .login-card h1,
+:root[data-theme="dark"] body.login-body .login-card h2,
+:root[data-theme="dark"] body.login-body .login-card label {
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body.login-body .input-wrapper input {
+    background: #24324a;
+    border-color: var(--line);
+    color: var(--ink);
+}
+
+:root[data-theme="dark"] body.login-body .btn-login {
+    background: var(--teal);
+    color: #062a29;
+}
+
+:root[data-theme="dark"] body.login-body .btn-login:hover {
+    background: var(--teal-dark);
+}
+
+:root[data-theme="dark"] body.login-body .notice-msg {
+    background: var(--teal-soft);
+    color: var(--teal-dark);
+    border-color: var(--teal);
+}
+
+/* No animation when reduced motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+    .login-card,
+    .login-body,
+    .theme-toggle { transition: none !important; }
+}

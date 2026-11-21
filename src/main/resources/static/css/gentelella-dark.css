@@ -1,0 +1,208 @@
+/* SmartStock operations theme based on the supplied dark dashboard reference.
+   Visual-only override. Keep full original style.css, navigation and backend. */
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --bg:#101622; --card:#1b2534; --ink:#edf2f8; --muted:#91a0b5;
+  --line:#2c3a4e; --teal:#18b69e; --teal-dark:#64ddca;
+  --teal-soft:#193c3d; --orange:#f6ad29; --orange-soft:#3d3323;
+  --shadow:0 4px 14px rgba(0,0,0,.10);
+  --accent:#18b69e; --accent-hover:#17b49c; --panel:#1b2534;
+  --surface:#1b2534; --border:#2c3a4e; --text:#edf2f8; --txt:#edf2f8;
+  --d-accent:#18b69e; --ss-accent:#18b69e; --dc-txt:#edf2f8;
+  --dc-muted:#91a0b5; --dc-line:#2c3a4e; --dc-panel:#1b2534;
+  --tr-surface:#1b2534; --tr-border:#2c3a4e; --tr-text:#edf2f8;
+}
+/* NAVIGATION */
+:root[data-theme="dark"] body:not(.login-body) { background:#101622; color:var(--ink); }
+:root[data-theme="dark"] body:not(.login-body)>main { background:transparent; color:var(--ink); }
+:root[data-theme="dark"] body>header { background:#1b2534; border-color:#293749; color:#c7d0de; }
+:root[data-theme="dark"] body>header .brand-text h1 { color:#f5f9ff; font-weight:750; }
+:root[data-theme="dark"] body>header .brand-text span { color:#92a0b4; }
+:root[data-theme="dark"] body>header .brand-mark { background:#16ac96; width:36px; height:36px; border-radius:8px; }
+:root[data-theme="dark"] body>header .brand-mark .ico { width:19px; height:19px; }
+:root[data-theme="dark"] body>header nav { gap:3px; }
+:root[data-theme="dark"] body>header nav .nav-label { color:#7b8ba0; font-size:10px; letter-spacing:.1em; padding-top:20px; }
+:root[data-theme="dark"] body>header nav a { display:flex; gap:12px; align-items:center; padding:10px 12px; border:1px solid transparent; border-radius:7px; font-size:13px; font-weight:500; color:#aab7c9; }
+:root[data-theme="dark"] body>header nav a span { color:inherit; }
+:root[data-theme="dark"] body>header nav a .ico { color:#8a9bb0; width:18px; height:18px; }
+:root[data-theme="dark"] body>header nav a:hover,
+:root[data-theme="dark"] body>header nav a:focus-visible { background:#243447; color:#f3f7fd; }
+:root[data-theme="dark"] body>header nav a.active,
+:root[data-theme="dark"] body>header nav a.active:hover { color:#f5fffd; background:#1c393e; border-left:3px solid #1bc5ad; padding-left:10px; box-shadow:none; }
+:root[data-theme="dark"] body>header nav a.active .ico { color:#36d3be; }
+:root[data-theme="dark"] body>header .smart-topbar { min-height:60px; padding:8px 28px; background:#161f2d; border-bottom:1px solid #2b394c; color:#e6ecf5; }
+:root[data-theme="dark"] body>header .smart-topbar .topbar-search { background:#101926; border:1px solid #2b3a4e; border-radius:7px; height:36px; max-width:390px; color:#8b9bb0; }
+:root[data-theme="dark"] body>header .smart-topbar .topbar-search:focus-within { background:#101b2a; border-color:#18b69e; }
+:root[data-theme="dark"] body>header .smart-topbar .topbar-search input { background:transparent; border:0; box-shadow:none; color:#edf3fb; }
+:root[data-theme="dark"] body>header .smart-topbar input::placeholder { color:#8191a6; }
+:root[data-theme="dark"] body>header .topbar-quick-add summary { background:#14ad98; width:34px; height:34px; }
+:root[data-theme="dark"] body>header .topbar-icon-link,
+:root[data-theme="dark"] body>header .topbar-notifications summary,
+:root[data-theme="dark"] body>header .topbar-profile summary { color:#9fb0c4; }
+:root[data-theme="dark"] body>header .topbar-icon-link:hover,
+:root[data-theme="dark"] body>header .topbar-notifications summary:hover,
+:root[data-theme="dark"] body>header .topbar-profile summary:hover { color:#65ddca; background:#203747; }
+:root[data-theme="dark"] body>header .topbar-avatar { color:#64ddca!important; background:#1d423f; }
+:root[data-theme="dark"] body>header .topbar-profile-label { color:#edf3fb; }
+:root[data-theme="dark"] body>header :is(.topbar-dropdown,.topbar-notification-menu,.topbar-profile-menu,.topbar-search-results) { background:#202c3d; border:1px solid #36475a; color:#e5eefa; box-shadow:0 12px 26px rgba(0,0,0,.28); }
+:root[data-theme="dark"] body>header :is(.topbar-dropdown,.topbar-notification-menu,.topbar-profile-menu) :is(a,strong) { color:#e5eefa; }
+:root[data-theme="dark"] body>header .topbar-dropdown a:hover { background:#293c4e; }
+/* Shared dark controls across pages, without editing their markup */
+:root[data-theme="dark"] body>main :is(.panel,.card,.light-card,.dashboard-panel,.dashboard-card) { background:#1b2534; border:1px solid #2c3b4d; color:#e6eef8; box-shadow:0 3px 14px rgba(0,0,0,.07); }
+:root[data-theme="dark"] body>main :is(.panel-head,.lc-header) { background:transparent; border-color:#2c3b4d; }
+:root[data-theme="dark"] body>main :is(h1,h2,h3,h4,label) { color:#edf3fa; }
+:root[data-theme="dark"] body>main :is(p,small) { color:#a1afc0; }
+:root[data-theme="dark"] body>main input:not([type="checkbox"]):not([type="radio"]),
+:root[data-theme="dark"] body>main :is(select,textarea) { background:#152031; border-color:#35485c; color:#eaf2fa; }
+:root[data-theme="dark"] body>main :is(input,textarea)::placeholder { color:#8395aa; }
+:root[data-theme="dark"] body>main :is(input,select,textarea):focus-visible { border-color:#18b69e; outline-color:#18b69e; }
+:root[data-theme="dark"] body>main :is(.button,.btn-primary) { background:#18b69e; color:#052b29; border-color:transparent; }
+:root[data-theme="dark"] body>main :is(.button,.btn-primary):hover { background:#27c7af; }
+:root[data-theme="dark"] body>main :is(.button.ghost,.btn-ghost) { background:#283648; border:1px solid #36495f; color:#e3eaf4; }
+:root[data-theme="dark"] body>main :is(th,td) { border-bottom-color:#304053; }
+:root[data-theme="dark"] body>main th { color:#9aacc1; }
+:root[data-theme="dark"] body>main td { color:#e3eaf4; }
+:root[data-theme="dark"] body>main tbody tr:hover { background:rgba(255,255,255,.025); }
+:root[data-theme="dark"] body>main .form-note { background:#1d363c; border-color:#245a59; }
+:root[data-theme="dark"] body>main .form-note p { color:#a8dfd6; }
+/* Dashboard layout */
+body>main.dashboard-page { width:100%; max-width:none; height:auto; min-height:100vh; overflow:visible; padding:93px 28px 48px; gap:20px; }
+body>main.dashboard-page .heading { margin-bottom:0; align-items:center; gap:20px; }
+body>main.dashboard-page .heading h2 { font-size:25px; font-weight:750; letter-spacing:-.035em; }
+body>main.dashboard-page .heading p { margin-top:4px; font-size:12.5px; }
+.dashboard-eyebrow { display:block; margin-bottom:6px; color:#8997aa; font-size:10px; font-weight:750; letter-spacing:.11em; }
+body>main.dashboard-page .heading-actions form { display:flex; align-items:flex-end; gap:9px; }
+body>main.dashboard-page .heading-actions form label { margin:0; font-size:11px; }
+body>main.dashboard-page .heading-actions input[type="date"] { height:36px; margin-top:4px; border-radius:7px; }
+body>main.dashboard-page .heading-actions .button { padding:9px 15px; min-height:36px; border-radius:7px; font-size:12px; }
+/* Six financial metrics use actual backend values. */
+.metrics-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.metric-card { display:flex; align-items:center; gap:15px; min-width:0; min-height:114px; padding:19px 20px; background:#fff; border:1px solid #e6ebf0; border-radius:10px; box-shadow:0 2px 5px rgba(20,35,55,.03); }
+.metric-symbol { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; border-radius:8px; }
+.metric-symbol .ico { width:22px; height:22px; }
+.metric-symbol--teal { background:#d9f6ee; color:#099a83; }
+.metric-symbol--blue { background:#e1eeff; color:#247bdd; }
+.metric-symbol--violet { background:#efe4fc; color:#894cd7; }
+.metric-symbol--amber { background:#fff0cf; color:#bf820d; }
+.metric-symbol--red { background:#fee6e7; color:#ca4850; }
+.metric-symbol--green { background:#daf5de; color:#219557; }
+.metric-copy { min-width:0; }
+.metric-copy .metric-label { margin:0 0 3px; color:#66758b; font-size:11px; font-weight:650; letter-spacing:.07em; text-transform:uppercase; }
+.metric-copy .metric-value { color:#162034; font-size:clamp(19px,1.85vw,27px); font-weight:750; margin:0 0 3px; overflow-wrap:anywhere; letter-spacing:-.04em; line-height:1.3; }
+.metric-copy .metric-note { color:#8895a8; font-size:11.5px; margin:0; }
+.metric--negative .metric-value { color:#e05a5f; }
+:root[data-theme="dark"] .metric-card { background:#1b2534; border-color:#2c3b4e; box-shadow:0 4px 10px rgba(0,0,0,.06); }
+:root[data-theme="dark"] .metric-copy .metric-label { color:#9cabbc; }
+:root[data-theme="dark"] .metric-copy .metric-value { color:#f3f7fd; }
+:root[data-theme="dark"] .metric-copy .metric-note { color:#8d9bb0; }
+:root[data-theme="dark"] .metric--negative .metric-copy .metric-value { color:#ff858a; }
+:root[data-theme="dark"] .metric-symbol--teal { background:#183e3e; color:#24cbb2; }
+:root[data-theme="dark"] .metric-symbol--blue { background:#193655; color:#4b9dec; }
+:root[data-theme="dark"] .metric-symbol--violet { background:#352b52; color:#b990ef; }
+:root[data-theme="dark"] .metric-symbol--amber { background:#403723; color:#efb43d; }
+:root[data-theme="dark"] .metric-symbol--red { background:#472936; color:#f47b89; }
+:root[data-theme="dark"] .metric-symbol--green { background:#1c4338; color:#42c998; }
+body>main.dashboard-page .charts { display:grid; grid-template-columns:minmax(0,1.75fr) minmax(0,1fr); gap:16px; margin:0; }
+body>main.dashboard-page .stats.triple { gap:16px; margin:0; }
+body>main.dashboard-page .panel { padding:19px 20px; border-radius:10px; overflow:visible; }
+body>main.dashboard-page .panel-head { padding:0 0 12px; margin:0 0 16px; min-height:24px; background:transparent; border-bottom:1px solid var(--line); }
+body>main.dashboard-page .panel-head h3 { font-size:12.5px; font-weight:750; letter-spacing:.01em; }
+body>main.dashboard-page .panel-meta { color:var(--muted); font-size:11.5px; }
+body>main.dashboard-page .trend-chart { height:300px; }
+body>main.dashboard-page .trend-chart .line { stroke:#19bea5; stroke-width:2.7; }
+body>main.dashboard-page .trend-chart .dot { stroke:#17b49d; }
+body>main.dashboard-page .cat-track { height:7px; }
+body>main.dashboard-page .cat-bar { background:#15b69f; }
+body>main.dashboard-page .figures>div { padding:12px 0; }
+body>main.dashboard-page .donut { width:114px; height:114px; }
+body>main.dashboard-page .expense-form { gap:12px; }
+:root[data-theme="dark"] body>main.dashboard-page .panel { background:#1b2534; border-color:#2d3b4d; }
+:root[data-theme="dark"] body>main.dashboard-page .trend-chart .grid { stroke:#344254; }
+:root[data-theme="dark"] body>main.dashboard-page .trend-chart text { fill:#94a6bb; }
+:root[data-theme="dark"] body>main.dashboard-page .trend-chart .dot { fill:#1b2534; }
+:root[data-theme="dark"] body>main.dashboard-page .donut-ring { stroke:#303c4d; }
+:root[data-theme="dark"] body>main.dashboard-page .figures dt { color:#96a7bc; }
+:root[data-theme="dark"] body>main.dashboard-page .figures dd { color:#edf4fb; }
+:root[data-theme="dark"] body>main.dashboard-page .donut-center strong { color:#eaf2fc; }
+:root[data-theme="dark"] body>main.dashboard-page .accounting-note summary { color:#c6d3e0; }
+/* Login stays functional, matches slate theme. */
+:root[data-theme="dark"] body.login-body { background-color:#101622!important; background-image:radial-gradient(circle at 50% 42%,rgba(28,66,73,.3),transparent 62%)!important; }
+:root[data-theme="dark"] body.login-body .login-card { background:#1b2534; border:1px solid #344153; border-radius:13px; box-shadow:0 15px 45px rgba(0,0,0,.2); }
+:root[data-theme="dark"] body.login-body :is(.login-brand h1,.login-card h2,.login-form label) { color:#edf4fb; }
+:root[data-theme="dark"] body.login-body :is(.login-sub,.login-brand span) { color:#98a9bc; }
+:root[data-theme="dark"] body.login-body .input-wrapper input { background:#141f2f; border-color:#354359; color:#edf4fb; }
+:root[data-theme="dark"] body.login-body .btn-login { background:#18b69e; color:#062524; border-radius:8px; }
+/* Responsive */
+@media(min-width:1100px) { :root[data-theme="dark"] body>header .smart-topbar { left:260px; } body>main.dashboard-page { padding:92px 28px 42px; } }
+@media(max-width:1200px) { .metrics-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:1099px) { body>main.dashboard-page { padding:24px 20px 40px; } }
+@media(max-width:850px) { body>main.dashboard-page .charts { grid-template-columns:1fr; } body>main.dashboard-page .stats.triple { grid-template-columns:1fr 1fr; } }
+@media(max-width:650px) { .metrics-grid { grid-template-columns:1fr; gap:10px; } .metric-card { min-height:92px; padding:14px 16px; } body>main.dashboard-page { padding:20px 14px 32px; gap:14px; } body>main.dashboard-page .heading { align-items:stretch; } body>main.dashboard-page .stats.triple { grid-template-columns:1fr; } body>main.dashboard-page .panel { padding:16px; } body>main.dashboard-page .trend-chart { height:245px; } }
+@media print { body>main.dashboard-page { padding-top:12px; } :root[data-theme="dark"] body>main .panel, :root[data-theme="dark"] .metric-card { background:#fff!important; color:#172034!important; border-color:#dde5ed!important; box-shadow:none!important; } :root[data-theme="dark"] .metric-copy :is(.metric-label,.metric-value,.metric-note) { color:#172034!important; } }
+/* Legacy theme.css has an extra-specific ghost-button text rule. */
+:root[data-theme="dark"] body>main a.button.ghost.button,
+:root[data-theme="dark"] body>main button.button.ghost.button {
+  background:#283648; color:#e7effa; border:1px solid #36495f;
+}
+:root[data-theme="dark"] body>main a.button.ghost.button:hover,
+:root[data-theme="dark"] body>main button.button.ghost.button:hover { background:#344458; }
+
+/* ===============================================================
+   LIGHT / DARK GEOMETRY PARITY — V2
+   Both themes retain the compact Gentelella layout. Only colors,
+   backgrounds and shadows change when the user toggles modes.
+   The dark measurements are the reference; bring LIGHT into parity.
+   =============================================================== */
+:root[data-theme="light"] body > header .brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+:root[data-theme="light"] body > header .brand-mark .ico {
+  width: 19px;
+  height: 19px;
+}
+:root[data-theme="light"] body > header nav {
+  gap: 3px;
+}
+:root[data-theme="light"] body > header nav .nav-label {
+  font-size: 10px;
+  letter-spacing: .1em;
+  padding-top: 20px;
+}
+:root[data-theme="light"] body > header nav a {
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+}
+:root[data-theme="light"] body > header nav a .ico {
+  width: 18px;
+  height: 18px;
+}
+:root[data-theme="light"] body > header nav a.active,
+:root[data-theme="light"] body > header nav a.active:hover {
+  border-left: 3px solid var(--teal);
+  padding-left: 10px;
+}
+:root[data-theme="light"] body > header .smart-topbar {
+  min-height: 60px;
+  padding: 8px 28px;
+}
+:root[data-theme="light"] body > header .smart-topbar .topbar-search {
+  height: 36px;
+  max-width: 390px;
+  border-radius: 7px;
+}
+:root[data-theme="light"] body > header .topbar-quick-add summary {
+  width: 34px;
+  height: 34px;
+}
+/* Keep the compact header usable on phone-sized viewports. */
+@media (max-width: 650px) {
+  :root[data-theme="light"] body > header .smart-topbar,
+  :root[data-theme="dark"] body > header .smart-topbar {
+    padding: 8px 12px;
+  }
+}
