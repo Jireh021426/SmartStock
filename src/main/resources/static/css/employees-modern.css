@@ -459,3 +459,37 @@ dialog.emx-dialog .emx-dialog-foot {
 @media (prefers-reduced-motion: reduce) {
     dialog.emx-dialog[open] { animation: none; }
 }
+
+/* ---------- Dialog fixes ---------- */
+/* 1. The dialog lives outside <main>, so it needs its own color variables */
+dialog.emx-dialog {
+    --emx-accent: var(--teal, #0f9d8a);
+    --emx-line: color-mix(in srgb, currentColor 12%, transparent);
+    --emx-soft: color-mix(in srgb, currentColor 5%, transparent);
+}
+dialog.emx-dialog .emx-btn--primary {
+    background: var(--emx-accent) !important;
+    border-color: var(--emx-accent) !important;
+    color: #fff !important;
+}
+dialog.emx-dialog .emx-dialog-foot .emx-btn { min-width: 110px; }
+
+/* 2. Hints must not inherit the global red <small> style */
+dialog.emx-dialog .emx-field small {
+    color: inherit !important;
+    opacity: .6;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* 3. Even label/input spacing; stop rows from stretching each other */
+dialog.emx-dialog .emx-grid { align-items: start; }
+dialog.emx-dialog .emx-field,
+dialog.emx-dialog .emx-field > label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+dialog.emx-dialog .emx-field > label > span { display: block; margin: 0; padding: 0; }
