@@ -9,6 +9,8 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/theme.css}">
     <link rel="stylesheet" th:href="@{/css/employees.css(v=reference-1)}">
+    <!-- Redesign layer: loads last so it wins over employees.css -->
+    <link rel="stylesheet" th:href="@{/css/employees-modern.css(v=1)}">
     <script th:src="@{/js/theme.js}"></script>
 </head>
 
@@ -16,226 +18,136 @@
 
 <header th:replace="~{fragments/navigation :: siteHeader}"></header>
 
-<main class="employees-page">
+<main class="employees-page emx-page">
 
-    <!-- Screenshot-inspired page heading. Shared SmartStock navigation remains untouched. -->
-    <div class="topbar employee-hero">
-        <div class="employee-hero-heading">
-            <svg class="employee-hero-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-                <circle cx="16" cy="9" r="5" fill="currentColor"/>
-                <path d="M7.5 24.8c0-5.5 3.6-9 8.5-9s8.5 3.5 8.5 9v1.7h-17z" fill="currentColor"/>
-                <circle cx="5.5" cy="12" r="3.5" fill="currentColor" opacity=".72"/>
-                <path d="M.8 23c0-4.1 2.1-7 5.1-7 1.3 0 2.3.4 3.2 1.1-1.3 1.9-2 4.3-2 7.2H.8z" fill="currentColor" opacity=".72"/>
-                <circle cx="26.5" cy="12" r="3.5" fill="currentColor" opacity=".72"/>
-                <path d="M31.2 23c0-4.1-2.1-7-5.1-7-1.3 0-2.3.4-3.2 1.1 1.3 1.9 2 4.3 2 7.2h6.3z" fill="currentColor" opacity=".72"/>
-            </svg>
-            <h2 class="page-title">Employees</h2>
+    <!-- Page header -->
+    <div class="emx-header">
+        <div>
+            <h2 class="emx-title">Employees</h2>
+            <p class="emx-sub">Manage staff accounts, roles, locations and access.</p>
         </div>
-        <div class="employee-account-pill" aria-label="Signed-in user">
-            <span class="employee-account-avatar" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4.2 20c0-4.8 3.4-7.6 7.8-7.6s7.8 2.8 7.8 7.6" fill="currentColor"/></svg>
-            </span>
-            <span th:text="${currentUsername}">Admin</span>
-        </div>
+        <button type="button" class="emx-btn emx-btn--primary" data-open-employee-dialog>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Add employee
+        </button>
     </div>
 
-    <!-- Notices stay outside of the form so status and validation remain visible. -->
     <p class="error-msg" th:if="${error}" th:text="${error}"></p>
     <p class="notice-msg" th:if="${notice}" th:text="${notice}"></p>
 
-    <section class="panel employee-create-panel" aria-labelledby="employee-create-title">
-        <div class="panel-head employee-create-heading">
-            <span class="employee-add-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/></svg>
-            </span>
-            <h3 id="employee-create-title">Add Employee</h3>
-        </div>
+    <!-- Employee list -->
+    <section class="panel emx-card" id="employee-list" aria-labelledby="employees-list-title">
 
-        <form class="nova-form employee-create-form" th:action="@{/employees/create}" method="post" id="employee-create-form">
-            <div class="form-grid employee-reference-grid">
-                <label for="employee-full-name">
-                    <span class="employee-field-label">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.1" r="4.2" fill="currentColor"/><path d="M3.7 20.5v-1.1c0-4.2 3.5-7.5 8.3-7.5s8.3 3.3 8.3 7.5v1.1z" fill="currentColor"/></svg>
-                        Name
-                    </span>
-                    <input id="employee-full-name" type="text" name="fullName" maxlength="100" placeholder="e.g. Juan Dela Cruz" autocomplete="name" required>
-                </label>
-
-                <label for="employee-username">
-                    <span class="employee-field-label">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.1" r="4.2" fill="currentColor"/><path d="M3.7 20.5v-1.1c0-4.2 3.5-7.5 8.3-7.5s8.3 3.3 8.3 7.5v1.1z" fill="currentColor"/></svg>
-                        Username
-                    </span>
-                    <input id="employee-username" type="text" name="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" autocomplete="off" placeholder="e.g. juan.dela" required>
-                </label>
-
-                <div class="employee-password-field">
-                    <label for="employee-password" class="employee-password-label">
-                    <span class="employee-field-label">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="11.5" rx="2.5" fill="currentColor"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="12" cy="15.5" r="1.3" fill="#fff"/></svg>
-                        Password
-                    </span>
-                    </label>
-                    <span class="employee-password-wrap">
-                        <input id="employee-password" type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" placeholder="Min 12 chars" required>
-                        <button class="employee-password-toggle" type="button" aria-label="Show password" aria-pressed="false" aria-controls="employee-password" title="Show password">
-                            <svg class="eye-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-                            <svg class="eye-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.4 6.1A11.9 11.9 0 0 1 12 6c6.4 0 10 6 10 6a13.5 13.5 0 0 1-3.5 3.6M6.2 7.4C3.5 9.3 2 12 2 12s3.6 6 10 6c1.6 0 3-.4 4.3-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 10a3 3 0 0 0 4 4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
-                        </button>
-                    </span>
-                </div>
-
-                <label for="employee-role">
-                    <span class="employee-field-label">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" fill="currentColor"/><rect x="8" y="3" width="8" height="5" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 12h20M10 12v2.5h4V12" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
-                        Role
-                    </span>
-                    <select id="employee-role" name="role" required>
-                        <option value="">Select Role</option>
-                        <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
-                    </select>
-                </label>
-
-                <label class="full-width" for="employee-location">
-                    <span class="employee-field-label">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c-2.2-3.3-8-9.4-8-14A8 8 0 1 1 20 8c0 4.6-5.8 10.7-8 14z" fill="currentColor"/><circle cx="12" cy="8.3" r="2.6" fill="#fff"/></svg>
-                        Location
-                    </span>
-                    <select id="employee-location" name="locationId" aria-describedby="employee-location-hint">
-                        <option value="">None</option>
-                        <option th:each="location : ${locations}" th:value="${location.id}"
-                                th:text="${location.name + ' (' + location.code + ')'}"></option>
-                    </select>
-                </label>
+        <div class="emx-card-head">
+            <div class="emx-card-title">
+                <h3 id="employees-list-title">Registered employees</h3>
+                <span class="emx-count" th:if="${totalPages > 0}"
+                      th:text="|${totalEmployees} ${totalEmployees == 1 ? 'employee' : 'employees'}|">2 employees</span>
             </div>
 
-            <p class="form-hint" id="employee-location-hint">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="currentColor"/><path d="M12 10.5v5M12 7.5h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-                Assigned location is required for Sender, Receiver, and Cashier roles.
-            </p>
+            <div class="emx-toolbar">
+                <form class="emx-search" method="get" th:action="@{/employees}" role="search" id="employee-search-form">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                    <label for="employee-search-field" class="emx-sr-only">Search employees by name, username, or role</label>
+                    <input id="employee-search-field" name="q" type="search" maxlength="100" th:value="${searchQuery}"
+                           placeholder="Search name, username or role" autocomplete="off">
+                    <input type="hidden" name="size" th:value="${pageSize}">
+                    <a th:if="${searchQuery != null and !#strings.isEmpty(searchQuery)}"
+                       th:href="@{/employees(size=${pageSize})}" class="emx-clear" aria-label="Clear search" title="Clear search">&times;</a>
+                    <button type="submit" class="emx-btn emx-btn--ghost emx-btn--sm">Search</button>
+                </form>
 
-            <div class="form-actions employee-create-actions">
-                <button class="btn employee-cancel-button" type="reset">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 1 1 .8 5.4M4 5v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Cancel
-                </button>
-                <button class="btn btn-primary employee-submit-button" type="submit">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M4 12h16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-                    Create
-                </button>
-            </div>
-        </form>
-    </section>
-
-    <!-- Employee table: searches across all employees on the server, not only the visible page. -->
-    <section class="panel employee-list-panel" id="employee-list" aria-labelledby="employees-list-title">
-        <div class="employee-list-heading">
-            <div>
-                <h3 id="employees-list-title">Registered Employees</h3>
-                <p>Manage staff accounts, roles, locations, and account access.</p>
-            </div>
-        </div>
-
-        <div class="emp-toolbar">
-            <form class="emp-search" method="get" th:action="@{/employees}" role="search" id="employee-search-form">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-                <label for="employee-search-field" class="emp-sr-only">Search employees by name, username, or role</label>
-                <input id="employee-search-field" name="q" type="search" maxlength="100" th:value="${searchQuery}"
-                       placeholder="Search name, username, or role..." autocomplete="off">
-                <input type="hidden" name="size" th:value="${pageSize}">
-                <button type="submit" class="emp-search-submit">Search</button>
-                <a th:if="${searchQuery != null and !#strings.isEmpty(searchQuery)}" th:href="@{/employees(size=${pageSize})}" class="emp-search-clear" aria-label="Clear search" title="Clear search">&times;</a>
-            </form>
-            <div class="emp-actions">
-                <a class="btn-export" th:href="@{/employees/export(q=${searchQuery})}" title="Download all matching employees as CSV (no passwords)">
+                <a class="emx-btn emx-btn--ghost" th:href="@{/employees/export(q=${searchQuery})}"
+                   title="Download all matching employees as CSV (no passwords)">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></svg>
                     Export CSV
                 </a>
-                <a class="btn-add-emp" href="#employee-create-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-                    Add Employee
-                </a>
             </div>
         </div>
 
-        <div class="table-wrap employee-table-wrap">
-            <table class="emp-table" data-no-paginate>
+        <div class="table-wrap emx-table-wrap">
+            <table class="emx-table" data-no-paginate>
                 <thead>
                     <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Full Name <span class="emp-sort-hint" title="Sorted by full name ascending" aria-label="Sorted ascending">&uarr;</span></th>
-                        <th scope="col">Username</th>
+                        <th scope="col" class="emx-col-id">ID</th>
+                        <th scope="col">Employee</th>
                         <th scope="col">Role</th>
-                        <th scope="col">Assigned Location</th>
+                        <th scope="col">Assigned location</th>
                         <th scope="col">Status</th>
-                        <th scope="col" class="emp-action-heading">Action</th>
+                        <th scope="col" class="emx-col-action">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="employee : ${employees}">
-                        <td class="emp-id" th:text="${employee.id}">1</td>
+                        <td class="emx-id" th:text="'#' + ${employee.id}">#1</td>
+
                         <td>
-                            <div class="emp-name-cell">
-                                <span class="emp-avatar" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1.5c0-3.7 3.3-6.5 8-6.5s8 2.8 8 6.5V21"/></svg>
-                                </span>
-                                <strong th:text="${employee.fullName}">Employee Name</strong>
+                            <div class="emx-person">
+                                <span class="emx-avatar" aria-hidden="true"
+                                      th:text="${#strings.isEmpty(employee.fullName) ? '?' : #strings.toUpperCase(#strings.substring(employee.fullName, 0, 1))}">A</span>
+                                <div class="emx-person-text">
+                                    <strong th:text="${employee.fullName}">Employee Name</strong>
+                                    <span th:text="'@' + ${employee.username}">@username</span>
+                                </div>
                             </div>
                         </td>
-                        <td class="emp-username" th:text="${employee.username}">staff</td>
+
                         <td>
-                            <span class="emp-role" th:classappend="${'role-' + #strings.toLowerCase(employee.role.name())}">
-                                <svg th:if="${employee.role.name() == 'ADMIN'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
-                                <svg th:if="${employee.role.name() == 'MANAGER'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-                                <svg th:if="${employee.role.name() == 'CASHIER'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                                <svg th:if="${employee.role.name() == 'SENDER' or employee.role.name() == 'RECEIVER'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
-                                <svg th:if="${employee.role.name() == 'AUDITOR'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 2h6v4H9zM9 12l2 2 4-4"/></svg>
-                                <span th:text="${employee.role}">ADMIN</span>
+                            <span class="emx-role" th:classappend="${'emx-role--' + #strings.toLowerCase(employee.role.name())}">
+                                <span class="emx-role-dot" aria-hidden="true"></span>
+                                <span th:text="${#strings.capitalize(#strings.toLowerCase(employee.role.name()))}">Admin</span>
                             </span>
                         </td>
+
                         <td>
-                            <span class="emp-location" th:classappend="${employee.assignedLocation == null} ? ' emp-not-assigned' : ''">
+                            <span class="emx-location" th:classappend="${employee.assignedLocation == null} ? ' emx-location--none' : ''">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                                <span th:text="${employee.assignedLocation != null ? employee.assignedLocation.name : 'Not Assigned'}">Not Assigned</span>
+                                <span th:text="${employee.assignedLocation != null ? employee.assignedLocation.name : 'Not assigned'}">Not assigned</span>
                             </span>
                         </td>
+
                         <td>
-                            <span class="emp-status" th:classappend="${employee.active} ? ' emp-is-active' : ' emp-is-inactive'">
-                                <span class="emp-status-dot" aria-hidden="true"></span>
-                                <span th:text="${employee.active ? 'ACTIVE' : 'INACTIVE'}">ACTIVE</span>
+                            <span class="emx-status" th:classappend="${employee.active} ? ' emx-status--active' : ' emx-status--inactive'">
+                                <span class="emx-status-dot" aria-hidden="true"></span>
+                                <span th:text="${employee.active ? 'Active' : 'Inactive'}">Active</span>
                             </span>
                         </td>
-                        <td>
-                            <div class="emp-row-actions">
-                                <form th:if="${employee.active}" th:action="@{/employees/deactivate}" method="post" class="employee-status-form">
-                                    <input type="hidden" name="employeeId" th:value="${employee.id}">
-                                    <input type="hidden" name="page" th:value="${currentPage}">
-                                    <input type="hidden" name="size" th:value="${pageSize}">
-                                    <input type="hidden" name="q" th:value="${searchQuery}">
-                                    <button type="submit" class="emp-icon-button emp-deactivate" th:aria-label="${'Deactivate ' + employee.fullName}" th:title="${'Deactivate ' + employee.fullName}">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18.4 6.6a9 9 0 1 1-12.8 0M12 2v10"/></svg>
-                                    </button>
-                                </form>
-                                <form th:unless="${employee.active}" th:action="@{/employees/activate}" method="post" class="employee-status-form">
-                                    <input type="hidden" name="employeeId" th:value="${employee.id}">
-                                    <input type="hidden" name="page" th:value="${currentPage}">
-                                    <input type="hidden" name="size" th:value="${pageSize}">
-                                    <input type="hidden" name="q" th:value="${searchQuery}">
-                                    <button type="submit" class="emp-icon-button emp-activate" th:aria-label="${'Activate ' + employee.fullName}" th:title="${'Activate ' + employee.fullName}">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3"/></svg>
-                                    </button>
-                                </form>
-                            </div>
+
+                        <td class="emx-col-action">
+                            <form th:if="${employee.active}" th:action="@{/employees/deactivate}" method="post" class="employee-status-form">
+                                <input type="hidden" name="employeeId" th:value="${employee.id}">
+                                <input type="hidden" name="page" th:value="${currentPage}">
+                                <input type="hidden" name="size" th:value="${pageSize}">
+                                <input type="hidden" name="q" th:value="${searchQuery}">
+                                <button type="submit" class="emx-icon-btn emx-icon-btn--danger"
+                                        th:aria-label="${'Deactivate ' + employee.fullName}" th:title="${'Deactivate ' + employee.fullName}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18.4 6.6a9 9 0 1 1-12.8 0M12 2v10"/></svg>
+                                </button>
+                            </form>
+                            <form th:unless="${employee.active}" th:action="@{/employees/activate}" method="post" class="employee-status-form">
+                                <input type="hidden" name="employeeId" th:value="${employee.id}">
+                                <input type="hidden" name="page" th:value="${currentPage}">
+                                <input type="hidden" name="size" th:value="${pageSize}">
+                                <input type="hidden" name="q" th:value="${searchQuery}">
+                                <button type="submit" class="emx-icon-btn emx-icon-btn--good"
+                                        th:aria-label="${'Activate ' + employee.fullName}" th:title="${'Activate ' + employee.fullName}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3"/></svg>
+                                </button>
+                            </form>
                         </td>
                     </tr>
+
                     <tr th:if="${#lists.isEmpty(employees)}">
-                        <td colspan="7" class="emp-empty">No employees match your search.</td>
+                        <td colspan="6" class="emx-empty">
+                            <strong>No employees found</strong>
+                            <span>Try a different search, or add a new employee.</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Real Spring Data pagination; the shared unified-pager script handles number-window styling. -->
+        <!-- Server-side pagination (unchanged behaviour; styled by pagination-unified.css) -->
         <nav class="employees-pagination" aria-label="Employee pages" th:if="${totalPages > 0}">
             <div class="pagination-info">
                 Showing <strong th:text="${showingStart}">1</strong>
@@ -264,23 +176,94 @@
                 <span th:unless="${currentPage < totalPages - 1}" class="page-button disabled">Next</span>
             </div>
         </nav>
-        <div th:if="${totalPages == 0}" class="emp-zero-count" th:text="${'0 employees found'}">0 employees found</div>
+        <div th:if="${totalPages == 0}" class="emx-zero" th:text="${'0 employees found'}">0 employees found</div>
     </section>
 
 </main>
 
+<!-- Add employee dialog (same field names and endpoint as before) -->
+<dialog class="panel emx-dialog" id="employee-dialog" aria-labelledby="employee-create-title">
+    <form class="emx-form" id="employee-create-form" th:action="@{/employees/create}" method="post">
+
+        <div class="emx-dialog-head">
+            <div>
+                <h3 id="employee-create-title">Add employee</h3>
+                <p>Create a staff account and assign it to a stall or storage location.</p>
+            </div>
+            <button type="button" class="emx-x" data-close aria-label="Close">&times;</button>
+        </div>
+
+        <div class="emx-grid">
+            <label class="emx-field" for="employee-full-name">
+                <span>Full name</span>
+                <input id="employee-full-name" type="text" name="fullName" maxlength="100"
+                       placeholder="e.g. Juan Dela Cruz" autocomplete="name" required>
+            </label>
+
+            <label class="emx-field" for="employee-username">
+                <span>Username</span>
+                <input id="employee-username" type="text" name="username" minlength="3" maxlength="50"
+                       pattern="[A-Za-z0-9._-]+" autocomplete="off" placeholder="e.g. juan.dela" required>
+                <small>Letters, numbers, dot, dash or underscore.</small>
+            </label>
+
+            <div class="emx-field">
+                <label for="employee-password"><span>Password</span></label>
+                <span class="emx-password">
+                    <input id="employee-password" type="password" name="password" minlength="12" maxlength="72"
+                           autocomplete="new-password" placeholder="At least 12 characters" required>
+                    <button class="emx-eye" type="button" aria-label="Show password" aria-pressed="false"
+                            aria-controls="employee-password" title="Show password">
+                        <svg class="eye-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                        <svg class="eye-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18M10.4 6.1A11.9 11.9 0 0 1 12 6c6.4 0 10 6 10 6a13.5 13.5 0 0 1-3.5 3.6M6.2 7.4C3.5 9.3 2 12 2 12s3.6 6 10 6c1.6 0 3-.4 4.3-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 10a3 3 0 0 0 4 4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                    </button>
+                </span>
+            </div>
+
+            <label class="emx-field" for="employee-role">
+                <span>Role</span>
+                <select id="employee-role" name="role" required>
+                    <option value="">Select role</option>
+                    <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
+                </select>
+            </label>
+
+            <label class="emx-field emx-field--full" for="employee-location">
+                <span>Assigned location <em class="emx-req" id="employee-location-req" hidden>required for this role</em></span>
+                <select id="employee-location" name="locationId">
+                    <option value="">No assigned location</option>
+                    <option th:each="location : ${locations}" th:value="${location.id}"
+                            th:text="${location.name + ' (' + location.code + ')'}"></option>
+                </select>
+                <small>Sender, Receiver and Cashier accounts must have a location.</small>
+            </label>
+        </div>
+
+        <div class="emx-dialog-foot">
+            <button type="button" class="emx-btn emx-btn--ghost" data-close>Cancel</button>
+            <button type="submit" class="emx-btn emx-btn--primary">Create employee</button>
+        </div>
+    </form>
+</dialog>
+
 <script>
 (function () {
     'use strict';
+    const dialog = document.getElementById('employee-dialog');
     const form = document.getElementById('employee-create-form');
-    if (!form) return;
+    if (!dialog || !form) return;
+
     const password = document.getElementById('employee-password');
-    const toggle = form.querySelector('.employee-password-toggle');
+    const toggle = form.querySelector('.emx-eye');
     const role = document.getElementById('employee-role');
-    const location = document.getElementById('employee-location');
+    const locationSelect = document.getElementById('employee-location');
+    const locationReq = document.getElementById('employee-location-req');
     const rolesRequiringLocation = new Set(['SENDER', 'RECEIVER', 'CASHIER']);
+
     function updateLocationRequirement() {
-        location.required = rolesRequiringLocation.has(role.value);
+        const needed = rolesRequiringLocation.has(role.value);
+        locationSelect.required = needed;
+        locationReq.hidden = !needed;
     }
     function hidePassword() {
         password.type = 'password';
@@ -288,6 +271,34 @@
         toggle.setAttribute('aria-label', 'Show password');
         toggle.title = 'Show password';
     }
+    function openDialog() {
+        form.reset();
+        hidePassword();
+        updateLocationRequirement();
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else dialog.setAttribute('open', '');
+        document.getElementById('employee-full-name').focus();
+    }
+    function closeDialog() {
+        if (typeof dialog.close === 'function') dialog.close();
+        else dialog.removeAttribute('open');
+    }
+
+    document.querySelectorAll('[data-open-employee-dialog]').forEach(function (b) {
+        b.addEventListener('click', openDialog);
+    });
+    dialog.querySelectorAll('[data-close]').forEach(function (b) {
+        b.addEventListener('click', closeDialog);
+    });
+
+    // Close when clicking the dimmed backdrop (but not when a text-selection drag ends there)
+    let downOnBackdrop = false;
+    dialog.addEventListener('mousedown', function (e) { downOnBackdrop = e.target === dialog; });
+    dialog.addEventListener('click', function (e) {
+        if (e.target === dialog && downOnBackdrop) closeDialog();
+    });
+    dialog.addEventListener('close', function () { form.reset(); hidePassword(); });
+
     toggle.addEventListener('click', function () {
         if (password.type === 'password') {
             password.type = 'text';
@@ -297,12 +308,10 @@
         } else hidePassword();
     });
     role.addEventListener('change', updateLocationRequirement);
-    form.addEventListener('reset', function () {
-        hidePassword();
-        // The browser restores select values after the reset event.
-        setTimeout(updateLocationRequirement, 0);
-    });
     updateLocationRequirement();
+
+    // Old links like /employees#employee-create-title still open the form
+    if (window.location.hash === '#employee-create-title') openDialog();
 })();
 </script>
 
