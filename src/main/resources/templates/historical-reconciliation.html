@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SmartStock | Historical Reconciliation</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+<main class="form-page">
+  <div class="topbar"><div><h2 class="page-title">Historical Daily Reconciliation</h2>
+    <p class="page-sub">Reconstruct previous business days using original Excel records. Read-only evidence: does not post sales, payments, utang, or stock movements.</p>
+  </div></div>
+  <p class="error-msg" th:if="${error}" th:text="${error}"></p>
+  <p th:if="${notice}" th:text="${notice}"></p>
+  <div class="panel" th:if="${canEdit}">
+    <h3>Create a historical day</h3>
+    <p>Start with November 15 as the debt baseline, then enter November 16 for the same company stall. Use the recorded collection total, not your estimated sales.</p>
+    <form class="nova-form" th:action="@{/historical-reconciliation}" th:object="${form}" method="post">
+      <div class="form-grid">
+        <label>Company Stall
+          <select th:field="*{locationId}" required>
+            <option value="">Choose company stall</option>
+            <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name + ' (' + loc.code + ')'}"></option>
+          </select>
+        </label>
+        <label>Historical Business Date <input th:field="*{businessDate}" type="date" required></label>
+        <label>Total Money Collected (₱) <input th:field="*{collections}" type="number" min="0" step="0.01" required placeholder="79564.00"></label>
+        <label>Original Workbook / Source <input th:field="*{sourceFile}" maxlength="255" required placeholder="November 16, 2026.xlsx"></label>
+        <label>Notes (cash float, assumptions, other suppliers) <input th:field="*{notes}" maxlength="1000" placeholder="Record what the amount includes"></label>
+      </div>
+      <div class="form-actions"><button class="btn btn-primary" type="submit">Create Historical Day</button></div>
+    </form>
+  </div>
+  <div class="panel">
+    <h3>Saved historical days</h3>
+    <p th:if="${#lists.isEmpty(days)}">No historical records yet.</p>
+    <div style="overflow-x:auto" th:unless="${#lists.isEmpty(days)}">
+      <table class="table" style="width:100%;border-collapse:collapse">
+        <thead><tr><th>Date</th><th>Company stall</th><th>Collections</th><th>Debt list</th><th>Stock list</th><th>Status</th><th></th></tr></thead>
+        <tbody><tr th:each="day : ${days}">
+          <td th:text="${day.businessDate}"></td>
+          <td th:text="${day.location.name}"></td>
+          <td th:text="${'₱' + #numbers.formatDecimal(day.collections,1,'COMMA',2,'POINT')}"></td>
+          <td th:text="${day.debtsComplete ? 'Complete' : 'Incomplete'}"></td>
+          <td th:text="${day.stockComplete ? 'Complete' : 'Incomplete'}"></td>
+          <td th:text="${day.status}"></td>
+          <td><a th:href="@{/historical-reconciliation/{id}(id=${day.id})}">View / Enter Details</a></td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
+</main></body></html>

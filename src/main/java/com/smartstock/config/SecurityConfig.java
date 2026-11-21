@@ -252,6 +252,13 @@ public class SecurityConfig {
                 .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers("/daily-closing/**").denyAll()
 
+                // Historical source evidence; never modifies live inventory or sales.
+                .requestMatchers(HttpMethod.GET, "/historical-reconciliation", "/historical-reconciliation/*")
+                .hasAnyRole("ADMIN", "MANAGER", "AUDITOR")
+                .requestMatchers(HttpMethod.POST, "/historical-reconciliation", "/historical-reconciliation/**")
+                .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/historical-reconciliation/**").denyAll()
+
                 // Sales: read-only access for auditors
                 .requestMatchers(
                         HttpMethod.GET,
