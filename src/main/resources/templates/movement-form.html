@@ -13,7 +13,6 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* Compact layout for this page only */
         .form-page .panel { padding: 22px 26px; }
         .form-page .form-grid { gap: 14px 22px; }
         .form-page .form-grid label { gap: 4px; }
@@ -27,7 +26,6 @@
         .has-error select,
         .has-error input { border-color: #b42318 !important; }
 
-        /* Live total */
         .total-box {
             grid-column: 1 / -1;
             display: flex;
@@ -43,7 +41,6 @@
         .total-box .total-detail { font-size: 0.8rem; opacity: 0.75; display: block; font-weight: 400; }
         .total-box .total-value { font-size: 1.35rem; font-weight: 700; white-space: nowrap; }
 
-        /* Collapsible help */
         details.form-note { margin-top: 16px; }
         details.form-note summary { cursor: pointer; font-weight: 600; }
         details.form-note p { margin: 8px 0 0; }
@@ -71,7 +68,6 @@
             box-shadow: 0 0 0 3px rgba(15, 155, 122, 0.18);
         }
 
-        /* Stock In / Stock Out toggle */
         .seg {
             grid-column: 1 / -1;
             display: grid;
@@ -98,7 +94,6 @@
         .seg-btn.active[data-value="STOCK_OUT"] { color: #b42318; }
         .seg-btn:focus-visible { outline: 2px solid #0f9b7a; outline-offset: 2px; }
 
-        /* Total + actions */
         .total-box .total-value { color: #0b7a60; }
         .form-page .form-actions {
             margin-top: 18px;
@@ -369,7 +364,6 @@
 
             </div>
 
-            <!-- INFORMATION (collapsed to save space) -->
             <details class="form-note">
                 <summary>How this form works</summary>
 
@@ -448,7 +442,6 @@
             return movementType.value === "STOCK_IN";
         }
 
-        /* ---------- Show/hide fields by movement type ---------- */
         function updateMovementFields() {
             var stockIn = isStockIn();
 
@@ -465,7 +458,6 @@
             updateTotal();
         }
 
-        /* ---------- Live total ---------- */
         function formatPeso(n) {
             return "₱" + n.toLocaleString("en-PH", {
                 minimumFractionDigits: 2,
@@ -500,7 +492,6 @@
             }
         }
 
-        /* ---------- Validation ---------- */
         function errorEl(name) {
             return document.querySelector('[data-error-for="' + name + '"]');
         }
@@ -583,16 +574,14 @@
             return true;
         }
 
-        /* ---------- Remember last location ---------- */
         function restoreLastLocation() {
             try {
-                // Only prefill when the form is empty (not after a server-side error)
                 if (locationSelect.value) { return; }
                 var saved = localStorage.getItem(LAST_LOCATION_KEY);
                 if (saved && locationSelect.querySelector('option[value="' + saved + '"]')) {
                     locationSelect.value = saved;
                 }
-            } catch (e) { /* storage unavailable: ignore */ }
+            } catch (e) { }
         }
 
         function saveLastLocation() {
@@ -600,10 +589,9 @@
                 if (locationSelect.value) {
                     localStorage.setItem(LAST_LOCATION_KEY, locationSelect.value);
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) { }
         }
 
-        /* ---------- Wire up ---------- */
         document.addEventListener("DOMContentLoaded", function () {
             movementType.addEventListener("change", updateMovementFields);
 
@@ -627,7 +615,6 @@
             purchaseInput.addEventListener("input", updateTotal);
             weightInput.addEventListener("input", updateTotal);
 
-            // Clear a field's error as soon as the user edits it
             ["productId", "locationId", "businessDate", "purchaseCostPerKg",
              "category", "weightKg", "reason"].forEach(function (id) {
                 var el = $(id);
@@ -644,7 +631,655 @@
                 }
                 saveLastLocation();
 
-                // Prevent double-saving the same movement
+                var btn = $("saveBtn");
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = "Saving...";
+                }
+            });
+
+            restoreLastLocation();
+            updateMovementFields();
+        });
+    })();
+</script>
+
+</body>
+</html>
+EOFcat > src/main/resources/templates/movement-form.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Record Stock Movement</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+
+    <script th:src="@{/js/theme.js}"></script>
+
+    <style>
+        .form-page .panel { padding: 22px 26px; }
+        .form-page .form-grid { gap: 14px 22px; }
+        .form-page .form-grid label { gap: 4px; }
+        .form-page .form-grid select,
+        .form-page .form-grid input { padding-top: 9px; padding-bottom: 9px; }
+        .form-page .movement-dependent-fields { display: contents; }
+        .form-page .movement-dependent-fields > div { min-width: 0; }
+
+        .hint-text { font-size: 0.8rem; opacity: 0.75; font-weight: 400; }
+        .js-error { display: block; color: #b42318; font-size: 0.8rem; font-weight: 600; min-height: 0; }
+        .has-error select,
+        .has-error input { border-color: #b42318 !important; }
+
+        .total-box {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(16, 150, 120, 0.10);
+            border: 1px solid rgba(16, 150, 120, 0.30);
+        }
+        .total-box .total-label { font-weight: 600; }
+        .total-box .total-detail { font-size: 0.8rem; opacity: 0.75; display: block; font-weight: 400; }
+        .total-box .total-value { font-size: 1.35rem; font-weight: 700; white-space: nowrap; }
+
+        details.form-note { margin-top: 16px; }
+        details.form-note summary { cursor: pointer; font-weight: 600; }
+        details.form-note p { margin: 8px 0 0; }
+
+        @media (max-width: 700px) {
+            .form-page .panel { padding: 16px; }
+            .total-box { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* ---- Design polish ---- */
+        .form-page .form-grid { align-items: start; row-gap: 16px !important; column-gap: 20px !important; }
+        .form-page .form-grid label { font-weight: 600; font-size: 0.9rem; }
+        .form-page .form-grid small.hint-text { color: inherit !important; opacity: 0.65; font-weight: 400; }
+        .form-page .form-grid label[data-field="reason"] { grid-column: 1 / -1; }
+        .form-page .form-grid label[data-field="movementType"] { display: none; }
+        .form-page .form-grid select,
+        .form-page .form-grid input {
+            border-radius: 10px;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .form-page .form-grid select:focus,
+        .form-page .form-grid input:focus {
+            outline: none;
+            border-color: #0f9b7a !important;
+            box-shadow: 0 0 0 3px rgba(15, 155, 122, 0.18);
+        }
+
+        .seg {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding: 5px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .seg-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 12px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: inherit;
+            opacity: 0.7;
+            transition: background .15s, opacity .15s, color .15s;
+        }
+        .seg-btn small { display: block; font-weight: 400; font-size: 0.75rem; opacity: 0.85; }
+        .seg-btn.active { opacity: 1; background: #fff; color: #0b7a60; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+        .seg-btn.active[data-value="STOCK_OUT"] { color: #b42318; }
+        .seg-btn:focus-visible { outline: 2px solid #0f9b7a; outline-offset: 2px; }
+
+        .total-box .total-value { color: #0b7a60; }
+        .form-page .form-actions {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: flex-end;
+        }
+        .form-page .form-actions .btn { padding: 12px 28px; border-radius: 12px; font-weight: 700; }
+        @media (max-width: 700px) {
+            .form-page .form-actions .btn { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="form-page">
+
+    <div class="topbar">
+        <div>
+            <a class="back-link" th:href="@{/inventory}">
+                ← Back to Stock History
+            </a>
+
+            <h2 class="page-title">Record Stock Movement</h2>
+
+            <p class="page-sub">
+                Log supplier deliveries or record spoilage/damage.
+            </p>
+        </div>
+    </div>
+
+    <div class="panel">
+
+        <p class="error-msg"
+           th:if="${error}"
+           th:text="${error}">
+        </p>
+
+        <form class="nova-form"
+              id="movementFormEl"
+              th:object="${movementForm}"
+              th:action="@{/inventory/save}"
+              method="post"
+              novalidate>
+
+            <div class="form-grid">
+
+                <!-- MOVEMENT TYPE TOGGLE (syncs with the select below) -->
+                <div class="seg" role="radiogroup" aria-label="Movement type">
+                    <button type="button" class="seg-btn" data-value="STOCK_IN"
+                            role="radio" aria-checked="true">
+                        Stock In
+                        <small>Supplier delivery</small>
+                    </button>
+                    <button type="button" class="seg-btn" data-value="STOCK_OUT"
+                            role="radio" aria-checked="false">
+                        Stock Out
+                        <small>Spoilage, damage or missing</small>
+                    </button>
+                </div>
+
+                <!-- PRODUCT -->
+                <label data-field="productId">
+                    Chicken Product
+
+                    <select th:field="*{productId}"
+                            id="productId"
+                            required>
+
+                        <option value="">
+                            Choose a product
+                        </option>
+
+                        <option th:each="p : ${products}"
+                                th:value="${p.id}"
+                                th:text="${p.name + ' — company total: ' + p.stockKg + ' kg'}">
+                        </option>
+                    </select>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('productId')}"
+                           th:errors="*{productId}">
+                    </small>
+                    <small class="js-error" data-error-for="productId"></small>
+                </label>
+
+                <!-- LOCATION -->
+                <label data-field="locationId">
+                    Receiving / Stock Location
+
+                    <select th:field="*{locationId}"
+                            id="locationId"
+                            required>
+
+                        <option value="">
+                            Choose a stall or storage location
+                        </option>
+
+                        <option th:each="loc : ${locations}"
+                                th:value="${loc.id}"
+                                th:text="${loc.name + ' (' + loc.code + ')'}">
+                        </option>
+                    </select>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('locationId')}"
+                           th:errors="*{locationId}">
+                    </small>
+                    <small class="js-error" data-error-for="locationId"></small>
+                </label>
+
+                <!-- MOVEMENT TYPE -->
+                <label data-field="movementType">
+                    Movement Type
+
+                    <select th:field="*{type}"
+                            id="movementType"
+                            required>
+
+                        <option value="STOCK_IN">
+                            Stock In — Supplier Delivery
+                        </option>
+
+                        <option value="STOCK_OUT">
+                            Stock Out — Inventory Loss
+                        </option>
+                    </select>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('type')}"
+                           th:errors="*{type}">
+                    </small>
+                </label>
+
+                <!-- BUSINESS DATE -->
+                <label data-field="businessDate">
+                    Business Date / Delivery Date
+
+                    <input th:field="*{businessDate}"
+                           id="businessDate"
+                           type="date"
+                           required>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('businessDate')}"
+                           th:errors="*{businessDate}">
+                    </small>
+                    <small class="js-error" data-error-for="businessDate"></small>
+
+                    <small class="hint-text">
+                        The actual date the delivery or stock movement occurred.
+                    </small>
+                </label>
+
+                <!-- MOVEMENT-DEPENDENT FIELDS -->
+                <div class="movement-dependent-fields">
+
+                    <!-- STOCK LOSS CATEGORY -->
+                    <div id="lossCategorySection"
+                         style="display: none;">
+
+                        <label data-field="category">
+                            Reason for Stock Loss
+
+                            <select th:field="*{category}"
+                                    id="category">
+
+                                <option value="">
+                                    Choose a loss category
+                                </option>
+
+                                <option value="SPOILAGE">
+                                    Spoilage
+                                </option>
+
+                                <option value="DAMAGE">
+                                    Damage
+                                </option>
+
+                                <option value="MISSING_STOCK">
+                                    Missing / Unexplained Stock
+                                </option>
+                            </select>
+
+                            <small class="error-text"
+                                   th:if="${#fields.hasErrors('category')}"
+                                   th:errors="*{category}">
+                            </small>
+                            <small class="js-error" data-error-for="category"></small>
+                        </label>
+                    </div>
+
+                    <!-- PURCHASE COST -->
+                    <div id="purchaseCostSection">
+
+                        <label data-field="purchaseCostPerKg">
+                            Purchase Cost per kg (₱)
+
+                            <input th:field="*{purchaseCostPerKg}"
+                                   id="purchaseCostPerKg"
+                                   type="number"
+                                   inputmode="decimal"
+                                   min="0.01"
+                                   step="0.01"
+                                   placeholder="e.g. 185.00">
+
+                            <small class="error-text"
+                                   th:if="${#fields.hasErrors('purchaseCostPerKg')}"
+                                   th:errors="*{purchaseCostPerKg}">
+                            </small>
+                            <small class="js-error" data-error-for="purchaseCostPerKg"></small>
+                        </label>
+                    </div>
+
+                </div>
+
+                <!-- WEIGHT -->
+                <label data-field="weightKg">
+                    Weight (kg)
+
+                    <input th:field="*{weightKg}"
+                           id="weightKg"
+                           type="number"
+                           inputmode="decimal"
+                           min="0.001"
+                           step="0.001"
+                           placeholder="e.g. 12.750"
+                           required>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('weightKg')}"
+                           th:errors="*{weightKg}">
+                    </small>
+                    <small class="js-error" data-error-for="weightKg"></small>
+                </label>
+
+                <!-- REFERENCE -->
+                <label data-field="reason">
+                    Reason / Reference
+
+                    <input th:field="*{reason}"
+                           id="reason"
+                           maxlength="255"
+                           placeholder="e.g. Marcela Farms DR-001"
+                           required>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('reason')}"
+                           th:errors="*{reason}">
+                    </small>
+                    <small class="js-error" data-error-for="reason"></small>
+                </label>
+
+                <!-- LIVE TOTAL -->
+                <div class="total-box" id="totalBox" aria-live="polite">
+                    <div>
+                        <span class="total-label" id="totalLabel">Total purchase cost</span>
+                        <span class="total-detail" id="totalDetail">
+                            Enter cost per kg and weight to see the total.
+                        </span>
+                    </div>
+                    <span class="total-value" id="totalValue">₱0.00</span>
+                </div>
+
+            </div>
+
+            <details class="form-note">
+                <summary>How this form works</summary>
+
+                <p>
+                    <strong>Business Date:</strong>
+                    Enter the actual delivery or movement date,
+                    even when recording the transaction later.
+                    SmartStock also preserves when the entry
+                    was actually recorded.
+                </p>
+
+                <p>
+                    <strong>Stock In:</strong>
+                    Adds purchased inventory directly to the
+                    selected location and updates the company total.
+                </p>
+
+                <p>
+                    <strong>Purchase Cost:</strong>
+                    Enter the actual supplier cost.
+                    SmartStock calculates the updated
+                    company-wide weighted-average cost.
+                </p>
+
+                <p>
+                    <strong>Stock Out:</strong>
+                    Records spoilage, damage or missing stock
+                    against the selected location.
+                </p>
+
+                <p>
+                    <strong>Transfers &amp; Sales:</strong>
+                    Do not use this form to move stock between
+                    company stalls. Use Transfers.
+                    Customer sales must be recorded using
+                    the appropriate sales workflow.
+                </p>
+            </details>
+
+            <div class="form-actions">
+                <button class="btn btn-primary"
+                        id="saveBtn"
+                        type="submit">
+                    Save Movement
+                </button>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+<script>
+    (function () {
+        "use strict";
+
+        var LAST_LOCATION_KEY = "smartstock.lastLocationId";
+
+        function $(id) { return document.getElementById(id); }
+
+        var form = $("movementFormEl");
+        var movementType = $("movementType");
+        var purchaseSection = $("purchaseCostSection");
+        var purchaseInput = $("purchaseCostPerKg");
+        var lossSection = $("lossCategorySection");
+        var lossInput = $("category");
+        var weightInput = $("weightKg");
+        var locationSelect = $("locationId");
+        var dateInput = $("businessDate");
+
+        if (!form || !movementType || !purchaseSection || !purchaseInput ||
+            !lossSection || !lossInput || !weightInput) {
+            return;
+        }
+
+        function isStockIn() {
+            return movementType.value === "STOCK_IN";
+        }
+
+        function updateMovementFields() {
+            var stockIn = isStockIn();
+
+            purchaseSection.style.display = stockIn ? "block" : "none";
+            purchaseInput.required = stockIn;
+            purchaseInput.disabled = !stockIn;
+
+            lossSection.style.display = stockIn ? "none" : "block";
+            lossInput.required = !stockIn;
+            lossInput.disabled = stockIn;
+
+            clearError("purchaseCostPerKg");
+            clearError("category");
+            updateTotal();
+        }
+
+        function formatPeso(n) {
+            return "₱" + n.toLocaleString("en-PH", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function updateTotal() {
+            var box = $("totalBox");
+            var label = $("totalLabel");
+            var detail = $("totalDetail");
+            var value = $("totalValue");
+
+            if (!isStockIn()) {
+                box.style.display = "none";
+                return;
+            }
+            box.style.display = "flex";
+            label.textContent = "Total purchase cost";
+
+            var cost = parseFloat(purchaseInput.value);
+            var weight = parseFloat(weightInput.value);
+
+            if (cost > 0 && weight > 0) {
+                value.textContent = formatPeso(cost * weight);
+                detail.textContent =
+                    formatPeso(cost) + " per kg × " + weight + " kg";
+            } else {
+                value.textContent = "₱0.00";
+                detail.textContent =
+                    "Enter cost per kg and weight to see the total.";
+            }
+        }
+
+        function errorEl(name) {
+            return document.querySelector('[data-error-for="' + name + '"]');
+        }
+
+        function setError(name, message) {
+            var el = errorEl(name);
+            if (el) {
+                el.textContent = message;
+                var wrap = el.closest("label");
+                if (wrap) { wrap.classList.add("has-error"); }
+            }
+        }
+
+        function clearError(name) {
+            var el = errorEl(name);
+            if (el) {
+                el.textContent = "";
+                var wrap = el.closest("label");
+                if (wrap) { wrap.classList.remove("has-error"); }
+            }
+        }
+
+        function todayISO() {
+            var d = new Date();
+            var m = String(d.getMonth() + 1).padStart(2, "0");
+            var day = String(d.getDate()).padStart(2, "0");
+            return d.getFullYear() + "-" + m + "-" + day;
+        }
+
+        function validate() {
+            var firstInvalid = null;
+
+            function fail(id, message) {
+                setError(id, message);
+                if (!firstInvalid) { firstInvalid = $(id); }
+            }
+
+            ["productId", "locationId", "businessDate", "purchaseCostPerKg",
+             "category", "weightKg", "reason"].forEach(clearError);
+
+            if (!$("productId").value) {
+                fail("productId", "Choose a product.");
+            }
+            if (!locationSelect.value) {
+                fail("locationId", "Choose a stall or storage location.");
+            }
+
+            if (!dateInput.value) {
+                fail("businessDate", "Select the delivery or movement date.");
+            } else if (dateInput.value > todayISO()) {
+                fail("businessDate", "The date cannot be in the future.");
+            }
+
+            if (isStockIn()) {
+                var cost = parseFloat(purchaseInput.value);
+                if (isNaN(cost)) {
+                    fail("purchaseCostPerKg", "Enter the purchase cost per kg.");
+                } else if (cost <= 0) {
+                    fail("purchaseCostPerKg", "Cost must be greater than 0.");
+                }
+            } else if (!lossInput.value) {
+                fail("category", "Choose a loss category.");
+            }
+
+            var weight = parseFloat(weightInput.value);
+            if (isNaN(weight)) {
+                fail("weightKg", "Enter the weight in kg.");
+            } else if (weight <= 0) {
+                fail("weightKg", "Weight must be greater than 0.");
+            }
+
+            if (!$("reason").value.trim()) {
+                fail("reason", "Enter a reason or reference (e.g. delivery receipt number).");
+            }
+
+            if (firstInvalid) {
+                firstInvalid.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function restoreLastLocation() {
+            try {
+                if (locationSelect.value) { return; }
+                var saved = localStorage.getItem(LAST_LOCATION_KEY);
+                if (saved && locationSelect.querySelector('option[value="' + saved + '"]')) {
+                    locationSelect.value = saved;
+                }
+            } catch (e) { }
+        }
+
+        function saveLastLocation() {
+            try {
+                if (locationSelect.value) {
+                    localStorage.setItem(LAST_LOCATION_KEY, locationSelect.value);
+                }
+            } catch (e) { }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            movementType.addEventListener("change", updateMovementFields);
+
+            var segBtns = document.querySelectorAll(".seg-btn");
+            function syncSegment() {
+                segBtns.forEach(function (b) {
+                    var on = b.getAttribute("data-value") === movementType.value;
+                    b.classList.toggle("active", on);
+                    b.setAttribute("aria-checked", on ? "true" : "false");
+                });
+            }
+            segBtns.forEach(function (b) {
+                b.addEventListener("click", function () {
+                    movementType.value = b.getAttribute("data-value");
+                    movementType.dispatchEvent(new Event("change"));
+                });
+            });
+            movementType.addEventListener("change", syncSegment);
+            syncSegment();
+
+            purchaseInput.addEventListener("input", updateTotal);
+            weightInput.addEventListener("input", updateTotal);
+
+            ["productId", "locationId", "businessDate", "purchaseCostPerKg",
+             "category", "weightKg", "reason"].forEach(function (id) {
+                var el = $(id);
+                if (el) {
+                    el.addEventListener("input", function () { clearError(id); });
+                    el.addEventListener("change", function () { clearError(id); });
+                }
+            });
+
+            form.addEventListener("submit", function (event) {
+                if (!validate()) {
+                    event.preventDefault();
+                    return;
+                }
+                saveLastLocation();
+
                 var btn = $("saveBtn");
                 if (btn) {
                     btn.disabled = true;
