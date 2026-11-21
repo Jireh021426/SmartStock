@@ -106,6 +106,44 @@
         @media (max-width: 700px) {
             .form-page .form-actions .btn { width: 100%; }
         }
+
+        /* ---- Fit on one screen (landscape layout) ---- */
+        .form-page { padding-top: 8px !important; }
+        .form-page .topbar { margin-bottom: 8px !important; }
+        .form-page .page-title { font-size: 1.5rem !important; margin: 4px 0 !important; }
+        .form-page .page-sub { display: none !important; }
+        .form-page .panel { padding: 16px 20px !important; }
+
+        .form-page .form-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            row-gap: 10px !important;
+            column-gap: 16px !important;
+        }
+        .form-page .form-grid label[data-field="productId"],
+        .form-page .form-grid label[data-field="locationId"] { grid-column: span 2; }
+        .form-page .form-grid label[data-field="reason"] { grid-column: auto; }
+        .form-page .form-grid small.hint-text { display: none; }
+
+        .seg { padding: 4px; }
+        .seg-btn { padding: 8px 10px; }
+        .seg-btn small { display: none; }
+
+        .total-box { padding: 8px 14px; }
+        .total-box .total-value { font-size: 1.15rem; }
+        details.form-note { margin-top: 10px; }
+        .form-page .form-actions { margin-top: 10px !important; padding-top: 10px !important; }
+        .form-page .form-actions .btn { padding: 10px 26px !important; }
+
+        @media (max-width: 1000px) {
+            .form-page .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
+        @media (max-width: 600px) {
+            .form-page .form-grid { grid-template-columns: 1fr !important; }
+            .form-page .form-grid label[data-field="productId"],
+            .form-page .form-grid label[data-field="locationId"] { grid-column: auto; }
+            .form-page .page-sub { display: block !important; }
+            .seg-btn small { display: block; }
+        }
     </style>
 </head>
 
