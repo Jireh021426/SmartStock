@@ -58,3 +58,135 @@
 :root[data-theme="dark"] .audits-page .btn-reject {color:#fb7185}
 :root[data-theme="dark"] .audits-page .btn-approve {color:#34d399}
 @media(max-width:760px){.audits-page{padding:20px 16px}.audits-page .form-grid{grid-template-columns:1fr}.audits-page .panel-body{padding:16px}.audits-page .rc-details{grid-template-columns:1fr}.audits-page .rc-actions .btn{flex:1}}
+
+/* ============================================================
+   SmartStock Audits — viewport layout and readable audit trail
+   Preserves all thirteen audit fields and all review actions.
+   The fixed site topbar is NOT this page's local .topbar.
+   ============================================================ */
+body > main.audits-page {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    min-height: 100vh;
+    height: auto;
+    overflow: visible;
+    padding: 95px 28px 42px;
+    gap: 20px;
+}
+
+/* Global .topbar can be fixed-position; this title row must be in flow. */
+body > main.audits-page > .topbar {
+    position: static;
+    inset: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    z-index: auto;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+}
+body > main.audits-page > .topbar .page-title {
+    margin: 0;
+    font-size: 25px;
+    line-height: 1.2;
+    letter-spacing: -.025em;
+}
+body > main.audits-page > .topbar .page-sub {
+    margin-top: 7px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    max-width: 72ch;
+}
+
+body > main.audits-page > .panel {
+    min-width: 0;
+    border-radius: 10px;
+}
+body > main.audits-page .panel-head {
+    min-height: 58px;
+    padding: 15px 20px;
+}
+body > main.audits-page .panel-head h3 {
+    font-size: 13px;
+    letter-spacing: .005em;
+}
+
+/* A 13-column audit log cannot fit at 1200px without damaging legibility.
+   Let the table itself scroll while the sidebar and page stay in place. */
+body > main.audits-page .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+}
+body > main.audits-page .table-wrap table {
+    width: 100%;
+    min-width: 1840px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+body > main.audits-page .table-wrap :is(th, td) {
+    padding: 14px 16px;
+    line-height: 1.48;
+    vertical-align: middle;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+body > main.audits-page .table-wrap th {
+    font-size: 10px;
+    white-space: nowrap;
+    letter-spacing: .055em;
+}
+body > main.audits-page .table-wrap td {
+    font-size: 12.5px;
+    white-space: nowrap;
+}
+/* Audit narrative is readable, not stacked into individual words. */
+body > main.audits-page .table-wrap :is(th, td):nth-child(12),
+body > main.audits-page .table-wrap :is(th, td):nth-child(13) {
+    min-width: 225px;
+    max-width: 310px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+body > main.audits-page .table-wrap :is(th, td):nth-child(2),
+body > main.audits-page .table-wrap :is(th, td):nth-child(3),
+body > main.audits-page .table-wrap :is(th, td):nth-child(7),
+body > main.audits-page .table-wrap :is(th, td):nth-child(10) {
+    min-width: 120px;
+    white-space: normal;
+}
+body > main.audits-page .table-wrap tr:last-child td {
+    border-bottom: none;
+}
+body > main.audits-page .table-wrap .status-badge {
+    white-space: nowrap;
+}
+
+@media (max-width: 1099px) {
+    body > main.audits-page { padding: 28px 20px 38px; }
+}
+@media (max-width: 760px) {
+    body > main.audits-page { padding: 24px 15px 32px; gap: 15px; }
+    body > main.audits-page > .topbar .page-title { font-size: 22px; }
+    body > main.audits-page .panel-head { padding: 14px 16px; }
+    body > main.audits-page .table-wrap table { min-width: 1840px; }
+}
+@media print {
+    body > main.audits-page { padding: 12px 0; }
+    body > main.audits-page .table-wrap { overflow: visible; }
+    body > main.audits-page .table-wrap table { min-width: 0; }
+}
