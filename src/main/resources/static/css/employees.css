@@ -1153,3 +1153,65 @@ main.employees-page {
     .employees-page .emp-actions a { flex: 1; }
     .employees-page .employee-list-panel .employees-pagination { padding: 16px 18px; }
 }
+
+/* BEGIN SMARTSTOCK EMPLOYEE DARK CONTRAST FIX 20261123 */
+/* SmartStock: employee actions + native dropdown contrast. Scoped to Employees only. */
+:root[data-theme="dark"] .employees-page .form-grid select[name="role"],
+:root[data-theme="dark"] .employees-page .form-grid select[name="locationId"],
+:root[data-theme="dark"] .employees-page select#employee-role,
+:root[data-theme="dark"] .employees-page select#employee-location {
+    color-scheme: dark !important;
+    background-color: #202c42 !important;
+    color: #f8fafc !important;
+    -webkit-text-fill-color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+    opacity: 1 !important;
+}
+:root[data-theme="dark"] .employees-page select[name="role"] option,
+:root[data-theme="dark"] .employees-page select[name="locationId"] option,
+:root[data-theme="dark"] .employees-page select#employee-role option,
+:root[data-theme="dark"] .employees-page select#employee-location option {
+    color-scheme: dark !important;
+    background-color: #172033 !important;
+    color: #f8fafc !important;
+    -webkit-text-fill-color: #f8fafc !important;
+}
+:root[data-theme="dark"] .employees-page .emp-icon-button,
+:root[data-theme="dark"] .employees-page .btn-action,
+:root[data-theme="dark"] .employees-page .employee-create-actions button[type="submit"],
+:root[data-theme="dark"] .employees-page .form-actions button[type="submit"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+    font-weight: 750 !important;
+}
+:root[data-theme="dark"] .employees-page .emp-icon-button.emp-deactivate,
+:root[data-theme="dark"] .employees-page .btn-action.btn-deactivate {
+    color: #fecdd3 !important;
+    background: #492535 !important;
+    border: 1px solid #fb7185 !important;
+}
+:root[data-theme="dark"] .employees-page .emp-icon-button.emp-activate,
+:root[data-theme="dark"] .employees-page .btn-action.btn-activate {
+    color: #a7f3d0 !important;
+    background: #174938 !important;
+    border: 1px solid #34d399 !important;
+}
+:root[data-theme="dark"] .employees-page .emp-icon-button svg {
+    color: inherit !important;
+    stroke: currentColor !important;
+    opacity: 1 !important;
+}
+:root[data-theme="dark"] .employees-page .employee-create-actions button[type="submit"],
+:root[data-theme="dark"] .employees-page .form-actions button[type="submit"] {
+    color: #052e2b !important;
+    background: #2dd4bf !important;
+    border: 1px solid #14b8a6 !important;
+}
+:root[data-theme="dark"] .employees-page .emp-icon-button:focus-visible,
+:root[data-theme="dark"] .employees-page .btn-action:focus-visible,
+:root[data-theme="dark"] .employees-page .form-actions button:focus-visible {
+    outline: 3px solid #5eead4 !important;
+    outline-offset: 2px;
+}
+/* END SMARTSTOCK EMPLOYEE DARK CONTRAST FIX 20261123 */

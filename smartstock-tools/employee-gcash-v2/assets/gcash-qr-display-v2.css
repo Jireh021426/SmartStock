@@ -1,0 +1,29 @@
+/* Fit the entire user-provided original QR image, including recipient details,
+   without cropping or resampling it. The dialog scrolls on shorter screens. */
+.ss-gcash-modal .ss-gcash-dialog {
+  width: min(100%, 460px);
+  max-height: min(90vh, 900px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ss-gcash-modal .ss-gcash-qr-frame {
+  width: min(100%, 350px);
+  max-width: 350px;
+  min-height: 0;
+  margin-inline: auto;
+  padding: 9px;
+  background: white;
+}
+.ss-gcash-modal .ss-gcash-qr-frame img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  height: auto;
+  object-fit: contain;
+}
+.ss-gcash-modal .ss-gcash-qr-frame img[hidden] { display:none !important; }
+@media (max-width: 480px) {
+  .ss-gcash-modal .ss-gcash-dialog { padding: 18px 14px; }
+  .ss-gcash-modal .ss-gcash-qr-frame { width: min(100%, 320px); }
+}

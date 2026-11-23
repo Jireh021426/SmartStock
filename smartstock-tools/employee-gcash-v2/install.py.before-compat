@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+"""UI-only SmartStock fix. Validate all changes first; backup, write, verify, rollback."""
+from pathlib import Path
+from datetime import datetime
+import hashlib, os, sys, tempfile
+from zipfile import ZipFile, ZIP_DEFLATED
+
+ROOT = Path(__file__).resolve().parents[2]
+ASSETS = Path(__file__).resolve().parent / 'assets'
+EMP_PAGE = 'src/main/resources/templates/employees.html'
+FORMS = {
+  'src/main/resources/templates/sale-form.html': '/sales/save',
+  'src/main/resources/templates/payment-form.html': '/payments/save',
+  'src/main/resources/templates/independent-payment-form.html': '/independent-stalls/payments/save',
+}
+STATIC = 'src/main/resources/static/'
+CSS_BASE = 'css/gcash-qr.css'
+JS_BASE = 'js/gcash-qr.js'
+QR = 'images/gcash-merchant-qr.png'
+EMP_CONTRAST = 'css/employees-contrast-v2.css'
+QR_DISPLAY = 'css/gcash-qr-display-v2.css'
+EMP_TAG = '<link rel="stylesheet" th:href="@{/css/employees-contrast-v2.css(v=20261123b)}">'
+GCASH_TAG = '<link rel="stylesheet" th:href="@{/css/gcash-qr.css(v=1)}">'
+GCASH_JS = '<script defer th:src="@{/js/gcash-qr.js(v=1)}"></script>'
+DISPLAY_TAG = '<link rel="stylesheet" th:href="@{/css/gcash-qr-display-v2.css(v=20261123b)}">'
+
+def text(b, name):
+    try: return b.decode('utf-8')
+    except UnicodeDecodeError as e: raise ValueError(f'{name}: invalid UTF-8: {e}')
+
+def add_head(s, tag):
+    if tag in s: return s
+    nl = '\r\n' if '\r\n' in s else '\n'
+    return s.replace('</head>', '    ' + tag + nl + '</head>')
+
+def adjust_template(b, name):
+    s = text(b, name)
+    if s.count('</head>') != 1 or s.count('</body>') != 1:
+        raise ValueError(f'{name}: cannot locate unique head/body; nothing changed')
+    if name == EMP_PAGE:
+        if not all(key in s for key in ['employees-page', 'employee-role', 'employee-location', 'emp-icon-button']):
+            raise ValueError('Employee page structure differs from compatible layout; nothing changed')
+        s = add_head(s, EMP_TAG)
+    else:
+        if FORMS[name] not in s or 'GCASH' not in s.upper():
+            raise ValueError(f'{name}: payment form structure differs; nothing changed')
+        if '/css/gcash-qr.css' not in s: s = add_head(s, GCASH_TAG)
+        s = add_head(s, DISPLAY_TAG)
+        if '/js/gcash-qr.js' not in s:
+            nl = '\r\n' if '\r\n' in s else '\n'
+            s = s.replace('</body>', GCASH_JS + nl + '</body>')
+    return s.encode('utf-8')
+
+def sha(b): return hashlib.sha256(b).hexdigest()
+
+def main():
+    if not (ROOT / 'pom.xml').is_file():
+        raise RuntimeError('Extract archive inside SmartStock project root, then run install.py')
+    before = {}
+    after = {}
+    for rel in [EMP_PAGE, *FORMS.keys()]:
+        path = ROOT / rel
+        if not path.is_file(): raise RuntimeError(f'Missing required template: {rel}; no files changed')
+        b = path.read_bytes()
+        before[rel] = b
+        after[rel] = adjust_template(b, rel)
+    for name, asset in [(CSS_BASE, 'gcash-qr.css'), (JS_BASE, 'gcash-qr.js'),
+                        (QR, 'gcash-merchant-qr.png'), (EMP_CONTRAST, 'employees-contrast-v2.css'),
+                        (QR_DISPLAY, 'gcash-qr-display-v2.css')]:
+        rel = STATIC + name
+        src = (ASSETS / asset).read_bytes()
+        dest = ROOT / rel
+        prev = dest.read_bytes() if dest.is_file() else None
+        # Do not replace someone else's official QR code or customized previous assets.
+        if name == QR and prev is not None and prev != src:
+            raise RuntimeError(f'Official QR already exists but differs from uploaded image: {rel}; no files changed')
+        if name in (CSS_BASE, JS_BASE) and prev is not None:
+            src = prev   # Keep existing, customized QR popup code and styles.
+        if name in (EMP_CONTRAST, QR_DISPLAY) and prev is not None and prev != src:
+            raise RuntimeError(f'Conflicting existing UI V2 asset: {rel}; no files changed')
+        before[rel] = prev
+        after[rel] = src
+    changed = [p for p in after if before[p] != after[p]]
+    print('PASS: checked employee template, 3 payment forms, 5 static assets; no Java or DB operations.')
+    print(f'Found {len(changed)} new/changed files.')
+    if '--dry-run' in sys.argv:
+        print('DRY RUN PASS: no files changed.')
+        return
+    if not changed:
+        print('Already installed; nothing to change.')
+        return
+    backup_home = Path.home() / 'smartstock-private-backups'
+    backup_home.mkdir(parents=True, exist_ok=True)
+    backup = backup_home / ('employee-gcash-v2-before-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f') + '.zip')
+    with ZipFile(backup, 'w', ZIP_DEFLATED) as z:
+        for name in changed:
+            if before[name] is not None: z.writestr(name, before[name])
+        z.writestr('FILES_ADDED.txt', '\n'.join(name for name in changed if before[name] is None))
+    written = []
+    try:
+        for rel in changed:
+            dest = ROOT / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            handle, temp = tempfile.mkstemp(prefix='.smartstock-ui-v2-', dir=str(dest.parent))
+            try:
+                with os.fdopen(handle, 'wb') as out: out.write(after[rel])
+                os.replace(temp, dest)
+            finally:
+                if os.path.exists(temp): os.unlink(temp)
+            written.append(rel)
+        for rel in changed:
+            if sha((ROOT / rel).read_bytes()) != sha(after[rel]):
+                raise RuntimeError(f'Integrity check failed: {rel}')
+    except Exception:
+        for rel in reversed(written):
+            dest = ROOT / rel
+            if before[rel] is None: dest.unlink(missing_ok=True)
+            else: dest.write_bytes(before[rel])
+        raise
+    print(f'SUCCESS: {len(changed)} files installed; SHA-256 integrity verified.')
+    print('BACKUP:', backup)
+    print('ORIGINAL QR IMAGE:', ROOT / (STATIC + QR))
+    print('No Java, database, payment processing, or Railway deployment changes.')
+    print('Run Maven tests and restart locally. Scan QR only after verifying its destination in GCash.')
+
+if __name__ == '__main__':
+    try: main()
+    except Exception as e:
+        print('ABORTED:', e)
+        sys.exit(1)

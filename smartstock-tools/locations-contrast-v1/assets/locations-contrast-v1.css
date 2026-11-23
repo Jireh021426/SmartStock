@@ -1,0 +1,23 @@
+/* SmartStock Locations: readable reconciliation success notification in dark mode.
+   Limited to the Locations page; does not change stock calculations or other notices. */
+:root[data-theme="dark"] body .locations-page p.notice-msg {
+    background: #123d32 !important;
+    background-color: #123d32 !important;
+    color: #e6fff3 !important;
+    -webkit-text-fill-color: #e6fff3 !important;
+    border: 1px solid #2b8063 !important;
+    opacity: 1 !important;
+}
+
+/* The optional dismiss button is injected by the shared UI enhancements. */
+:root[data-theme="dark"] body .locations-page p.notice-msg .ss-close {
+    color: #e6fff3 !important;
+    -webkit-text-fill-color: #e6fff3 !important;
+    opacity: 1 !important;
+}
+
+:root[data-theme="dark"] body .locations-page p.notice-msg .ss-close:hover,
+:root[data-theme="dark"] body .locations-page p.notice-msg .ss-close:focus-visible {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}

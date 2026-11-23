@@ -1,0 +1,123 @@
+/* SmartStock Employees: native select and action visibility in dark mode.
+   Supports legacy emp-* and modern emx-* employee pages. */
+
+/* Closed selects remain dark; Windows/Chrome native option menus stay legible. */
+:root[data-theme="dark"] .employees-page #employee-role,
+:root[data-theme="dark"] .employees-page #employee-location,
+:root[data-theme="dark"] .employees-page select[name="role"],
+:root[data-theme="dark"] .employees-page select[name="locationId"] {
+  color-scheme: light !important;
+  background: #202c42 !important;
+  color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
+  border: 1px solid #43566f !important;
+  opacity: 1 !important;
+}
+
+.employees-page #employee-role option,
+.employees-page #employee-location option,
+.employees-page select[name="role"] option,
+.employees-page select[name="locationId"] option,
+:root[data-theme="dark"] .employees-page #employee-role option,
+:root[data-theme="dark"] .employees-page #employee-location option,
+:root[data-theme="dark"] .employees-page select[name="role"] option,
+:root[data-theme="dark"] .employees-page select[name="locationId"] option {
+  color-scheme: light !important;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background: #ffffff !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="dark"] .employees-page select[name="role"]:focus-visible,
+:root[data-theme="dark"] .employees-page select[name="locationId"]:focus-visible {
+  outline: 2px solid #2dd4bf !important;
+  outline-offset: 2px;
+}
+
+/* Legacy action buttons. Keep the original selectors for older templates. */
+:root[data-theme="dark"] .employees-page button.emp-icon-button.emp-deactivate,
+:root[data-theme="dark"] .employees-page .emp-row-actions button.emp-deactivate {
+  display: inline-grid !important;
+  place-items: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #492333 !important;
+  border: 1px solid #c65170 !important;
+  color: #ffe4e6 !important;
+  -webkit-text-fill-color: #ffe4e6 !important;
+  filter: none !important;
+}
+
+:root[data-theme="dark"] .employees-page button.emp-icon-button.emp-activate,
+:root[data-theme="dark"] .employees-page .emp-row-actions button.emp-activate {
+  display: inline-grid !important;
+  place-items: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #15493a !important;
+  border: 1px solid #36bf93 !important;
+  color: #d1fae5 !important;
+  -webkit-text-fill-color: #d1fae5 !important;
+  filter: none !important;
+}
+
+:root[data-theme="dark"] .employees-page .emp-row-actions .emp-icon-button svg,
+:root[data-theme="dark"] .employees-page .emp-row-actions .emp-icon-button svg path {
+  stroke: currentColor !important;
+  color: inherit !important;
+  fill: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+:root[data-theme="dark"] .employees-page button.emp-deactivate:hover {
+  background: #6a3045 !important;
+}
+:root[data-theme="dark"] .employees-page button.emp-activate:hover {
+  background: #1b624d !important;
+}
+.employees-page .emp-row-actions button.emp-icon-button:focus-visible {
+  outline: 3px solid #2dd4bf !important;
+  outline-offset: 3px;
+}
+
+/* Modern emx-* UI: preserve the 34px circular buttons and existing form actions. */
+:root[data-theme="dark"] main.employees-page.emx-page button.emx-icon-btn.emx-icon-btn--danger {
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #492333 !important;
+  border-color: #c65170 !important;
+  color: #ffe4e6 !important;
+  -webkit-text-fill-color: #ffe4e6 !important;
+  filter: none !important;
+}
+
+:root[data-theme="dark"] main.employees-page.emx-page button.emx-icon-btn.emx-icon-btn--good {
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #15493a !important;
+  border-color: #36bf93 !important;
+  color: #d1fae5 !important;
+  -webkit-text-fill-color: #d1fae5 !important;
+  filter: none !important;
+}
+
+:root[data-theme="dark"] main.employees-page.emx-page button.emx-icon-btn svg,
+:root[data-theme="dark"] main.employees-page.emx-page button.emx-icon-btn svg path {
+  stroke: currentColor !important;
+  color: inherit !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+:root[data-theme="dark"] main.employees-page.emx-page button.emx-icon-btn--danger:hover {
+  background: #6a3045 !important;
+}
+:root[data-theme="dark"] main.employees-page.emx-page button.emx-icon-btn--good:hover {
+  background: #1b624d !important;
+}
+main.employees-page.emx-page button.emx-icon-btn:focus-visible {
+  outline: 3px solid #2dd4bf !important;
+  outline-offset: 3px;
+}
