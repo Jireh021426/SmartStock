@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SmartStock | Sales</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/sales.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="sales-page">
+
+    <div class="topbar">
+        <div>
+            <h2 class="page-title">Sales Management</h2>
+            <p class="page-sub">Cash, GCash and utang. Sales and collections are tracked separately.</p>
+        </div>
+        <a class="btn btn-primary" th:if="${isAdmin or isCashier}" th:href="@{/sales/new}">+ New Sale</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats triple">
+        <div class="panel rem-kpi" style="--c: var(--good); --cb: rgba(52,211,153,.1)">
+            <span class="kpi-icon"><svg class="ico"><use href="#i-peso"/></svg></span>
+            <small>Today's sales (including utang)</small>
+            <h2 th:text="'₱' + ${todaySales}">₱0</h2>
+        </div>
+
+        <div class="panel rem-kpi" style="--c: var(--accent); --cb: rgba(76,201,240,.1)">
+            <span class="kpi-icon"><svg class="ico"><use href="#i-wallet"/></svg></span>
+            <small>Today's money collected</small>
+            <h2 th:text="'₱' + ${todayCollected}">₱0</h2>
+        </div>
+
+        <div class="panel rem-kpi" style="--c: var(--warn); --cb: rgba(251,191,36,.1)">
+            <span class="kpi-icon"><svg class="ico"><use href="#i-users"/></svg></span>
+            <small>Total unpaid utang</small>
+            <h2 th:text="'₱' + ${outstanding}">₱0</h2>
+        </div>
+    </div>
+
+    <!-- Sales History -->
+    <div class="panel">
+        <div class="panel-head">
+            <h3>Sales History</h3>
+        </div>
+        
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sale #</th>
+                        <th>Time</th>
+                        <th>Product</th>
+                        <th style="text-align: right;">Weight</th>
+                        <th style="text-align: right;">Price/kg</th>
+                        <th style="text-align: right;">Total</th>
+                        <th>Method</th>
+                        <th>Customer</th>
+                        <th style="text-align: right;">Receipt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="s : ${sales}">
+                        <td class="text-muted" th:text="'#' + ${s.id}"></td>
+                        <td class="text-muted" th:text="${#temporals.format(s.soldAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="product-name" th:text="${s.productName}"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="${s.weightKg} + ' kg'"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums;" th:text="'₱' + ${s.pricePerKg}"></td>
+                        <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 700;" th:text="'₱' + ${s.total}"></td>
+                        
+                        <!-- Payment Method Badge -->
+                        <td>
+                            <span class="status-badge" 
+                                  th:classappend="${s.paymentMethod.name() == 'CASH' ? 'status-in' : (s.paymentMethod.name() == 'GCASH' ? 'status-accent' : 'status-warn')}" 
+                                  th:text="${s.paymentMethod}">
+                            </span>
+                        </td>
+                        
+                        <td th:text="${s.customer != null ? s.customer.name : 'Walk-in'}"></td>
+                        <td style="text-align: right;">
+                            <a class="btn-action btn-ghost" th:href="@{/sales/{id}(id=${s.id})}">View</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(sales)}">
+                        <td colspan="9" class="empty-state">No sales recorded yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

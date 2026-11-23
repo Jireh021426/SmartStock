@@ -21,7 +21,7 @@
             <h2 class="page-title">Sales Management</h2>
             <p class="page-sub">Cash, GCash and utang. Sales and collections are tracked separately.</p>
         </div>
-        <a class="btn btn-primary" th:href="@{/sales/new}">+ New Sale</a>
+        <a class="btn btn-primary" th:if="${isAdmin or isCashier}" th:href="@{/sales/new}">+ New Sale</a>
     </div>
 
     <!-- Stats -->

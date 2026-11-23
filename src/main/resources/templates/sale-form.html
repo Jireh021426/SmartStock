@@ -29,15 +29,31 @@
         <form class="nova-form" th:action="@{/sales/save}" th:object="${saleForm}" method="post">
             
             <div class="form-grid">
+                <!-- ADMIN-ONLY: sale is attributed to this cashier for remittances -->
+                <label class="full-width" th:if="${adminSale}">
+                    Responsible Cashier (for remittance)
+                    <select id="cashierId" th:field="*{cashierId}" required>
+                        <option value="">Select active cashier</option>
+                        <option th:each="e : ${cashiers}" th:value="${e.id}"
+                                th:text="${e.fullName + ' — ' + e.assignedLocation.name}"></option>
+                    </select>
+                    <span class="form-hint">Admin enters this sale; the selected cashier's stall and remittance will be used. Choose the matching selling location below.</span>
+                    <span class="error-text" th:if="${#fields.hasErrors('cashierId')}" th:errors="*{cashierId}"></span>
+                </label>
+                <p class="form-hint full-width" th:if="${adminSale and #lists.isEmpty(cashiers)}">
+                    No active cashier is assigned to a stall. Create and assign one under Employees before recording sales.
+                </p>
+
                 <!-- SELLING LOCATION -->
                 <label class="full-width">
                     Selling Location / Chicken Stall
                     <select id="locationId" th:field="*{locationId}" required>
-                        <option value="">Assigned selling location</option>
+                        <option value="" th:text="${adminSale} ? 'Choose the cashier assigned stall' : 'Assigned selling location'">Assigned selling location</option>
                         <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.name + ' (' + loc.code + ')'}"></option>
                     </select>
                     <small class="error-text" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></small>
-                    <span class="form-hint" style="border: none; padding: 4px 0 0 0; background: transparent;">Only your assigned stall is available. Changing the request cannot bypass this restriction.</span>
+                    <span class="form-hint" th:unless="${adminSale}" style="border: none; padding: 4px 0 0 0; background: transparent;">Only your assigned stall is available. Changing the request cannot bypass this restriction.</span>
+                    <span class="form-hint" th:if="${adminSale}" style="border: none; padding: 4px 0 0 0; background: transparent;">Choose the location assigned to the responsible cashier; server validation enforces the match.</span>
                 </label>
 
                 <!-- PRODUCT -->

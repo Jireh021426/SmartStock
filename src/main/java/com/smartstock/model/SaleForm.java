@@ -50,6 +50,13 @@ public class SaleForm {
 
     private Long customerId;
 
+    // An administrator must select the responsible cashier. Cashiers' own
+    // sale forms ignore this field (cannot change remittance ownership).
+    private Long cashierId;
+
+    public Long getCashierId() { return cashierId; }
+    public void setCashierId(Long cashierId) { this.cashierId = cashierId; }
+
     // ========================================
     // GETTERS AND SETTERS
     // ========================================

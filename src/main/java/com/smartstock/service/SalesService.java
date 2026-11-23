@@ -6,6 +6,8 @@ import com.smartstock.repository.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -84,8 +86,32 @@ public class SalesService {
 
     @Transactional
     public Sale recordSale(String username, SaleForm form) {
-
         Employee cashier = requireCashier(username);
+        // This existing cashier-only entry point intentionally ignores any
+        // cashierId supplied by the browser.
+        return recordSaleForCashier(cashier, form, username);
+    }
+
+    @Transactional
+    public Sale recordSaleAsAdmin(Authentication authentication, SaleForm form) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getAuthorities().stream().noneMatch(a ->
+                        "ROLE_ADMIN".equals(a.getAuthority()))) {
+            throw new AccessDeniedException("Administrator role required");
+        }
+        if (form == null || form.getCashierId() == null) {
+            throw new IllegalArgumentException(
+                    "Choose the cashier responsible for this sale and remittance");
+        }
+        Employee cashier = employees.findLockedById(form.getCashierId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Selected cashier account not found"));
+        validateCashier(cashier);
+        return recordSaleForCashier(cashier, form, authentication.getName());
+    }
+
+    private Sale recordSaleForCashier(
+            Employee cashier, SaleForm form, String recordedBy) {
         requireOpenRemittanceDay(cashier);
 
         StockLocation assignedLocation = cashier.getAssignedLocation();
@@ -219,6 +245,7 @@ public class SalesService {
         );
 
         sale.assignCashier(cashier);
+        sale.assignRecordedBy(recordedBy);
 
         // Update customer balance for credit sales.
         if (customer != null) {
@@ -279,11 +306,15 @@ public class SalesService {
                         new IllegalArgumentException(
                                 "A database cashier account is required."));
 
-        if (!cashier.isActive() ||
-                cashier.getRole() != EmployeeRole.CASHIER) {
+        validateCashier(cashier);
+        return cashier;
+    }
 
+    private void validateCashier(Employee cashier) {
+        if (cashier == null || !cashier.isActive() ||
+                cashier.getRole() != EmployeeRole.CASHIER) {
             throw new IllegalArgumentException(
-                    "Only active cashiers may record sales.");
+                    "An active cashier is required for sale recording.");
         }
 
         StockLocation assigned = cashier.getAssignedLocation();
@@ -296,8 +327,6 @@ public class SalesService {
             throw new IllegalArgumentException(
                     "Cashier requires an active STALL assignment.");
         }
-
-        return cashier;
     }
 
     // ========================================

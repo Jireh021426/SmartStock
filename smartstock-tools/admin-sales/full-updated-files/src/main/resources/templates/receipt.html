@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Sale Receipt</title>
+
+    <script th:src="@{/js/theme.js}"></script>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <link rel="stylesheet" th:href="@{/css/receipt.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="receipt-page">
+
+    <div class="receipt-wrapper">
+
+        <a class="back-link no-print" th:href="@{/sales}">
+            ← Back to Sales
+        </a>
+
+        <h1 class="page-title no-print">Sale Receipt</h1>
+
+        <section class="receipt-card">
+
+            <div class="receipt-header">
+
+                <div class="receipt-brand-mark">
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/>
+                        <path d="M12 12l9-5M12 12v10M12 12L3 7"/>
+                    </svg>
+                </div>
+
+                <h2>SmartStock</h2>
+
+                <p>Fresh Chicken Business — Demo Receipt</p>
+
+            </div>
+
+            <div class="receipt-divider">
+                <span>DETAILS</span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">Receipt #</span>
+                <span class="receipt-value" th:text="${sale.id}">1</span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">Date</span>
+                <span class="receipt-value"
+                      th:text="${#temporals.format(sale.soldAt, 'yyyy-MM-dd HH:mm:ss')}">
+                    2026-11-19 14:44:44
+                </span>
+            </div>
+
+            <div class="receipt-row" th:if="${sale.independentDelivery}">
+                <span class="receipt-label">Delivery Date</span>
+                <span class="receipt-value" th:text="${sale.businessDate}"></span>
+            </div>
+            <div class="receipt-row" th:if="${sale.independentDelivery}">
+                <span class="receipt-label">Delivery Reference</span>
+                <span class="receipt-value" th:text="${sale.deliveryReference}"></span>
+            </div>
+            <div class="receipt-row" th:if="${sale.recordedBy != null}">
+                <span class="receipt-label">Recorded by</span>
+                <span class="receipt-value" th:text="${sale.recordedBy}">admin</span>
+            </div>
+            <div class="receipt-row" th:if="${sale.cashier != null}">
+                <span class="receipt-label">Responsible cashier</span>
+                <span class="receipt-value" th:text="${sale.cashier.fullName}">Cashier</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Product</span>
+                <span class="receipt-value"
+                      th:text="${sale.productName}">
+                    Whole Dressed Chicken
+                </span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">Weight</span>
+                <span class="receipt-value"
+                      th:text="${sale.weightKg} + ' kg'">
+                    5.000 kg
+                </span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="receipt-label">Price per kg</span>
+                <span class="receipt-value"
+                      th:text="'₱' + ${sale.pricePerKg}">
+                    ₱180.00
+                </span>
+            </div>
+
+            <div class="receipt-total">
+                <span>TOTAL</span>
+
+                <span th:text="'₱' + ${sale.total}">
+                    ₱900.00
+                </span>
+            </div>
+
+            <div class="receipt-divider">
+                <span>PAYMENT</span>
+            </div>
+
+            <div class="receipt-row">
+
+                <span class="receipt-label">Method</span>
+
+                <span class="receipt-value">
+
+                    <span class="receipt-status"
+                          th:classappend="${sale.paymentMethod.name() == 'CASH'
+                              ? ' status-cash'
+                              : (sale.paymentMethod.name() == 'GCASH'
+                                  ? ' status-gcash'
+                                  : ' status-credit')}"
+                          th:text="${sale.paymentMethod}">
+                        CASH
+                    </span>
+
+                </span>
+
+            </div>
+
+            <div class="receipt-row"
+                 th:if="${sale.customer != null}">
+
+                <span class="receipt-label">Customer</span>
+
+                <span class="receipt-value"
+                      th:text="${sale.customer.name}">
+                    Customer Name
+                </span>
+
+            </div>
+
+            <div class="receipt-note"
+                 th:if="${sale.paymentMethod.name() == 'CREDIT'}">
+
+                <strong>Note:</strong>
+                Recorded as utang. No cash collected.
+
+            </div>
+
+            <button type="button"
+                    class="receipt-print-button no-print"
+                    onclick="window.print()">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M6 9V3h12v6"/>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                    <path d="M6 14h12v8H6z"/>
+                </svg>
+
+                Print Receipt
+
+            </button>
+
+        </section>
+
+    </div>
+
+</main>
+
+</body>
+</html>

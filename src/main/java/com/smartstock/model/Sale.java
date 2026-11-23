@@ -45,6 +45,21 @@ public class Sale {
     @JoinColumn(name = "cashier_id")
     private Employee cashier; // null for pre-Phase-5 historical sales
 
+    // Authenticated person who actually entered the sale. Nullable for
+    // legacy and independent-stall delivery records.
+    @Column(name = "recorded_by", length = 100)
+    private String recordedBy;
+
+    public String getRecordedBy() { return recordedBy; }
+
+    public void assignRecordedBy(String username) {
+        if (recordedBy != null || username == null || username.isBlank()
+                || username.trim().length() > 100) {
+            throw new IllegalArgumentException("Valid sale recorder is required");
+        }
+        this.recordedBy = username.trim();
+    }
+
     public Employee getCashier() { return cashier; }
     public void assignCashier(Employee employee) {
         if (employee == null || employee.getRole() != EmployeeRole.CASHIER)

@@ -270,16 +270,17 @@ public class SecurityConfig {
                         "AUDITOR"
                 )
 
-                // Sale creation is cashier-only
+                // Administrators can record sales on behalf of an active
+                // stall cashier; remittance ownership stays with that cashier.
                 .requestMatchers(
                         HttpMethod.GET,
                         "/sales/new"
-                ).hasRole("CASHIER")
+                ).hasAnyRole("ADMIN", "CASHIER")
 
                 .requestMatchers(
                         HttpMethod.POST,
                         "/sales/save"
-                ).hasRole("CASHIER")
+                ).hasAnyRole("ADMIN", "CASHIER")
 
                 // Individual receipts
                 .requestMatchers(

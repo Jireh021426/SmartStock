@@ -76,6 +76,14 @@
                 <span class="receipt-label">Delivery Reference</span>
                 <span class="receipt-value" th:text="${sale.deliveryReference}"></span>
             </div>
+            <div class="receipt-row" th:if="${sale.recordedBy != null}">
+                <span class="receipt-label">Recorded by</span>
+                <span class="receipt-value" th:text="${sale.recordedBy}">admin</span>
+            </div>
+            <div class="receipt-row" th:if="${sale.cashier != null}">
+                <span class="receipt-label">Responsible cashier</span>
+                <span class="receipt-value" th:text="${sale.cashier.fullName}">Cashier</span>
+            </div>
             <div class="receipt-row">
                 <span class="receipt-label">Product</span>
                 <span class="receipt-value"

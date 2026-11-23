@@ -74,8 +74,9 @@ public class SalesController {
         }
 
         try {
-            Sale sale = sales.recordSale(
-                    authentication.getName(), form);
+            Sale sale = isAdmin(authentication)
+                    ? sales.recordSaleAsAdmin(authentication, form)
+                    : sales.recordSale(authentication.getName(), form);
 
             return "redirect:/sales/" + sale.getId();
 
@@ -200,9 +201,40 @@ public class SalesController {
         }
     }
 
+    private static boolean isAdmin(Authentication authentication) {
+        return authentication != null && authentication.isAuthenticated()
+                && authentication.getAuthorities().stream().anyMatch(a ->
+                        "ROLE_ADMIN".equals(a.getAuthority()));
+    }
+
     private void fillSaleOptions(
             Model model,
             Authentication authentication) {
+
+        model.addAttribute("adminSale", isAdmin(authentication));
+        model.addAttribute("products", products.findAll());
+        model.addAttribute("customers", sales.retailCustomers());
+
+        if (isAdmin(authentication)) {
+            // Admin selects a real active cashier. The same cashier will own
+            // the sale for close-of-day and remittance reconciliation.
+            var cashiers = employees.findByRole(EmployeeRole.CASHIER)
+                    .stream()
+                    .filter(Employee::isActive)
+                    .filter(e -> e.getAssignedLocation() != null
+                            && e.getAssignedLocation().isActive()
+                            && !"LEGACY".equalsIgnoreCase(
+                                    e.getAssignedLocation().getCode())
+                            && "STALL".equalsIgnoreCase(
+                                    e.getAssignedLocation().getLocationType()))
+                    .sorted(java.util.Comparator.comparing(Employee::getFullName))
+                    .toList();
+            model.addAttribute("cashiers", cashiers);
+            model.addAttribute("locations", cashiers.stream()
+                    .map(Employee::getAssignedLocation)
+                    .distinct().toList());
+            return;
+        }
 
         Employee cashier = employees.findByUsername(
                 authentication.getName().toLowerCase(Locale.ROOT))
@@ -226,15 +258,9 @@ public class SalesController {
                 "assignedLocation",
                 cashier.getAssignedLocation());
 
-        model.addAttribute("products", products.findAll());
-
         model.addAttribute(
                 "locations",
                 java.util.List.of(cashier.getAssignedLocation()));
-
-        model.addAttribute(
-                "customers",
-                sales.retailCustomers());
     }
 
     private void fillPaymentOptions(Model model) {

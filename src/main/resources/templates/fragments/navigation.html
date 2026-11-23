@@ -47,7 +47,7 @@
                     <a th:if="${nav.admin}" th:href="@{/inventory/new}">
                         Stock In / Out
                     </a>
-                    <a th:if="${nav.cashier}" th:href="@{/sales/new}">
+                    <a th:if="${nav.admin or nav.cashier}" th:href="@{/sales/new}">
                         New Sale
                     </a>
                     <a th:if="${nav.admin or nav.manager}" th:href="@{/independent-stalls/deliveries/new}">
@@ -227,7 +227,7 @@
             <span>Sales</span>
         </a>
 
-        <a th:if="${nav.cashier}"
+        <a th:if="${nav.admin or nav.cashier}"
            th:href="@{/sales/new}">
             <svg class="ico"><use href="#i-cart"/></svg>
             <span>New Sale</span>

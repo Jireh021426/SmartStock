@@ -239,6 +239,22 @@ public class HttpRoleAuthorizationTest {
         deniedGet("/sales/999999", "SENDER");
     }
 
+    @Test
+    void adminMayOpenSaleCreationForm() throws Exception {
+        allowedGet("/sales/new", "ADMIN");
+    }
+
+    @Test
+    void adminMaySubmitSaleFormForValidation() throws Exception {
+        allowedPost("/sales/save", "ADMIN");
+    }
+
+    @Test
+    void managerCannotCreateSales() throws Exception {
+        deniedGet("/sales/new", "MANAGER");
+        deniedPost("/sales/save", "MANAGER");
+    }
+
     // Auditors must not record sales
 
     @Test

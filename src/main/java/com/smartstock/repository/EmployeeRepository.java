@@ -36,6 +36,13 @@ public interface EmployeeRepository
             @Param("username") String username
     );
 
+    // Admin sale entry locks the responsible cashier, preserving
+    // serialization with cashier remittances and normal cashier sales.
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = {"assignedLocation"})
+    @Query("SELECT e FROM Employee e WHERE e.id = :id")
+    Optional<Employee> findLockedById(@Param("id") Long id);
+
     boolean existsByUsername(String username);
 
     // Paginated employee view requires the assigned location outside the transaction.
@@ -67,6 +74,7 @@ public interface EmployeeRepository
 
     List<Employee> findByActiveTrueOrderByFullNameAsc();
 
+    @EntityGraph(attributePaths = {"assignedLocation"})
     List<Employee> findByRole(EmployeeRole role);
 
     List<Employee> findByAssignedLocationId(Long locationId);
