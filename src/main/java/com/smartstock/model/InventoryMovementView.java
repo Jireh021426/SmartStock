@@ -16,6 +16,8 @@ public record InventoryMovementView(
         BigDecimal totalPurchaseCost,
         BigDecimal averageCostAfter,
         BigDecimal inventoryLossValue,
-        LocalDate businessDate
+        LocalDate businessDate,
+        String supplierName,
+        String deliveryReceiptNumber
 ) {
 }

@@ -108,7 +108,7 @@
                 </form>
             </div>
             
-            <p class="text-muted" style="font-size: 13px;" th:if="${#lists.isEmpty(audits.?[status == pendingStatus])}">
+            <p class="text-muted" style="font-size: 13px;" th:if="${#lists.isEmpty(audits.?[status == #ctx.getVariable('pendingStatus')])}">
                 No pending audits to review.
             </p>
         </div>

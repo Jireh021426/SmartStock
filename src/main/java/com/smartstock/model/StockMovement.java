@@ -61,6 +61,38 @@ public class StockMovement {
     @Column(name = "movement_category", length = 40)
     private MovementCategory category;
 
+    // Supplier identity is recorded at delivery time; legacy rows remain nullable.
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
+
+    @Column(name = "delivery_receipt_number", length = 80)
+    private String deliveryReceiptNumber;
+
+    // Immutable supplier identity at delivery time, even if the supplier is renamed later.
+    @Column(name = "supplier_name_at_delivery", length = 150)
+    private String supplierNameAtDelivery;
+
+    @Column(name = "supplier_code_at_delivery", length = 40)
+    private String supplierCodeAtDelivery;
+
+    public void assignSupplierDelivery(Supplier supplier, String receiptNumber) {
+        if (type != MovementType.STOCK_IN) {
+            throw new IllegalStateException("Supplier details are only valid for stock-in");
+        }
+        if (supplier == null || !supplier.isActive()) {
+            throw new IllegalArgumentException("Select an active supplier");
+        }
+        if (receiptNumber == null || receiptNumber.isBlank()
+                || receiptNumber.trim().length() > 80) {
+            throw new IllegalArgumentException("Delivery receipt number must contain 1-80 characters");
+        }
+        this.supplier = supplier;
+        this.supplierNameAtDelivery = supplier.getName();
+        this.supplierCodeAtDelivery = supplier.getCode();
+        this.deliveryReceiptNumber = receiptNumber.trim();
+    }
+
     // ========================================
     // PURCHASE ACCOUNTING
     // ========================================
@@ -340,6 +372,22 @@ public class StockMovement {
 
     public BigDecimal getAverageCostAfter() {
         return averageCostAfter;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public String getSupplierNameAtDelivery() {
+        return supplierNameAtDelivery;
+    }
+
+    public String getSupplierCodeAtDelivery() {
+        return supplierCodeAtDelivery;
+    }
+
+    public String getDeliveryReceiptNumber() {
+        return deliveryReceiptNumber;
     }
 
     public BigDecimal getInventoryLossValue() {

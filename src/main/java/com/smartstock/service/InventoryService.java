@@ -22,17 +22,20 @@ public class InventoryService {
     private static final ZoneId BUSINESS_ZONE =
             ZoneId.of("Asia/Manila");
 
+    private final SupplierRepository suppliers;
     private final ProductRepository products;
     private final StockMovementRepository movements;
     private final StockLocationRepository locations;
     private final LocationInventoryRepository locationInventories;
 
     public InventoryService(
+            SupplierRepository suppliers,
             ProductRepository products,
             StockMovementRepository movements,
             StockLocationRepository locations,
             LocationInventoryRepository locationInventories) {
 
+        this.suppliers = suppliers;
         this.products = products;
         this.movements = movements;
         this.locations = locations;
@@ -114,6 +117,21 @@ public class InventoryService {
 
         if (form.getType() == MovementType.STOCK_IN) {
 
+            // Validate supplier and receipt BEFORE adjusting stock balances.
+            if (form.getSupplierId() == null) {
+                throw new IllegalArgumentException("Select a supplier for stock-in");
+            }
+            Supplier supplier = suppliers.findById(form.getSupplierId())
+                    .orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
+            if (!supplier.isActive()) {
+                throw new IllegalArgumentException("Supplier is inactive");
+            }
+            String receiptNumber = form.getDeliveryReceiptNumber();
+            if (receiptNumber == null || receiptNumber.isBlank()
+                    || receiptNumber.trim().length() > 80) {
+                throw new IllegalArgumentException("Delivery receipt number must contain 1-80 characters");
+            }
+
             BigDecimal incomingCost =
                     form.getPurchaseCostPerKg();
 
@@ -183,6 +201,7 @@ public class InventoryService {
             );
 
             movement.assignLocation(location);
+            movement.assignSupplierDelivery(supplier, receiptNumber);
             movement.assignCategory(MovementCategory.PURCHASE);
 
             // Record the actual business date separately

@@ -14,6 +14,7 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <link rel="stylesheet" th:href="@{/css/gentelella-dark.css(v=2)}">
+    <link rel="stylesheet" th:href="@{/css/supplier-delivery.css}">
 </head>
 
 <body>
@@ -49,6 +50,28 @@
               th:action="@{/inventory/save}"
               method="post"
               novalidate>
+            <!-- Supplier-linked receipt applies only to new stock-in deliveries. -->
+            <div id="supplierDeliveryFields" class="supplier-delivery-fields">
+                <label>
+                    Supplier (required for Stock In)
+                    <select th:field="*{supplierId}" id="supplierId">
+                        <option value="">Select a registered supplier</option>
+                        <option th:each="s : ${suppliers}" th:value="${s.id}"
+                                th:text="${s.name + ' (' + s.code + ')'}"></option>
+                    </select>
+                    <small class="error-text" th:if="${#fields.hasErrors('supplierId')}"
+                           th:errors="*{supplierId}"></small>
+                </label>
+                <label>
+                    Delivery Receipt / Invoice No. (required for Stock In)
+                    <input type="text" id="deliveryReceiptNumber"
+                           th:field="*{deliveryReceiptNumber}" maxlength="80"
+                           placeholder="e.g. DR-001">
+                    <small class="error-text" th:if="${#fields.hasErrors('deliveryReceiptNumber')}"
+                           th:errors="*{deliveryReceiptNumber}"></small>
+                </label>
+            </div>
+
 
             <div class="mf-grid">
 
@@ -551,5 +574,29 @@
     })();
 </script>
 
+
+<script>
+(function () {
+    function toggleSupplierDelivery() {
+        var type = document.getElementById('movementType') || document.querySelector('select[name="type"]');
+        var fields = document.getElementById('supplierDeliveryFields');
+        if (!type || !fields) return;
+        var incoming = type.value === 'STOCK_IN';
+        fields.hidden = !incoming;
+        for (var id of ['supplierId', 'deliveryReceiptNumber']) {
+            var input = document.getElementById(id);
+            if (input) {
+                input.required = incoming;
+                input.disabled = !incoming;
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var type = document.getElementById('movementType') || document.querySelector('select[name="type"]');
+        if (type) type.addEventListener('change', toggleSupplierDelivery);
+        toggleSupplierDelivery();
+    });
+})();
+</script>
 </body>
 </html>

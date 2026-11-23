@@ -1,0 +1,5 @@
+.supplier-delivery-fields {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-bottom:20px;}
+.supplier-delivery-fields[hidden] {display:none !important;}
+.supplier-delivery-fields label {min-width:0;}
+.supplier-delivery-fields select, .supplier-delivery-fields input {width:100%;}
+@media (max-width:720px) {.supplier-delivery-fields{grid-template-columns:1fr;}}

@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>SmartStock | Record Stock Movement</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/forms.css}">
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/supplier-delivery.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/navigation :: siteHeader}"></header>
+
+<main class="form-page">
+
+    <div class="topbar">
+        <div>
+            <a class="back-link" th:href="@{/inventory}">
+                ← Back to Stock History
+            </a>
+
+            <h2 class="page-title">Record Stock Movement</h2>
+
+            <p class="page-sub">
+                Log supplier deliveries or record spoilage/damage.
+            </p>
+        </div>
+    </div>
+
+    <div class="panel">
+
+        <p class="error-msg"
+           th:if="${error}"
+           th:text="${error}">
+        </p>
+
+        <form class="nova-form"
+              th:object="${movementForm}"
+              th:action="@{/inventory/save}"
+              method="post">
+            <!-- Supplier-linked receipt applies only to new stock-in deliveries. -->
+            <div id="supplierDeliveryFields" class="supplier-delivery-fields">
+                <label>
+                    Supplier (required for Stock In)
+                    <select th:field="*{supplierId}" id="supplierId">
+                        <option value="">Select a registered supplier</option>
+                        <option th:each="s : ${suppliers}" th:value="${s.id}"
+                                th:text="${s.name + ' (' + s.code + ')'}"></option>
+                    </select>
+                    <small class="error-text" th:if="${#fields.hasErrors('supplierId')}"
+                           th:errors="*{supplierId}"></small>
+                </label>
+                <label>
+                    Delivery Receipt / Invoice No. (required for Stock In)
+                    <input type="text" id="deliveryReceiptNumber"
+                           th:field="*{deliveryReceiptNumber}" maxlength="80"
+                           placeholder="e.g. DR-001">
+                    <small class="error-text" th:if="${#fields.hasErrors('deliveryReceiptNumber')}"
+                           th:errors="*{deliveryReceiptNumber}"></small>
+                </label>
+            </div>
+
+
+            <div class="form-grid">
+
+                <!-- PRODUCT -->
+                <label>
+                    Chicken Product
+
+                    <select th:field="*{productId}"
+                            id="productId"
+                            required>
+
+                        <option value="">
+                            Choose a product
+                        </option>
+
+                        <option th:each="p : ${products}"
+                                th:value="${p.id}"
+                                th:text="${p.name + ' — company total: ' + p.stockKg + ' kg'}">
+                        </option>
+                    </select>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('productId')}"
+                           th:errors="*{productId}">
+                    </small>
+                </label>
+
+                <!-- LOCATION -->
+                <label>
+                    Receiving / Stock Location
+
+                    <select th:field="*{locationId}"
+                            id="locationId"
+                            required>
+
+                        <option value="">
+                            Choose a stall or storage location
+                        </option>
+
+                        <option th:each="loc : ${locations}"
+                                th:value="${loc.id}"
+                                th:text="${loc.name + ' (' + loc.code + ')'}">
+                        </option>
+                    </select>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('locationId')}"
+                           th:errors="*{locationId}">
+                    </small>
+                </label>
+
+                <!-- MOVEMENT TYPE -->
+                <label>
+                    Movement Type
+
+                    <select th:field="*{type}"
+                            id="movementType"
+                            required>
+
+                        <option value="STOCK_IN">
+                            Stock In — Supplier Delivery
+                        </option>
+
+                        <option value="STOCK_OUT">
+                            Stock Out — Inventory Loss
+                        </option>
+                    </select>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('type')}"
+                           th:errors="*{type}">
+                    </small>
+                </label>
+
+                <!-- BUSINESS DATE -->
+                <label>
+                    Business Date / Delivery Date
+
+                    <input th:field="*{businessDate}"
+                           id="businessDate"
+                           type="date"
+                           required>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('businessDate')}"
+                           th:errors="*{businessDate}">
+                    </small>
+
+                    <small>
+                        Select the actual date when the
+                        delivery or stock movement occurred.
+                    </small>
+                </label>
+
+                <!-- MOVEMENT-DEPENDENT FIELDS -->
+                <div class="movement-dependent-fields">
+
+                    <!-- STOCK LOSS CATEGORY -->
+                    <div id="lossCategorySection"
+                         style="display: none;">
+
+                        <label>
+                            Reason for Stock Loss
+
+                            <select th:field="*{category}"
+                                    id="category">
+
+                                <option value="">
+                                    Choose a loss category
+                                </option>
+
+                                <option value="SPOILAGE">
+                                    Spoilage
+                                </option>
+
+                                <option value="DAMAGE">
+                                    Damage
+                                </option>
+
+                                <option value="MISSING_STOCK">
+                                    Missing / Unexplained Stock
+                                </option>
+                            </select>
+
+                            <small class="error-text"
+                                   th:if="${#fields.hasErrors('category')}"
+                                   th:errors="*{category}">
+                            </small>
+                        </label>
+                    </div>
+
+                    <!-- PURCHASE COST -->
+                    <div id="purchaseCostSection">
+
+                        <label>
+                            Purchase Cost per kg (₱)
+
+                            <input th:field="*{purchaseCostPerKg}"
+                                   id="purchaseCostPerKg"
+                                   type="number"
+                                   min="0.01"
+                                   step="0.01"
+                                   placeholder="e.g. 185.00">
+
+                            <small class="error-text"
+                                   th:if="${#fields.hasErrors('purchaseCostPerKg')}"
+                                   th:errors="*{purchaseCostPerKg}">
+                            </small>
+                        </label>
+                    </div>
+
+                </div>
+
+                <!-- WEIGHT -->
+                <label>
+                    Weight (kg)
+
+                    <input th:field="*{weightKg}"
+                           id="weightKg"
+                           type="number"
+                           min="0.001"
+                           step="0.001"
+                           placeholder="e.g. 12.750"
+                           required>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('weightKg')}"
+                           th:errors="*{weightKg}">
+                    </small>
+                </label>
+
+                <!-- REFERENCE -->
+                <label>
+                    Reason / Reference
+
+                    <input th:field="*{reason}"
+                           id="reason"
+                           maxlength="255"
+                           placeholder="e.g. Marcela Farms DR-001"
+                           required>
+
+                    <small class="error-text"
+                           th:if="${#fields.hasErrors('reason')}"
+                           th:errors="*{reason}">
+                    </small>
+                </label>
+
+            </div>
+
+            <!-- INFORMATION -->
+            <div class="form-note">
+
+                <p>
+                    <strong>Business Date:</strong>
+                    Enter the actual delivery or movement date,
+                    even when recording the transaction later.
+                    SmartStock also preserves when the entry
+                    was actually recorded.
+                </p>
+
+                <p>
+                    <strong>Stock In:</strong>
+                    Adds purchased inventory directly to the
+                    selected location and updates the company total.
+                </p>
+
+                <p>
+                    <strong>Purchase Cost:</strong>
+                    Enter the actual supplier cost.
+                    SmartStock calculates the updated
+                    company-wide weighted-average cost.
+                </p>
+
+                <p>
+                    <strong>Stock Out:</strong>
+                    Records spoilage, damage or missing stock
+                    against the selected location.
+                </p>
+
+                <p>
+                    <strong>Transfers &amp; Sales:</strong>
+                    Do not use this form to move stock between
+                    company stalls. Use Transfers.
+                    Customer sales must be recorded using
+                    the appropriate sales workflow.
+                </p>
+
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary"
+                        type="submit">
+                    Save Movement
+                </button>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+<script>
+    function updateMovementFields() {
+
+        const movementType =
+            document.getElementById("movementType");
+
+        const purchaseSection =
+            document.getElementById("purchaseCostSection");
+
+        const purchaseInput =
+            document.getElementById("purchaseCostPerKg");
+
+        const lossSection =
+            document.getElementById("lossCategorySection");
+
+        const lossInput =
+            document.getElementById("category");
+
+        if (!movementType ||
+            !purchaseSection ||
+            !purchaseInput ||
+            !lossSection ||
+            !lossInput) {
+            return;
+        }
+
+        const isStockIn =
+            movementType.value === "STOCK_IN";
+
+        purchaseSection.style.display =
+            isStockIn ? "block" : "none";
+
+        purchaseInput.required = isStockIn;
+        purchaseInput.disabled = !isStockIn;
+
+        lossSection.style.display =
+            isStockIn ? "none" : "block";
+
+        lossInput.required = !isStockIn;
+        lossInput.disabled = isStockIn;
+    }
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const movementType =
+                document.getElementById("movementType");
+
+            if (!movementType) {
+                return;
+            }
+
+            movementType.addEventListener(
+                "change",
+                updateMovementFields
+            );
+
+            updateMovementFields();
+        }
+    );
+</script>
+
+
+<script>
+(function () {
+    function toggleSupplierDelivery() {
+        var type = document.getElementById('movementType') || document.querySelector('select[name="type"]');
+        var fields = document.getElementById('supplierDeliveryFields');
+        if (!type || !fields) return;
+        var incoming = type.value === 'STOCK_IN';
+        fields.hidden = !incoming;
+        for (var id of ['supplierId', 'deliveryReceiptNumber']) {
+            var input = document.getElementById(id);
+            if (input) {
+                input.required = incoming;
+                input.disabled = !incoming;
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        var type = document.getElementById('movementType') || document.querySelector('select[name="type"]');
+        if (type) type.addEventListener('change', toggleSupplierDelivery);
+        toggleSupplierDelivery();
+    });
+})();
+</script>
+</body>
+</html>

@@ -39,6 +39,12 @@ public class MovementForm {
     @Digits(integer = 10, fraction = 2)
     private BigDecimal purchaseCostPerKg;
 
+    // Required for new supplier deliveries; not applicable to STOCK_OUT.
+    private Long supplierId;
+
+    @Size(max = 80, message = "Delivery receipt must be at most 80 characters")
+    private String deliveryReceiptNumber;
+
     // Required for manual STOCK_OUT.
     // STOCK_IN is automatically classified as PURCHASE.
     private MovementCategory category;
@@ -49,6 +55,22 @@ public class MovementForm {
             message = "Reason must not exceed 255 characters"
     )
     private String reason;
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getDeliveryReceiptNumber() {
+        return deliveryReceiptNumber;
+    }
+
+    public void setDeliveryReceiptNumber(String deliveryReceiptNumber) {
+        this.deliveryReceiptNumber = deliveryReceiptNumber;
+    }
 
     public Long getProductId() {
         return productId;

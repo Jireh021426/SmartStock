@@ -11,6 +11,7 @@ import com.smartstock.repository.StockLocationRepository;
 
 import com.smartstock.service.InventoryService;
 import com.smartstock.service.ProductService;
+import com.smartstock.service.SupplierService;
 
 import jakarta.validation.Valid;
 
@@ -29,16 +30,19 @@ import org.springframework.data.domain.Pageable;
 @RequestMapping("/inventory")
 public class InventoryController {
 
+    private final SupplierService suppliers;
     private final InventoryService inventory;
     private final ProductService products;
     private final StockLocationRepository locations;
 
     public InventoryController(
             InventoryService inventory,
+            SupplierService suppliers,
             ProductService products,
             StockLocationRepository locations) {
 
         this.inventory = inventory;
+        this.suppliers = suppliers;
         this.products = products;
         this.locations = locations;
     }
@@ -162,7 +166,9 @@ public class InventoryController {
                 canSeeFinancials
                         ? movement.getInventoryLossValue()
                         : null,
-                movement.getBusinessDate()
+                movement.getBusinessDate(),
+                canSeeFinancials ? movement.getSupplierNameAtDelivery() : null,
+                canSeeFinancials ? movement.getDeliveryReceiptNumber() : null
         );
     }
 
@@ -183,6 +189,7 @@ public class InventoryController {
     }
 
     private void loadFormOptions(Model model) {
+        model.addAttribute("suppliers", suppliers.activeSuppliers());
 
         model.addAttribute(
                 "products",
@@ -219,6 +226,16 @@ public class InventoryController {
             MovementForm form,
             BindingResult result,
             Model model) {
+
+        if (form.getType() == MovementType.STOCK_IN) {
+            if (form.getSupplierId() == null) {
+                result.rejectValue("supplierId", "required", "Select an active supplier");
+            }
+            if (form.getDeliveryReceiptNumber() == null
+                    || form.getDeliveryReceiptNumber().isBlank()) {
+                result.rejectValue("deliveryReceiptNumber", "required", "Enter a delivery receipt number");
+            }
+        }
 
         if (form.getType() == MovementType.STOCK_IN &&
                 form.getPurchaseCostPerKg() == null) {

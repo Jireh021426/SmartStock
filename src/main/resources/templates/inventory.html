@@ -69,6 +69,8 @@
                         <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Total Purchase Cost</th>
                         <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Average Cost After</th>
                         <th th:if="${canSeeInventoryFinancials}" style="text-align: right;">Inventory Loss</th>
+                        <th th:if="${canSeeInventoryFinancials}">Supplier</th>
+                        <th th:if="${canSeeInventoryFinancials}">Delivery receipt</th>
                         <th>Reason / Reference</th>
                     </tr>
                 </thead>
@@ -101,11 +103,15 @@
                             <span class="loss-value" th:if="${m.inventoryLossValue != null}" th:text="${'₱' + #numbers.formatDecimal(m.inventoryLossValue, 1, 2)}"></span>
                             <span th:unless="${m.inventoryLossValue != null}" style="color: #5c6b88;">—</span>
                         </td>
+                        <td th:if="${canSeeInventoryFinancials}"
+                            th:text="${m.supplierName != null ? m.supplierName : '—'}"></td>
+                        <td th:if="${canSeeInventoryFinancials}"
+                            th:text="${m.deliveryReceiptNumber != null ? m.deliveryReceiptNumber : '—'}"></td>
                         <td th:text="${m.reason}"></td>
                     </tr>
                     <!-- EMPTY HISTORY -->
                     <tr th:if="${#lists.isEmpty(movements)}">
-                        <td th:colspan="${canSeeInventoryFinancials ? 10 : 6}" class="empty-state">
+                        <td th:colspan="${canSeeInventoryFinancials ? 12 : 6}" class="empty-state">
                             No stock movements recorded yet.
                         </td>
                     </tr>
